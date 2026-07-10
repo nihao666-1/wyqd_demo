@@ -42,3 +42,10 @@ test('草稿主区以组件区块渲染三个资料入口、三能力和七步�
   assert.match(content, /<style scoped>\r?\n\.task-detail-draft-overview \{\r?\n/);
   compileComponent('TaskDetailDraftOverview.vue');
 });
+
+test('草稿右栏包含资料输出阻断和当前任务日志', () => {
+  const content = source('TaskDetailDraftRail.vue');
+  for (const label of ['下一步提示', '待补充资料', '所需输出', '阻断项', '操作留痕', '全部日志', '10 条/页']) assert.match(content, new RegExp(label));
+  assert.doesNotMatch(content, /DataTable/);
+  compileComponent('TaskDetailDraftRail.vue');
+});
