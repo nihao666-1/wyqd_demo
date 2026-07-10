@@ -1,0 +1,20 @@
+:root {
+  --color-primary: #a6192e;
+  --color-primary-dark: #7f1020;
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-surface-strong: #fbfcfe;
+  --color-line: #dbe2ec;
+  --color-line-strong: #c6d0df;
+  --color-text: #172033;
+  --color-muted: #66728a;
+  --color-soft: #f8fafc;
+  --color-success: #12805c;
+  --color-warning: #b56a00;
+  --color-danger: #b4232c;
+  --shadow-panel: 0 16px 38px rgba(22, 32, 51, 0.09);
+  --shadow-card: 0 8px 20px rgba(22, 32, 51, 0.075);
+  --shadow-subtle: 0 2px 8px rgba(22, 32, 51, 0.05);
+  --radius: 8px;
+  --font-main: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+}
