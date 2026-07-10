@@ -2,7 +2,7 @@
   <main class="task-detail-draft-page">
     <header class="task-detail-draft-header">
       <div class="task-detail-draft-title-row">
-        <RouterLink class="task-detail-draft-back" to="/tasks" aria-label="返回任务中心">←</RouterLink>
+        <RouterLink class="task-detail-draft-back" to="/tasks" aria-label="返回任务中心"><FontAwesomeIcon :icon="faArrowLeft" /></RouterLink>
         <h1>{{ task.title }}</h1>
         <span class="task-detail-draft-status">草稿</span>
       </div>
@@ -91,6 +91,8 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { draftTaskDetail } from '../../domain/taskDetail/draftTaskDetail';
 import TaskDetailDraftOverview from './task-detail-draft/TaskDetailDraftOverview.vue';
 import TaskDetailDraftRail from './task-detail-draft/TaskDetailDraftRail.vue';
@@ -156,10 +158,43 @@ function confirmDelete() {
 </script>
 
 <style scoped>
-.task-detail-draft-page{--draft-red:#b40000;--draft-line:#dfe5ec;padding:0 2px 18px;color:#252c37}
+.task-detail-draft-page{--draft-red:#c50000;--draft-line:#dfe5ec;padding:0 2px 18px;color:#252c37}
+
+:global(.task-detail-shell:has(.task-detail-draft-page) .sidebar) {
+  width: clamp(182px, 13.25vw, 212px);
+  height: 100dvh;
+  flex-basis: clamp(182px, 13.25vw, 212px);
+}
+
+:global(.task-detail-shell:has(.task-detail-draft-page) .main) {
+  height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+:global(.task-detail-shell:has(.task-detail-draft-page) .topbar),
+:global(.task-detail-shell:has(.task-detail-draft-page) .brand) {
+  min-height: 68px;
+  height: 68px;
+}
+
+:global(.task-detail-shell:has(.task-detail-draft-page) .brand) {
+  margin-bottom: 23px;
+  background: #c50000;
+}
+
+:global(.task-detail-shell:has(.task-detail-draft-page) .brand strong) { font-size: 21px; }
+:global(.task-detail-shell:has(.task-detail-draft-page) .sidebar a) { min-height: 46px; font-size: 14px; }
+:global(.task-detail-shell:has(.task-detail-draft-page) .bottom-nav) {
+  min-height: 118px;
+  flex: 0 0 118px;
+  align-content: start;
+  padding-top: 18px;
+}
 
 .task-detail-draft-header {
-  padding: 12px 12px 14px;
+  margin-bottom: 5px;
+  padding: 19px 24px 14px 14px;
   border-bottom: 1px solid var(--draft-line);
   background: #fff;
 }
@@ -170,6 +205,7 @@ function confirmDelete() {
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
+  padding-left: 10px;
 }
 
 .task-detail-draft-title-row h1 {
@@ -183,8 +219,12 @@ function confirmDelete() {
 }
 
 .task-detail-draft-back {
+  display: grid;
+  width: 28px;
+  height: 32px;
+  place-items: center;
   color: #2f3743;
-  font-size: 30px;
+  font-size: 23px;
   line-height: 1;
   text-decoration: none;
 }
@@ -242,12 +282,12 @@ function confirmDelete() {
 .task-detail-draft-meta span {
   margin-bottom: 10px;
   color: #687386;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .task-detail-draft-meta strong {
   color: #202732;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
 }
 
@@ -268,7 +308,7 @@ function confirmDelete() {
 
 .task-detail-draft-top-action {
   display: inline-flex;
-  min-width: 108px;
+  min-width: 112px;
   min-height: 38px;
   box-sizing: border-box;
   align-items: center;
@@ -302,14 +342,14 @@ function confirmDelete() {
 
 .task-detail-draft-tabs button {
   position: relative;
-  min-height: 50px;
+  min-height: 40px;
   flex: 0 0 auto;
   padding: 0 18px;
   border: 0;
   background: transparent;
   color: #343c48;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   white-space: nowrap;
   cursor: pointer;
 }
@@ -329,8 +369,8 @@ function confirmDelete() {
   content: "";
 }
 
-.task-detail-draft-grid{display:grid;grid-template-columns:minmax(0,3fr) minmax(286px,1fr);gap:10px;align-items:start}
-.task-detail-draft-grid { padding: 10px 12px 0; }
+.task-detail-draft-grid{display:grid;grid-template-columns:minmax(0,1fr) clamp(286px,25%,405px);gap:10px;align-items:start}
+.task-detail-draft-grid { padding: 8px 24px 0 12px; }
 
 .task-detail-draft-placeholder {
   min-height: 180px;
@@ -403,6 +443,11 @@ function confirmDelete() {
 @media (max-width: 1280px) {
   .task-detail-draft-summary { align-items: stretch; flex-direction: column; }
   .task-detail-draft-top-actions { justify-content: flex-end; }
+}
+
+@media (max-width: 1450px) {
+  .task-detail-draft-top-actions { gap: 8px; }
+  .task-detail-draft-top-action { min-width: 98px; padding: 0 12px; }
 }
 
 @media (max-width: 900px) {

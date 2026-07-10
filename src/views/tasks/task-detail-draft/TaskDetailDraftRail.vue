@@ -12,7 +12,7 @@
         </header>
         <ul>
           <li v-for="material in task.requiredMaterials" :key="material.name">
-            <span class="task-detail-draft-file-icon" aria-hidden="true">▧</span>
+            <span class="task-detail-draft-file-icon" aria-hidden="true"><FontAwesomeIcon :icon="faFileLines" /></span>
             <span :title="material.name">{{ material.name }}</span>
             <em>{{ material.status }}</em>
           </li>
@@ -23,7 +23,7 @@
         <header><h3>所需输出 <small>（生成后可用）</small></h3></header>
         <ul>
           <li v-for="output in task.outputs" :key="output.name">
-            <span class="task-detail-draft-file-icon" aria-hidden="true">▧</span>
+            <span class="task-detail-draft-file-icon" aria-hidden="true"><FontAwesomeIcon :icon="faFileLines" /></span>
             <span :title="output.name">{{ output.name }}</span>
             <em class="task-detail-draft-output-state">{{ output.status }}</em>
           </li>
@@ -32,7 +32,7 @@
 
       <div class="task-detail-draft-blocker" role="status">
         <h3>阻断项</h3>
-        <p><span class="task-detail-draft-blocker-icon" aria-hidden="true">!</span><span>尚未上传任何资料，无法进行解析与智能分析。<br>请补齐以上必填资料后继续。</span></p>
+        <p><span class="task-detail-draft-blocker-icon" aria-hidden="true"><FontAwesomeIcon :icon="faCircleExclamation" /></span><span>尚未上传任何资料，无法进行解析与智能分析。<br>请补齐以上必填资料后继续。</span></p>
       </div>
     </section>
 
@@ -66,6 +66,9 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faCircleExclamation, faFileLines } from '@fortawesome/free-solid-svg-icons';
+
 defineProps({ task: { type: Object, required: true } });
 const emit = defineEmits(['edit-materials']);
 </script>
@@ -140,23 +143,26 @@ const emit = defineEmits(['edit-materials']);
   grid-template-columns: 20px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 13px;
 }
 .task-detail-draft-guidance-group li > span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.task-detail-draft-file-icon { color: #7f8b9d; font-size: 18px; }
-.task-detail-draft-guidance-group em { font-size: 11px; font-style: normal; }
+.task-detail-draft-file-icon { color: #7f8b9d; font-size: 14px; }
+.task-detail-draft-guidance-group em { font-size: 12px; font-style: normal; }
 .task-detail-draft-output-state { color: #7f8998; }
 
 .task-detail-draft-blocker { min-height: 86px; padding-top: 12px; border-bottom: 0; }
-.task-detail-draft-blocker p { display: grid; grid-template-columns: 16px 1fr; margin: 10px 0 0; color: #697586; font-size: 11px; line-height: 1.6; }
-.task-detail-draft-blocker-icon { display: grid; width: 13px; height: 13px; place-items: center; border: 1px solid #e5484d; border-radius: 50%; color: #d71920; font-size: 9px; font-weight: 700; }
+.task-detail-draft-blocker p { display: grid; grid-template-columns: 17px 1fr; margin: 10px 0 0; color: #697586; font-size: 12px; line-height: 1.55; }
+.task-detail-draft-blocker-icon { color: #d71920; font-size: 13px; }
 
 .task-detail-draft-log-table { overflow-x: auto; }
-.task-detail-draft-log table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
+.task-detail-draft-log table { width: 100%; min-width: 0 !important; max-width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9px; }
 .task-detail-draft-log th,
 .task-detail-draft-log td { height: 30px; padding: 0 8px; overflow: hidden; border-bottom: 1px solid #eef1f4; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .task-detail-draft-log th { background: #fafbfc; color: #4d5664; font-weight: 500; }
-.task-detail-draft-log th:first-child { width: 33%; }
+.task-detail-draft-log th:nth-child(1) { width: 34%; }
+.task-detail-draft-log th:nth-child(2) { width: 23%; }
+.task-detail-draft-log th:nth-child(3) { width: 23%; }
+.task-detail-draft-log th:nth-child(4) { width: 20%; }
 .task-detail-draft-log td { color: #6b7584; }
 .task-detail-draft-log-result { color: #139657; }
 .task-detail-draft-log-empty { text-align: center !important; }

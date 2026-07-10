@@ -17,13 +17,13 @@
         <p>请上传制度文件、费用数据、监督共享文件或选择历史资料，系统解析后才能执行智能分析。</p>
         <div class="task-detail-draft-actions">
           <button type="button" class="task-detail-draft-action task-detail-draft-action--primary" data-source="local" @click="emit('open-material-source', 'local')">
-            <span class="task-detail-draft-action-icon" aria-hidden="true">↥</span>上传资料
+            <span class="task-detail-draft-action-icon" aria-hidden="true"><AuditIcon name="upload" /></span>上传资料
           </button>
           <button type="button" class="task-detail-draft-action" data-source="fileCenter" @click="emit('open-material-source', 'fileCenter')">
-            <span class="task-detail-draft-action-icon" aria-hidden="true">□</span>从文件中心选择
+            <span class="task-detail-draft-action-icon" aria-hidden="true"><AuditIcon name="files" /></span>从文件中心选择
           </button>
           <button type="button" class="task-detail-draft-action" data-source="simulation" @click="emit('open-material-source', 'simulation')">
-            <span class="task-detail-draft-action-icon" aria-hidden="true">◎</span>使用模拟数据
+            <span class="task-detail-draft-action-icon" aria-hidden="true"><FontAwesomeIcon :icon="faDatabase" /></span>使用模拟数据
           </button>
         </div>
       </div>
@@ -34,7 +34,7 @@
       <div class="task-detail-draft-capabilities">
         <article v-for="capability in task.capabilities" :key="capability.id" :class="['task-detail-draft-capability', `task-detail-draft-capability--${capability.tone}`]">
           <header class="task-detail-draft-capability-header">
-            <span class="task-detail-draft-capability-icon" aria-hidden="true">{{ capabilityIcons[capability.name] || '审' }}</span>
+            <span class="task-detail-draft-capability-icon" aria-hidden="true"><AuditIcon :name="capabilityIcons[capability.name] || 'review'" /></span>
             <h3>{{ capability.name }}</h3>
             <span class="task-detail-draft-capability-state">待资料</span>
           </header>
@@ -48,7 +48,7 @@
       <h2 id="task-detail-draft-timeline-title">任务流程</h2>
       <ol class="task-detail-draft-timeline-list" aria-label="任务流程：创建任务至导出归档">
         <li v-for="step in task.timeline" :key="step.label" :class="['task-detail-draft-timeline-step', { 'task-detail-draft-timeline-step--complete': step.complete }]">
-          <span class="task-detail-draft-timeline-node" aria-hidden="true">{{ step.complete ? '✓' : '·' }}</span>
+          <span class="task-detail-draft-timeline-node" aria-hidden="true"><AuditIcon :name="timelineIcons[step.label] || 'review'" /></span>
           <strong>{{ step.label }}</strong>
           <span class="task-detail-draft-timeline-state">{{ step.state }}</span>
           <time v-if="step.occurredAt" :datetime="step.occurredAt.replace(' ', 'T')">{{ step.occurredAt }}</time>
@@ -59,15 +59,20 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faDatabase } from '@fortawesome/free-solid-svg-icons';
+import AuditIcon from '../../../components/common/AuditIcon.vue';
+
 defineProps({ task: { type: Object, required: true } });
 const emit = defineEmits(['open-material-source']);
-const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审', 报告生成: '报' });
+const capabilityIcons = Object.freeze({ 制度比对: 'compare', 费用审计: 'expense', 报告生成: 'report-generate' });
+const timelineIcons = Object.freeze({ 创建任务: 'create', 上传资料: 'upload', 解析资料: 'review', 生成分析: 'analysis', 人工确认: 'qa', 保存版本: 'config', 导出归档: 'report' });
 </script>
 
 <style scoped>
 .task-detail-draft-overview {
   display: grid;
-  gap: 14px;
+  gap: 0;
   color: #232936;
 }
 
@@ -79,8 +84,8 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 
 .task-detail-draft-start {
   display: grid;
-  grid-template-columns: minmax(250px, 36%) minmax(0, 1fr);
-  min-height: 272px;
+  grid-template-columns: minmax(250px, 38%) minmax(0, 1fr);
+  min-height: 274px;
   align-items: center;
 }
 
@@ -104,7 +109,7 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-start-content p {
-  max-width: 650px;
+  max-width: 440px;
   margin: 14px 0 18px;
   color: #657083;
   font-size: 14px;
@@ -113,7 +118,7 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 
 .task-detail-draft-actions {
   display: flex;
-  gap: 18px;
+  gap: 22px;
   align-items: center;
 }
 
@@ -123,13 +128,14 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
   align-items: center;
   justify-content: center;
   gap: 9px;
-  padding: 0 22px;
+  padding: 0 29px;
   border: 1px solid #cdd5df;
   border-radius: 5px;
   background: #fff;
   color: #2c3440;
   font: inherit;
   font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -144,6 +150,8 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-action--primary {
+  padding-right: 22px;
+  padding-left: 22px;
   border-color: #c7000b;
   background: #c7000b;
   color: #fff;
@@ -156,16 +164,17 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-action-icon {
-  font-size: 20px;
+  width: 20px;
+  font-size: 19px;
   line-height: 1;
 }
 
 .task-detail-draft-section {
-  padding: 12px 18px;
+  padding: 8px 16px;
 }
 
 .task-detail-draft-section > h2 {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-size: 16px;
   line-height: 24px;
 }
@@ -177,8 +186,10 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-capability {
+  height: 126px;
+  box-sizing: border-box;
   min-width: 0;
-  padding: 16px;
+  padding: 12px 16px;
   border: 1px solid #dfe4eb;
   border-radius: 5px;
 }
@@ -199,6 +210,7 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
   background: #eaf7ef;
   color: #139657;
   font-weight: 700;
+  font-size: 20px;
 }
 
 .task-detail-draft-capability--orange .task-detail-draft-capability-icon {
@@ -227,11 +239,10 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-capability p {
-  min-height: 42px;
-  margin: 12px 0;
+  margin: 8px 0;
   color: #657083;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .task-detail-draft-capability strong {
@@ -244,27 +255,30 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-timeline {
-  padding-bottom: 18px;
+  min-height: 204px;
+  box-sizing: border-box;
+  margin-top: 16px;
+  padding: 12px 14px 18px;
 }
 
 .task-detail-draft-timeline-list {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   margin: 0;
-  padding: 4px 0 0;
+  padding: 8px 0 0;
   list-style: none;
 }
 
 .task-detail-draft-timeline-step {
   position: relative;
   min-width: 0;
-  padding: 42px 8px 0;
+  padding: 64px 4px 0;
   text-align: center;
 }
 
 .task-detail-draft-timeline-step::before {
   position: absolute;
-  top: 17px;
+  top: 26px;
   right: 50%;
   left: -50%;
   height: 1px;
@@ -276,20 +290,24 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
   display: none;
 }
 
+.task-detail-draft-timeline-step--complete + .task-detail-draft-timeline-step::before {
+  background: #d71920;
+}
+
 .task-detail-draft-timeline-node {
   position: absolute;
   z-index: 1;
   top: 0;
   left: 50%;
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 52px;
+  height: 52px;
   place-items: center;
   border: 1px solid #cfd6e0;
   border-radius: 50%;
   background: #fff;
   color: #8792a2;
-  font-size: 20px;
+  font-size: 27px;
   transform: translateX(-50%);
 }
 
@@ -313,14 +331,14 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
 }
 
 .task-detail-draft-timeline-step strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .task-detail-draft-timeline-state,
 .task-detail-draft-timeline-step time {
   margin-top: 5px;
   color: #7b8492;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .task-detail-draft-timeline-step--complete strong,
@@ -380,6 +398,12 @@ const capabilityIcons = Object.freeze({ 制度比对: '比', 费用审计: '审'
   .task-detail-draft-timeline-step time {
     white-space: normal;
   }
+}
+
+@media (min-width: 901px) and (max-width: 1450px) {
+  .task-detail-draft-actions { gap: 10px; }
+  .task-detail-draft-action,
+  .task-detail-draft-action--primary { padding-right: 14px; padding-left: 14px; }
 }
 
 @media (max-width: 520px) {

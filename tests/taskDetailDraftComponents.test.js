@@ -103,7 +103,7 @@ test('草稿页包含任务头、11标签、75比25双栏和删除确认', () =>
   assert.match(content, /emit\('delete-draft', task\.value\.id\)/);
   assert.match(content, /router\.push\('\/tasks'\)/);
 
-  assert.match(content, /grid-template-columns:minmax\(0,3fr\) minmax\(286px,1fr\)/);
+  assert.match(content, /grid-template-columns:minmax\(0,1fr\) clamp\(286px,25%,405px\)/);
   compileComponent('TaskDetailDraft.vue');
 });
 
