@@ -5,12 +5,22 @@ import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc';
 
 const componentDir = new URL('../src/views/tasks/task-detail-draft/', import.meta.url);
 
+function componentUrl(file) {
+  return file === 'TaskDetailDraft.vue'
+    ? new URL('../src/views/tasks/TaskDetailDraft.vue', import.meta.url)
+    : new URL(file, componentDir);
+}
+
 function source(file) {
-  return readFileSync(new URL(file, componentDir), 'utf8');
+  return readFileSync(componentUrl(file), 'utf8');
+}
+
+function draftTaskDataSource() {
+  return readFileSync(new URL('../src/domain/taskDetail/draftTaskDetail.js', import.meta.url), 'utf8');
 }
 
 function compileComponent(file) {
-  const filename = new URL(file, componentDir).pathname;
+  const filename = componentUrl(file).pathname;
   const parsed = parse(source(file), { filename });
   assert.deepEqual(parsed.errors, []);
   const script = compileScript(parsed.descriptor, { id: file });
@@ -47,5 +57,52 @@ test('草稿右栏包含资料输出阻断和当前任务日志', () => {
   const content = source('TaskDetailDraftRail.vue');
   for (const label of ['下一步提示', '待补充资料', '所需输出', '阻断项', '操作留痕', '全部日志', '10 条/页']) assert.match(content, new RegExp(label));
   assert.doesNotMatch(content, /DataTable/);
+  assert.match(content, /path: '\/records'/);
+  assert.match(content, /query: \{ taskId: task\.id \}/);
   compileComponent('TaskDetailDraftRail.vue');
+});
+
+test('草稿页包含任务头、11标签、75比25双栏和删除确认', () => {
+  const content = source('TaskDetailDraft.vue');
+  const dataContent = draftTaskDataSource();
+
+  for (const label of ['继续编辑', '上传资料', '删除草稿']) assert.match(content, new RegExp(label));
+  assert.equal((content.match(/data-top-action/g) || []).length, 3);
+
+  for (const label of ['任务编号', '被审计单位', '审计期间', '任务类型', '负责人', '状态', '当前版本']) {
+    assert.match(content, new RegExp(label));
+  }
+  assert.equal((content.match(/data-task-meta/g) || []).length, 7);
+
+  for (const label of ['任务概览', '输入资料', '分析过程', '生成结果', '智能体会话', '报告与附件', '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕']) {
+    assert.match(dataContent, new RegExp(label));
+  }
+  assert.match(content, /role="tablist"/);
+  assert.match(content, /role="tab"/);
+  assert.match(content, /role="tabpanel"/);
+  assert.match(content, /v-for="tab in task\.tabs"/);
+  assert.match(content, /:aria-selected="activeTab === tab\.id"/);
+  assert.match(content, /activeTab = ref\('overview'\)/);
+
+  assert.match(content, /TaskDetailDraftOverview/);
+  assert.match(content, /TaskDetailDraftRail/);
+  assert.match(content, /@open-material-source="openMaterialSource"/);
+  assert.match(content, /@edit-materials="openMaterialSource\('local'\)"/);
+
+  assert.match(content, /deleteOpen = ref\(false\)/);
+  assert.match(content, /role="dialog"/);
+  assert.match(content, /@keydown\.esc\.stop\.prevent="closeDelete"/);
+  assert.match(content, /emit\('delete-draft', task\.value\.id\)/);
+  assert.match(content, /router\.push\('\/tasks'\)/);
+
+  assert.match(content, /grid-template-columns:minmax\(0,3fr\) minmax\(286px,1fr\)/);
+  compileComponent('TaskDetailDraft.vue');
+});
+
+test('草稿页资料入口统一进入创建页资料阶段', () => {
+  const content = source('TaskDetailDraft.vue');
+  assert.match(content, /path: '\/tasks\/create'/);
+  assert.match(content, /query: \{ phase: 'materials', source \}/);
+  assert.match(content, /query: \{ phase: 'confirm' \}/);
+  assert.match(content, /router\.push\(materialRoute\(source\)\)/);
 });
