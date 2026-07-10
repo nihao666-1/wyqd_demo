@@ -8,6 +8,7 @@
     "build": "vite build",
     "check": "node scripts/check-demo-contract.js",
     "test:task-create": "node --test tests/taskCreateForm.test.js",
+    "test:task-detail-draft": "node --test tests/taskDetailDraftState.test.js tests/taskDetailDraftComponents.test.js tests/taskCreateEntry.test.js",
     "test:task-list": "node --test tests/taskListState.test.js"
   },
   "dependencies": {
