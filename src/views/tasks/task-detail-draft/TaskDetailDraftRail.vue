@@ -157,12 +157,12 @@ const emit = defineEmits(['edit-materials']);
 .task-detail-draft-log-table { overflow-x: auto; }
 .task-detail-draft-log table { width: 100%; min-width: 0 !important; max-width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9px; }
 .task-detail-draft-log th,
-.task-detail-draft-log td { height: 30px; padding: 0 8px; overflow: hidden; border-bottom: 1px solid #eef1f4; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
-.task-detail-draft-log th { background: #fafbfc; color: #4d5664; font-weight: 500; }
-.task-detail-draft-log th:nth-child(1) { width: 34%; }
-.task-detail-draft-log th:nth-child(2) { width: 23%; }
-.task-detail-draft-log th:nth-child(3) { width: 23%; }
-.task-detail-draft-log th:nth-child(4) { width: 20%; }
+.task-detail-draft-log td { height: 30px; padding: 0 4px; overflow: hidden; border-bottom: 1px solid #eef1f4; font-size: 9px; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.task-detail-draft-log th { background: #fafbfc; color: #4d5664; font-size: 9px; font-weight: 500; }
+.task-detail-draft-log th:nth-child(1) { width: 44%; }
+.task-detail-draft-log th:nth-child(2) { width: 24%; }
+.task-detail-draft-log th:nth-child(3) { width: 20%; }
+.task-detail-draft-log th:nth-child(4) { width: 12%; }
 .task-detail-draft-log td { color: #6b7584; }
 .task-detail-draft-log-result { color: #139657; }
 .task-detail-draft-log-empty { text-align: center !important; }
@@ -174,6 +174,11 @@ const emit = defineEmits(['edit-materials']);
 .task-detail-draft-pagination span { padding: 5px 9px; border: 1px solid #dce2ea; border-radius: 4px; color: #4e5968; font-size: 11px; }
 .task-detail-draft-guidance-group button:focus-visible,
 .task-detail-draft-panel-header a:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
+
+@media (max-width: 1439px) {
+  .task-detail-draft-log th { padding: 0 3px; font-size: 8px; }
+  .task-detail-draft-log td { padding: 0 2px; font-size: 8px; }
+}
 
 @media (max-width: 900px) {
   .task-detail-draft-guidance,
