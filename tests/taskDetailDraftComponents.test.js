@@ -82,6 +82,7 @@ test('草稿页包含任务头、11标签、75比25双栏和删除确认', () =>
   assert.match(content, /role="tabpanel"/);
   assert.match(content, /v-for="tab in task\.tabs"/);
   assert.match(content, /:aria-selected="activeTab === tab\.id"/);
+  assert.doesNotMatch(content, /:tabindex=/);
   assert.match(content, /activeTab = ref\('overview'\)/);
 
   assert.match(content, /TaskDetailDraftOverview/);
@@ -91,7 +92,14 @@ test('草稿页包含任务头、11标签、75比25双栏和删除确认', () =>
 
   assert.match(content, /deleteOpen = ref\(false\)/);
   assert.match(content, /role="dialog"/);
+  assert.match(content, /ref="deleteDialog"/);
+  assert.match(content, /ref="cancelDeleteButton"/);
+  assert.match(content, /ref="confirmDeleteButton"/);
   assert.match(content, /@keydown\.esc\.stop\.prevent="closeDelete"/);
+  assert.match(content, /@keydown\.tab="trapDeleteFocus"/);
+  assert.match(content, /function trapDeleteFocus\(event\)/);
+  assert.match(content, /event\.shiftKey/);
+  assert.match(content, /cancelDeleteButton\.value\?\.focus\(\)/);
   assert.match(content, /emit\('delete-draft', task\.value\.id\)/);
   assert.match(content, /router\.push\('\/tasks'\)/);
 

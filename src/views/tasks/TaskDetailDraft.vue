@@ -36,7 +36,6 @@
         :class="{ 'is-active': activeTab === tab.id }"
         :aria-selected="activeTab === tab.id"
         :aria-controls="`draft-panel-${tab.id}`"
-        :tabindex="activeTab === tab.id ? 0 : -1"
         @click="activeTab = tab.id"
       >
         {{ tab.label }}
@@ -76,12 +75,13 @@
         aria-describedby="task-detail-draft-delete-description"
         tabindex="-1"
         @keydown.esc.stop.prevent="closeDelete"
+        @keydown.tab="trapDeleteFocus"
       >
         <h2 id="task-detail-draft-delete-title">确认删除草稿？</h2>
         <p id="task-detail-draft-delete-description">删除后将返回任务中心，此操作不可撤销。</p>
         <div class="task-detail-draft-dialog-actions">
-          <button type="button" @click="closeDelete">取消</button>
-          <button type="button" class="task-detail-draft-dialog-confirm" @click="confirmDelete">确认删除</button>
+          <button ref="cancelDeleteButton" type="button" @click="closeDelete">取消</button>
+          <button ref="confirmDeleteButton" type="button" class="task-detail-draft-dialog-confirm" @click="confirmDelete">确认删除</button>
         </div>
       </section>
     </div>
@@ -105,6 +105,8 @@ const activeTab = ref('overview');
 const deleteOpen = ref(false);
 const deleteDialog = ref(null);
 const deleteTrigger = ref(null);
+const cancelDeleteButton = ref(null);
+const confirmDeleteButton = ref(null);
 const currentTab = computed(() => task.value.tabs.find((tab) => tab.id === activeTab.value) || task.value.tabs[0]);
 
 function materialRoute(source) {
@@ -118,13 +120,32 @@ function openMaterialSource(source) {
 async function openDelete() {
   deleteOpen.value = true;
   await nextTick();
-  deleteDialog.value?.focus();
+  cancelDeleteButton.value?.focus();
 }
 
 async function closeDelete() {
   deleteOpen.value = false;
   await nextTick();
   deleteTrigger.value?.focus();
+}
+
+function trapDeleteFocus(event) {
+  const dialog = deleteDialog.value;
+  const first = cancelDeleteButton.value;
+  const last = confirmDeleteButton.value;
+  if (!dialog || !first || !last) return;
+
+  const focused = document.activeElement;
+  if (!dialog.contains(focused)) {
+    event.preventDefault();
+    first.focus();
+  } else if (event.shiftKey && focused === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && focused === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 function confirmDelete() {
