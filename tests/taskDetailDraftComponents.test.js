@@ -6,9 +6,9 @@ import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc';
 const componentDir = new URL('../src/views/tasks/task-detail-draft/', import.meta.url);
 
 function componentUrl(file) {
-  return file === 'TaskDetailDraft.vue'
-    ? new URL('../src/views/tasks/TaskDetailDraft.vue', import.meta.url)
-    : new URL(file, componentDir);
+  if (file === 'TaskDetail.vue') return new URL('../src/views/tasks/TaskDetail.vue', import.meta.url);
+  if (file === 'TaskDetailDraft.vue') return new URL('../src/views/tasks/TaskDetailDraft.vue', import.meta.url);
+  return new URL(file, componentDir);
 }
 
 function source(file) {
@@ -113,4 +113,20 @@ test('草稿页资料入口统一进入创建页资料阶段', () => {
   assert.match(content, /query: \{ phase: 'materials', source \}/);
   assert.match(content, /query: \{ phase: 'confirm' \}/);
   assert.match(content, /router\.push\(materialRoute\(source\)\)/);
+});
+
+test('TaskDetail按草稿生成中待确认归档分派且保留现有实现', () => {
+  const content = source('TaskDetail.vue');
+
+  assert.match(content, /import TaskDetailDraft from '\.\/TaskDetailDraft\.vue'/);
+  assert.match(content, /import \{ resolveTaskDetailMode \} from '\.\.\/\.\.\/domain\/taskDetail\/draftTaskDetail\.js'/);
+  assert.match(content, /const detailMode = computed/);
+  assert.match(content, /const showDraftState = computed\(\(\) => detailMode\.value === 'draft'\)/);
+  assert.match(content, /explicitState: String\(route\.query\.state \|\| ''\)/);
+  assert.match(content, /statusKey: selectedTask\.value\?\.statusKey \|\| ''/);
+  assert.match(content, /tab: String\(route\.query\.tab \|\| ''\)/);
+  assert.match(content, /<template v-if="showDraftState">\s*<TaskDetailDraft \/>\s*<\/template>\s*<template v-else>/);
+  assert.match(content, /<TaskDetailArchived v-if="showArchivedState"/);
+  assert.match(content, /<TaskDetailGenerating v-if="showGeneratingState"/);
+  assert.match(content, /class="pending-task-detail"/);
 });
