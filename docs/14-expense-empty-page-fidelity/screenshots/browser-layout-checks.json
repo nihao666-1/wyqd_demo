@@ -1,0 +1,274 @@
+[
+  {
+    "viewport": {
+      "width": 1586,
+      "height": 995
+    },
+    "document": {
+      "scrollWidth": 1586,
+      "clientWidth": 1586,
+      "scrollHeight": 1006,
+      "clientHeight": 995
+    },
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 226,
+      "height": 995
+    },
+    "main": {
+      "x": 226,
+      "y": 0,
+      "width": 1360,
+      "height": 1006
+    },
+    "page": {
+      "x": 246,
+      "y": 64,
+      "width": 1328,
+      "height": 924
+    },
+    "layout": {
+      "x": 254,
+      "y": 129,
+      "width": 1312,
+      "height": 847
+    },
+    "metrics": {
+      "x": 254,
+      "y": 129,
+      "width": 992,
+      "height": 116
+    },
+    "hero": {
+      "x": 254,
+      "y": 257,
+      "width": 992,
+      "height": 176
+    },
+    "entries": {
+      "x": 254,
+      "y": 445,
+      "width": 992,
+      "height": 255
+    },
+    "taskPanel": {
+      "x": 254,
+      "y": 712,
+      "width": 992,
+      "height": 264
+    },
+    "sourcePanel": {
+      "x": 1274,
+      "y": 129,
+      "width": 292,
+      "height": 702
+    },
+    "horizontalOverflow": 0,
+    "consoleMessages": []
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "document": {
+      "scrollWidth": 1440,
+      "clientWidth": 1440,
+      "scrollHeight": 1006,
+      "clientHeight": 900
+    },
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 226,
+      "height": 900
+    },
+    "main": {
+      "x": 226,
+      "y": 0,
+      "width": 1214,
+      "height": 1006
+    },
+    "page": {
+      "x": 246,
+      "y": 64,
+      "width": 1182,
+      "height": 924
+    },
+    "layout": {
+      "x": 254,
+      "y": 129,
+      "width": 1166,
+      "height": 847
+    },
+    "metrics": {
+      "x": 254,
+      "y": 129,
+      "width": 916,
+      "height": 116
+    },
+    "hero": {
+      "x": 254,
+      "y": 257,
+      "width": 916,
+      "height": 176
+    },
+    "entries": {
+      "x": 254,
+      "y": 445,
+      "width": 916,
+      "height": 255
+    },
+    "taskPanel": {
+      "x": 254,
+      "y": 712,
+      "width": 916,
+      "height": 264
+    },
+    "sourcePanel": {
+      "x": 1128,
+      "y": 129,
+      "width": 292,
+      "height": 702
+    },
+    "horizontalOverflow": 0,
+    "consoleMessages": []
+  },
+  {
+    "viewport": {
+      "width": 1366,
+      "height": 768
+    },
+    "document": {
+      "scrollWidth": 1366,
+      "clientWidth": 1366,
+      "scrollHeight": 1006,
+      "clientHeight": 768
+    },
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 226,
+      "height": 768
+    },
+    "main": {
+      "x": 226,
+      "y": 0,
+      "width": 1140,
+      "height": 1006
+    },
+    "page": {
+      "x": 246,
+      "y": 64,
+      "width": 1108,
+      "height": 924
+    },
+    "layout": {
+      "x": 254,
+      "y": 129,
+      "width": 1092,
+      "height": 847
+    },
+    "metrics": {
+      "x": 254,
+      "y": 129,
+      "width": 916,
+      "height": 116
+    },
+    "hero": {
+      "x": 254,
+      "y": 257,
+      "width": 916,
+      "height": 176
+    },
+    "entries": {
+      "x": 254,
+      "y": 445,
+      "width": 916,
+      "height": 255
+    },
+    "taskPanel": {
+      "x": 254,
+      "y": 712,
+      "width": 916,
+      "height": 264
+    },
+    "sourcePanel": {
+      "x": 1054,
+      "y": 129,
+      "width": 292,
+      "height": 702
+    },
+    "horizontalOverflow": 0,
+    "consoleMessages": []
+  },
+  {
+    "viewport": {
+      "width": 1920,
+      "height": 1080
+    },
+    "document": {
+      "scrollWidth": 1920,
+      "clientWidth": 1920,
+      "scrollHeight": 1080,
+      "clientHeight": 1080
+    },
+    "sidebar": {
+      "x": 0,
+      "y": 0,
+      "width": 226,
+      "height": 1080
+    },
+    "main": {
+      "x": 226,
+      "y": 0,
+      "width": 1694,
+      "height": 1080
+    },
+    "page": {
+      "x": 408,
+      "y": 64,
+      "width": 1338,
+      "height": 924
+    },
+    "layout": {
+      "x": 416,
+      "y": 129,
+      "width": 1322,
+      "height": 847
+    },
+    "metrics": {
+      "x": 416,
+      "y": 129,
+      "width": 1002,
+      "height": 116
+    },
+    "hero": {
+      "x": 416,
+      "y": 257,
+      "width": 1002,
+      "height": 176
+    },
+    "entries": {
+      "x": 416,
+      "y": 445,
+      "width": 1002,
+      "height": 255
+    },
+    "taskPanel": {
+      "x": 416,
+      "y": 712,
+      "width": 1002,
+      "height": 264
+    },
+    "sourcePanel": {
+      "x": 1446,
+      "y": 129,
+      "width": 292,
+      "height": 702
+    },
+    "horizontalOverflow": 0,
+    "consoleMessages": []
+  }
+]

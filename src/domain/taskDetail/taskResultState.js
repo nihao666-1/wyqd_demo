@@ -3,7 +3,7 @@ const abilitySeeds = [
   { id: 2, name: '制度变更', summaryLabel: '变更条目', summaryValue: '35 条', fileName: '制度变更摘要.xlsx', fileType: 'xlsx', baseStatus: 'confirmed' },
   { id: 3, name: '制度比对', summaryLabel: '差异项', summaryValue: '5 项（缺失 2 错误 3）', fileName: '制度差异清单.xlsx', fileType: 'xlsx', baseStatus: 'pending' },
   { id: 4, name: '监管案例舆情分析', summaryLabel: '监管关注点', summaryValue: '12 条', fileName: '监管关注点清单.xlsx', fileType: 'xlsx', baseStatus: 'pending' },
-  { id: 5, name: '审计规范生成', summaryLabel: '规范条目', summaryValue: '156 条', fileName: '审计规范与建议.xlsx', fileType: 'xlsx', baseStatus: 'confirmed' },
+  { id: 5, name: '审计规范生成', summaryLabel: '规范条目', summaryValue: '186 条', fileName: '审计规范与建议.xlsx', fileType: 'xlsx', baseStatus: 'confirmed' },
   { id: 6, name: '监管共享信息分析', summaryLabel: '问题项', summaryValue: '8 项', fileName: '共享信息分析报告.docx', fileType: 'docx', baseStatus: 'pending' },
   { id: 7, name: '费用审计', summaryLabel: '异常', summaryValue: '6 条（高风险 3 条）', fileName: '费用异常汇总.xlsx', fileType: 'xlsx', baseStatus: 'pending' },
   { id: 8, name: '报告生成', summaryLabel: '报告草稿', summaryValue: '1 份', fileName: '审计报告草稿.docx', fileType: 'docx', baseStatus: 'pending' },

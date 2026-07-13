@@ -122,6 +122,14 @@ function showAllLogs() {
 }
 
 function viewResult(capability) {
+  if (capability.id === 'expense-audit') {
+    router.push({ path: '/expense/audit/overview', query: { taskId: snapshot.task.id } });
+    return;
+  }
+  if (capability.id === 'supervision-share') {
+    router.push({ path: '/tasks/detail/supervision-share', query: { taskId: snapshot.task.id } });
+    return;
+  }
   openDrawer('生成结果', capability.name, [
     { label: '当前状态', value: capability.statusLabel }, { label: '输出文件', value: capability.output }, { label: '输入资料', value: capability.input }
   ], `${capability.name}的结果已沉淀到任务详情，可继续查看来源和操作留痕。`);
@@ -171,6 +179,9 @@ onBeforeUnmount(() => {
 :global(.task-detail-shell.task-detail-scaled){width:1586px;min-height:calc(100vh / var(--task-detail-scale));margin-left:var(--task-detail-offset-x);zoom:var(--task-detail-scale);transform-origin:top left}:global(.task-detail-density-compact .topbar){min-height:56px}:global(.task-detail-density-compact .task-detail-generating-header){height:140px}:global(.task-detail-density-compact .task-detail-generating-title-row){height:39px}:global(.task-detail-density-compact .task-detail-generating-metadata){height:58px}:global(.task-detail-density-compact .task-detail-generating-tabs){height:42px}:global(.task-detail-density-compact .task-detail-stage-summary){height:95px}:global(.task-detail-density-compact .task-detail-stage-list){padding-top:16px}:global(.task-detail-density-compact .task-detail-capability-section){height:350px}:global(.task-detail-density-compact .task-detail-capability-grid){grid-auto-rows:105px}:global(.task-detail-density-compact .task-detail-table-section){height:210px;margin-top:9px}:global(.task-detail-density-compact .task-detail-execution-rail){grid-template-rows:430px 55px 183px}:global(.task-detail-density-compact .task-detail-pending-all){height:39px}
 .task-detail-generating-title-row{padding:0 40px 0 7px}
 .task-detail-generating-metadata{grid-template-columns:138px 108px 240px 92px 75px 220px 250px minmax(180px,1fr)}
-.task-detail-generating-tabs button{padding-right:17px;padding-left:17px}
+.task-detail-generating-metadata dt{font-size:10px}
+.task-detail-generating-metadata dd{font-size:11px}
+.task-detail-generating-actions button{font-size:12px}
+.task-detail-generating-tabs button{padding-right:17px;padding-left:17px;font-size:13px}
 @media(max-width:1199px){.task-detail-generating-header{height:auto}.task-detail-generating-metadata{height:auto;grid-template-columns:repeat(4,minmax(0,1fr));row-gap:10px}.task-detail-generating-workspace{grid-template-columns:1fr}.task-detail-generating-tabs{overflow-x:auto}.task-detail-generating-title-row{height:auto;min-height:48px;flex-wrap:wrap}.task-detail-generating-actions{padding:7px 0}}
 </style>

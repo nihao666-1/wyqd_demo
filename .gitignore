@@ -3,6 +3,7 @@ dist/
 output/
 coverage/
 .vite/
+.playwright-cli/
 
 .env
 .env.*

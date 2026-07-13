@@ -4,9 +4,6 @@
     title="文件中心"
     description="统一查询上传、解析、引用、生成、导出和回传文件。"
   >
-    <button class="btn" @click="store.setDemoDataMode(isEmptyMode ? 'data' : 'empty')">
-      {{ isEmptyMode ? '查看已有文件' : '查看空状态' }}
-    </button>
     <RouterLink class="btn primary" to="/supervision/import/upload">上传文件</RouterLink>
   </PageHeader>
 

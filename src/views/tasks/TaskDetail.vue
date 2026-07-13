@@ -92,7 +92,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
   canSubmitReview,
   confirmAbility,
@@ -126,6 +126,7 @@ import VersionExportPreview from './task-detail/VersionExportPreview.vue';
 import EvidenceTracePanel from './task-detail/EvidenceTracePanel.vue';
 
 const route = useRoute();
+const router = useRouter();
 const selectedTask = computed(() => route.query.state === 'generating' ? undefined : taskRows.find((task) => task.id === route.query.taskId));
 const detailMode = computed(() => resolveTaskDetailMode({
   explicitState: String(route.query.state || ''),
@@ -194,6 +195,14 @@ function handleTabChange(tabId) {
 }
 
 function handleViewResult(ability) {
+  if (ability.name === '费用审计') {
+    router.push({ path: '/expense/audit/overview', query: { taskId: route.query.taskId } });
+    return;
+  }
+  if (ability.id === 5) {
+    router.push({ path: '/audit-standard/draft', query: { taskId: route.query.taskId } });
+    return;
+  }
   showToast(`正在预览：${ability.fileName || ability.name}`);
   pushLog('查看能力结果', ability.name);
 }
@@ -325,8 +334,8 @@ function handleRunCheck() {
     ...taskState.value,
     abilities: taskState.value.abilities.map((ability) => ability.id === 9 ? { ...ability, baseStatus: 'check_passed' } : ability)
   });
-  pushLog('执行报告检查', '检查通过');
-  showToast('报告检查已完成');
+  pushLog('执行报告审核', '检查通过');
+  showToast('报告审核已完成');
 }
 
 function handlePageChange(nextPage) {

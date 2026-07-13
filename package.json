@@ -9,13 +9,15 @@
     "check": "node scripts/check-demo-contract.js",
     "test:task-create": "node --test tests/taskCreateForm.test.js",
     "test:task-detail-draft": "node --test tests/taskDetailDraftState.test.js tests/taskDetailDraftComponents.test.js tests/taskCreateEntry.test.js",
-    "test:task-list": "node --test tests/taskListState.test.js"
+    "test:task-list": "node --test tests/taskListState.test.js",
+    "test:regulatory-result": "node --test tests/regulatoryResultPage.test.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.0",
     "@fortawesome/free-solid-svg-icons": "^7.3.0",
     "@fortawesome/vue-fontawesome": "^3.3.1",
     "@vitejs/plugin-vue": "^5.2.4",
+    "fflate": "^0.8.2",
     "vite": "^6.3.5",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"

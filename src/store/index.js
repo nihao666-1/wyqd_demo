@@ -3,8 +3,9 @@ import { mockDb } from '../mock/index.js';
 import { guardAssetAction } from '../domain/lifecycle/assetReferenceGuard.js';
 import { guardReportAction } from '../domain/lifecycle/reportActionGuard.js';
 import { reportStates } from '../domain/stateMachines/reportState.js';
+import { applyExpenseDecision } from '../domain/expense/expenseAnomalyState.js';
 
-const storageKey = 'audit-lifecycle-demo-state-v8';
+const storageKey = 'audit-lifecycle-demo-state-v10';
 const canUseStorage = typeof window !== 'undefined' && !!window.localStorage;
 const persisted = (() => {
   if (!canUseStorage) return null;
@@ -15,12 +16,23 @@ const persisted = (() => {
   }
 })();
 
+const persistedDb = persisted?.db || {};
+export function mergePersistedExpenseAnomalies(baseRows, persistedRows) {
+  if (!Array.isArray(persistedRows)) return baseRows;
+  const persistedById = new Map(persistedRows.map((row) => [row.anomalyId, row]));
+  const normalized = baseRows.map((row) => ({ ...row, ...(persistedById.get(row.anomalyId) || {}) }));
+  const knownIds = new Set(normalized.map((row) => row.anomalyId));
+  return [...normalized, ...persistedRows.filter((row) => !knownIds.has(row.anomalyId))];
+}
+
+const mergedExpenseAnomalies = mergePersistedExpenseAnomalies(mockDb.expenseAnomalies, persistedDb.expenseAnomalies);
+
 export const store = reactive({
-  db: { ...mockDb, ...(persisted?.db || {}) },
+  db: { ...mockDb, ...persistedDb, expenseAnomalies: mergedExpenseAnomalies },
   notice: persisted?.notice || '',
   demoDataMode: persisted?.demoDataMode || 'empty',
   selectedAssetId: persisted?.selectedAssetId || 'FA-001',
-  selectedAnomalyId: persisted?.selectedAnomalyId || 'AN-001',
+  selectedAnomalyId: persisted?.selectedAnomalyId || 'FY-202504280002',
   activeTaskTab: persisted?.activeTaskTab || 'overview',
   activeRecordTab: persisted?.activeRecordTab || 'operation',
   activeDrawer: persisted?.activeDrawer || '',
@@ -118,7 +130,12 @@ export const store = reactive({
     });
     this.addLog('打开标签定义管理', '配置', 'TAG-SUP');
   },
-  saveTaskDraft() {
+  saveTaskDraft(payload = {}) {
+    this.db.taskDraft = {
+      ...payload,
+      savedBy: this.db.currentUser.name,
+      savedAt: this.now()
+    };
     this.ensureCollection('capabilityRuns', []);
     this.db.capabilityRuns.unshift({
       runId: `CAP-${Date.now()}`,
@@ -508,6 +525,51 @@ export const store = reactive({
       this.addLog(`异常状态调整为${status}`, '费用异常', anomalyId);
       this.setNotice(`异常 ${anomalyId} 已更新为${status}。`);
     }
+  },
+  decideExpenseAnomaly(anomalyId, action, payload = {}) {
+    const index = this.db.expenseAnomalies.findIndex((item) => item.anomalyId === anomalyId);
+    if (index < 0) return { ok: false, error: '未找到费用异常记录', row: null };
+    const result = applyExpenseDecision(this.db.expenseAnomalies[index], action, payload);
+    if (!result.ok) {
+      this.setNotice(result.error);
+      return result;
+    }
+    this.db.expenseAnomalies[index] = result.row;
+    const actionLabel = { confirm: '确认异常', exclude: '排除异常', supplement: '补充说明' }[action];
+    this.addLog(actionLabel, '费用异常', anomalyId);
+    this.setNotice(`异常 ${anomalyId} 已${actionLabel}。`);
+    return result;
+  },
+  saveExpenseSupplement(anomalyId, note) {
+    return this.decideExpenseAnomaly(anomalyId, 'supplement', { note });
+  },
+  saveExpenseRemediation(anomalyId, remediation) {
+    const row = this.db.expenseAnomalies.find((item) => item.anomalyId === anomalyId);
+    const value = typeof remediation === 'string' ? remediation.trim() : '';
+    if (!row) return { ok: false, error: '未找到费用异常记录', row: null };
+    if (!value) return { ok: false, error: '整改建议不能为空', row };
+    row.remediation = value;
+    this.addLog('保存整改建议', '费用异常', anomalyId);
+    this.setNotice(`异常 ${anomalyId} 的整改建议已保存。`);
+    return { ok: true, row };
+  },
+  recordExpenseExport(objectName, rowCount) {
+    if (!objectName || !Number.isInteger(rowCount) || rowCount <= 0) {
+      return { ok: false, error: '导出范围为空或文件名无效' };
+    }
+    const record = {
+      exportId: `EXP-${Date.now()}`,
+      objectType: '费用异常汇总',
+      objectName,
+      format: 'Excel',
+      exportedBy: this.db.currentUser.name,
+      exportedAt: this.now(),
+      rowCount
+    };
+    this.db.exportRecords.unshift(record);
+    this.addLog('导出费用异常汇总', '费用异常', record.exportId);
+    this.setNotice(`${objectName} 已生成，共导出 ${rowCount} 条记录。`);
+    return { ok: true, record };
   },
   updateReportReview(reviewId, decision) {
     const item = this.db.reportReviewItems.find((review) => review.reviewId === reviewId);
