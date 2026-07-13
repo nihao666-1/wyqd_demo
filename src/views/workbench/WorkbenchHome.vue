@@ -13,9 +13,6 @@
         </RouterLink>
       </div>
       <div class="workbench-actions">
-        <button class="btn mode-toggle-btn" type="button" @click="store.setDemoDataMode(isEmptyMode ? 'data' : 'empty')">
-          {{ isEmptyMode ? '导入模拟数据' : '查看空白页' }}
-        </button>
         <RouterLink class="btn primary create-task-btn" to="/tasks/create">创建审计任务</RouterLink>
       </div>
     </section>
@@ -512,6 +509,11 @@ const operationRows = computed(() => store.db.operationLogs);
   gap: 10px;
 }
 
+.workbench-page.is-empty {
+  min-height: calc(100dvh - 98px);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
 .workbench-page.has-data {
   min-height: calc(100vh - 98px);
   grid-template-rows:
@@ -628,7 +630,6 @@ const operationRows = computed(() => store.db.operationLogs);
   align-items: flex-start;
 }
 
-.mode-toggle-btn,
 .create-task-btn {
   align-self: start;
   min-height: 44px;
@@ -639,15 +640,12 @@ const operationRows = computed(() => store.db.operationLogs);
   min-width: 126px;
 }
 
-.mode-toggle-btn {
-  min-width: 104px;
-}
-
 .empty-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 292px;
   gap: 12px;
-  align-items: start;
+  min-height: 0;
+  align-items: stretch;
 }
 
 .empty-main,
@@ -889,6 +887,69 @@ const operationRows = computed(() => store.db.operationLogs);
   gap: 8px;
   padding: 16px 10px;
   text-align: center;
+}
+
+@media (min-width: 1281px) and (min-height: 880px) {
+  .workbench-page.is-empty {
+    height: calc(100dvh - 98px);
+  }
+
+  .empty-layout {
+    height: 100%;
+  }
+
+  .is-empty .empty-main {
+    min-height: 0;
+    grid-template-rows: minmax(236px, 1.1fr) minmax(182px, 0.78fr) minmax(108px, 0.42fr);
+  }
+
+  .is-empty .empty-rail {
+    min-height: 0;
+    grid-template-rows: minmax(252px, 1.02fr) minmax(158px, 0.68fr) minmax(148px, 0.6fr);
+  }
+
+  .is-empty .empty-main > .panel,
+  .is-empty .empty-rail > .panel {
+    min-height: 0;
+    margin-bottom: 0;
+  }
+
+  .is-empty .empty-main > .panel:not(.welcome-panel),
+  .is-empty .empty-rail > .panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .is-empty .start-card-grid,
+  .is-empty .flow-strip {
+    height: 100%;
+  }
+
+  .is-empty .start-card-grid {
+    grid-auto-rows: minmax(0, 1fr);
+  }
+
+  .is-empty .start-card {
+    min-height: 0;
+  }
+
+  .is-empty .guide-list {
+    align-content: start;
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+  }
+
+  .is-empty .status-stack {
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+  }
+
+  .is-empty .empty-log,
+  .is-empty .flow-strip {
+    align-content: center;
+  }
+
+  .is-empty .welcome-preview {
+    height: clamp(180px, 22vh, 240px);
+  }
 }
 
 .dashboard-row {
@@ -1340,20 +1401,29 @@ const operationRows = computed(() => store.db.operationLogs);
   min-height: clamp(132px, 15vh, 190px);
 }
 
-@media (max-width: 1280px) {
-  .workbench-top,
-  .empty-layout,
-  .welcome-panel,
-  .primary-row,
-  .secondary-row,
-  .start-card-grid {
+@media (max-width: 1200px) {
+  .workbench-top {
     grid-template-columns: 1fr;
   }
 
-  .create-task-btn {
-    justify-self: start;
+  .workbench-actions {
+    justify-self: end;
   }
 
+  .start-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1180px) {
+  .empty-layout,
+  .welcome-panel,
+  .primary-row,
+  .secondary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .create-task-btn,
   .workbench-actions {
     justify-self: start;
   }
@@ -1374,6 +1444,7 @@ const operationRows = computed(() => store.db.operationLogs);
   .flow-strip,
   .quick-grid,
   .progress-overview,
+  .start-card-grid,
   .todo-item,
   .result-item {
     grid-template-columns: 1fr;
