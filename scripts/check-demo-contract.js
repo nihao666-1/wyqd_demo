@@ -20,6 +20,8 @@ const requiredFiles = [
   'src/store/index.js',
   'src/mock/index.js',
   'src/views/workbench/WorkbenchHome.vue',
+  'src/views/tasks/TaskList.vue',
+  'src/views/tasks/TaskCenterEmptyState.vue',
   'src/views/tasks/TaskCreate.vue',
   'src/views/files/FileCenter.vue',
   'src/views/files/FileDetail.vue',
@@ -120,6 +122,26 @@ for (const route of [
 
 const taskCreateText = read('src/views/tasks/TaskCreate.vue');
 for (const marker of [
+  'data-page="task-create"',
+  'data-step="basic-info"',
+  '基础信息',
+  '任务说明',
+  '后续步骤影响',
+  '预计所需资料',
+  'data-step="material-selection"',
+  '所需资料清单',
+  '资料完成度',
+  'materials-workspace',
+  'materialRows',
+  'materialProgress',
+  'simulateFillMaterials',
+  '审计口径与数据范围',
+  '数据范围（可多选）',
+  '风险等级',
+  '当前步骤',
+  '默认输出模板',
+  'validateTaskCreateForm',
+  '@media (max-width:899px)',
   '选择能力',
   'ability-card',
   'ability-grid',
@@ -133,17 +155,70 @@ for (const marker of [
   '监督共享信息分析',
   '费用审计',
   '报告生成',
-  '报告审核',
-  '所需资料与输出结果',
-  '当前选择能力',
   '保存草稿',
   '上一步',
   '下一步'
 ]) {
-  assert(taskCreateText.includes(marker), `任务创建能力卡片页缺少：${marker}`);
+  assert(taskCreateText.includes(marker), `任务创建页面缺少：${marker}`);
 }
 
 assert(!taskCreateText.includes('DataTable'), '任务创建能力选择不得继续使用表格替代卡片');
+
+const taskListText = read('src/views/tasks/TaskList.vue');
+for (const marker of [
+  'task-center-page',
+  'demoDataMode',
+  '全部任务',
+  '执行中',
+  '待确认',
+  '已归档',
+  '失败/异常',
+  '今日待办与提醒',
+  '失败任务',
+  '最近操作日志',
+  '快捷入口',
+  '导入模拟任务',
+  'paginateTaskRows',
+  '全部任务',
+  '创建审计任务'
+]) {
+  assert(taskListText.includes(marker), `任务中心红框复刻缺少：${marker}`);
+}
+
+const taskEmptyText = read('src/views/tasks/TaskCenterEmptyState.vue');
+for (const marker of [
+  '任务中心',
+  '任务名称',
+  '被审计单位',
+  '审计期间',
+  '任务类型',
+  '任务状态',
+  '负责人',
+  '全部任务',
+  '草稿',
+  '待解析',
+  '生成中',
+  '待确认',
+  '已完成',
+  '任务列表',
+  '暂无审计任务',
+  '推荐演示路径',
+  '任务状态说明',
+  "setDemoDataMode('data')",
+  'auditPersonnel',
+  'organizations'
+]) {
+  assert(taskEmptyText.includes(marker), `任务中心无数据态缺少：${marker}`);
+}
+
+for (const marker of [
+  '任务说明',
+  'watch(() => form.taskType',
+  '基础信息',
+  '保存草稿'
+]) {
+  assert(taskCreateText.includes(marker), `任务创建基础信息缺少：${marker}`);
+}
 
 const fileCenterText = read('src/views/files/FileCenter.vue');
 for (const marker of [

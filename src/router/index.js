@@ -4,6 +4,7 @@ import EmptyStart from '../views/workbench/EmptyStart.vue';
 import TaskList from '../views/tasks/TaskList.vue';
 import TaskCreate from '../views/tasks/TaskCreate.vue';
 import TaskDetail from '../views/tasks/TaskDetail.vue';
+import SupervisionShareResult from '../views/supervision-result/SupervisionShareResult.vue';
 import FileCenter from '../views/files/FileCenter.vue';
 import FileDetail from '../views/files/FileDetail.vue';
 import ConfigCenter from '../views/config/ConfigCenter.vue';
@@ -31,12 +32,12 @@ import SupervisionPrecheck from '../views/supervision/SupervisionPrecheck.vue';
 import SupervisionReportSourceSelect from '../views/supervision/SupervisionReportSourceSelect.vue';
 import SupervisionReportDraft from '../views/supervision/SupervisionReportDraft.vue';
 import ExpenseWorkbench from '../views/expense/ExpenseWorkbench.vue';
+import ExpenseAuditOverview from '../views/expense/ExpenseAuditOverview.vue';
+import ExpenseAnomalyDashboard from '../views/expense/ExpenseAnomalyDashboard.vue';
 import ExpenseUsageNew from '../views/expense/ExpenseUsageNew.vue';
 import ExpenseUsageDashboard from '../views/expense/ExpenseUsageDashboard.vue';
 import ExpenseUsageDrilldown from '../views/expense/ExpenseUsageDrilldown.vue';
 import ExpenseUsageReport from '../views/expense/ExpenseUsageReport.vue';
-import ExpenseAnomalyDashboard from '../views/expense/ExpenseAnomalyDashboard.vue';
-import ExpenseCandidates from '../views/expense/ExpenseCandidates.vue';
 import AuditReportWorkbench from '../views/audit-report/AuditReportWorkbench.vue';
 import AuditReportTemplate from '../views/audit-report/AuditReportTemplate.vue';
 import AuditReportTemplateUpload from '../views/audit-report/AuditReportTemplateUpload.vue';
@@ -62,12 +63,13 @@ export const routes = [
   { path: '/tasks', component: TaskList, meta: { title: '任务列表' } },
   { path: '/tasks/create', component: TaskCreate, meta: { title: '创建审计任务' } },
   { path: '/tasks/detail', component: TaskDetail, meta: { title: '任务详情' } },
+  { path: '/tasks/detail/supervision-share', component: SupervisionShareResult, meta: { title: '监督共享信息分析' } },
   { path: '/files', component: FileCenter, meta: { title: '文件中心' } },
   { path: '/files/detail', component: FileDetail, meta: { title: '文件详情' } },
   { path: '/config', component: ConfigCenter, meta: { title: '配置中心' } },
   { path: '/records', component: RecordCenter, meta: { title: '记录中心' } },
   { path: '/demo-guide', component: DemoGuide, meta: { title: '演示指南' } },
-  { path: '/regulatory/workbench', component: RegulatoryWorkbench, meta: { title: '监管分析工作台' } },
+  { path: '/regulatory/workbench', component: RegulatoryWorkbench, meta: { title: '专项审计分析' } },
   { path: '/regulatory/new', component: RegulatoryNew, meta: { title: '新建监管分析任务' } },
   { path: '/regulatory/data-fetch', component: RegulatoryDataFetch, meta: { title: '监管分析数据获取' } },
   { path: '/regulatory/result', component: RegulatoryResult, meta: { title: '监管分析结果' } },
@@ -89,12 +91,13 @@ export const routes = [
   { path: '/supervision/report/source-select', component: SupervisionReportSourceSelect, meta: { title: '监督共享报告来源选择' } },
   { path: '/supervision/report/draft', component: SupervisionReportDraft, meta: { title: '监督共享报告草稿' } },
   { path: '/expense/workbench', component: ExpenseWorkbench, meta: { title: '费用审计入口' } },
+  { path: '/expense/audit/overview', component: ExpenseAuditOverview, meta: { title: '费用审计分析' } },
   { path: '/expense/usage/new', component: ExpenseUsageNew, meta: { title: '新建费用综合分析' } },
-  { path: '/expense/usage/dashboard', component: ExpenseUsageDashboard, meta: { title: '费用综合分析看板' } },
+  { path: '/expense/usage/dashboard', component: ExpenseUsageDashboard, meta: { title: '费用趋势分析' } },
   { path: '/expense/usage/drilldown', component: ExpenseUsageDrilldown, meta: { title: '费用综合分析下钻' } },
   { path: '/expense/usage/report', component: ExpenseUsageReport, meta: { title: '费用综合分析报告' } },
-  { path: '/expense/anomaly/dashboard', component: ExpenseAnomalyDashboard, meta: { title: '费用异常审计看板' } },
-  { path: '/expense/anomaly/candidates', component: ExpenseCandidates, meta: { title: '候选异常清单' } },
+  { path: '/expense/anomaly/dashboard', component: ExpenseAnomalyDashboard, meta: { title: '费用异常监控' } },
+  { path: '/expense/anomaly/candidates', redirect: '/expense/anomaly/dashboard' },
   { path: '/audit-report/workbench', component: AuditReportWorkbench, meta: { title: '审计报告入口' } },
   { path: '/audit-report/template', component: AuditReportTemplate, meta: { title: '报告模板管理' } },
   { path: '/audit-report/template-upload', component: AuditReportTemplateUpload, meta: { title: '上传报告模板' } },

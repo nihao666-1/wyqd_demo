@@ -631,3 +631,24 @@ tbody tr:hover td {
     width: 210px;
   }
 }
+
+@media (max-width: 900px) {
+  .sidebar { width: 64px; padding-left: 6px; padding-right: 6px; }
+  .brand { margin-left: -6px; margin-right: -6px; padding: 0; justify-content: center; }
+  .brand strong, .sidebar a:not(.nav-icon) { font-size: 0; }
+  .sidebar a { justify-content: center; padding: 8px; }
+  .sidebar a.router-link-active::before { left: -6px; }
+  .bottom-nav { margin-left: -6px; margin-right: -6px; padding-left: 6px; padding-right: 6px; }
+  .main { padding-left: 10px; padding-right: 10px; }
+  .topbar { margin-left: -10px; margin-right: -10px; padding: 0 12px; }
+}
+
+@media (max-width: 640px) {
+  .topbar { gap: 2px; }
+  .topbar > div:first-child { min-width: 0; }
+  .task-breadcrumb { gap: 6px; font-size: 15px; white-space: nowrap; }
+  .topbar-right, .top-icons { gap: 0; }
+  .user-scope { gap: 0; padding-left: 3px; }
+  .user-scope strong, .user-caret { display: none; }
+  .icon-btn { width: 28px; }
+}
