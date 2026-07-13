@@ -6,10 +6,26 @@
       </div>
 
       <nav class="main-nav">
-        <RouterLink v-for="item in businessNavItems" :key="item.path" :to="item.path">
-          <span class="nav-icon"><AuditIcon :name="item.icon" /></span>
-          {{ item.label }}
-        </RouterLink>
+        <template v-for="item in businessNavItems" :key="item.path">
+          <RouterLink :to="item.path">
+            <span class="nav-icon"><AuditIcon :name="item.icon" /></span>
+            {{ item.label }}
+          </RouterLink>
+          <div v-if="item.path === '/config' && route.path === '/config'" class="nav-sub">
+            <RouterLink
+              to="/config?mode=records"
+              :class="{ 'sub-active': route.query.mode === 'records' }"
+            >
+              配置与记录中心
+            </RouterLink>
+            <RouterLink
+              to="/config?mode=params"
+              :class="{ 'sub-active': route.query.mode === 'params' }"
+            >
+              系统参数配置
+            </RouterLink>
+          </div>
+        </template>
       </nav>
 
       <nav class="bottom-nav">

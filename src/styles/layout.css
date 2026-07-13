@@ -78,6 +78,55 @@
   background: var(--color-primary);
 }
 
+.nav-sub {
+  display: grid;
+  gap: 4px;
+  margin: -2px 0 4px 28px;
+}
+
+.nav-sub a {
+  min-height: 30px;
+  padding: 6px 10px 6px 22px;
+  border-radius: 5px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 6px;
+}
+
+.nav-sub a::before {
+  content: "";
+  position: static;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.nav-sub a.router-link-active {
+  background: transparent;
+  color: #667085;
+}
+
+.nav-sub a.router-link-active::before {
+  position: static;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+}
+
+.nav-sub a.sub-active::before {
+  position: static;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+}
+
+.nav-sub a.sub-active {
+  background: #fff0f1;
+  color: var(--color-primary);
+}
+
 .nav-icon {
   width: 18px;
   height: 18px;
