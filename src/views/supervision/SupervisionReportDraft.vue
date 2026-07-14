@@ -1,5 +1,6 @@
 <template>
-  <PageHeader eyebrow="监督共享报告" title="监督共享汇总分析报告草稿" description="来源预检通过后生成草稿，草稿确认后才能导出 Word / Excel。">
+  <div class="supervision-report-draft-page route-fill-page">
+    <PageHeader eyebrow="监督共享报告" title="监督共享汇总分析报告草稿" description="来源预检通过后生成草稿，草稿确认后才能导出 Word / Excel。">
     <button class="btn" @click="store.handleSupervisionReportAction('confirm')">确认报告</button>
     <button class="btn primary" @click="store.handleSupervisionReportAction('export')">导出 Word / Excel</button>
     <RouterLink class="btn" to="/files/detail">源文件引用阻断</RouterLink>
@@ -38,13 +39,14 @@
       </template>
     </DataTable>
   </section>
-  <aside v-if="store.activeDrawer === 'supervision-source'" class="drawer">
+    <aside v-if="store.activeDrawer === 'supervision-source'" class="drawer">
     <div class="panel-title">
       <h3>{{ store.drawerPayload.title }}</h3>
       <button class="btn" @click="store.closeDrawer()">关闭</button>
     </div>
     <DataTable :columns="sourceColumns" :rows="store.drawerPayload.rows" row-key="sourceId" />
-  </aside>
+    </aside>
+  </div>
 </template>
 
 <script setup>
@@ -79,3 +81,18 @@ const sourceColumns = [
   { key: 'referenceStatus', label: '引用状态' }
 ];
 </script>
+
+<style scoped>
+.supervision-report-draft-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.supervision-report-draft-page > .panel:last-of-type {
+  min-height: 0;
+  flex: 1;
+}
+</style>

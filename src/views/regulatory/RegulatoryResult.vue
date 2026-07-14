@@ -1,5 +1,5 @@
 <template>
-  <section class="reg-result-page" data-regulatory-result-page aria-label="监管案例舆情分析">
+  <section class="reg-result-page route-fill-page" data-regulatory-result-page aria-label="监管案例舆情分析">
     <div class="reg-result-main">
       <section class="filter-strip" data-result-region="filters" aria-label="分析筛选条件">
         <label v-for="filter in filters" :key="filter.label">
@@ -365,7 +365,8 @@ function notify(message) {
   --reg-soft: #f7f9fc;
   --reg-muted: #687386;
   width: 100%;
-  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  height: 0;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
   gap: 10px;
@@ -378,7 +379,8 @@ function notify(message) {
   grid-template-rows: 74px 88px minmax(218px, .9fr) minmax(244px, 1fr) 78px minmax(145px, .65fr);
   gap: 8px;
   min-width: 0;
-  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  min-height: 0;
+  overflow: auto;
 }
 
 .filter-strip,
@@ -1151,8 +1153,9 @@ td {
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  height: auto;
-  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
   margin: 0;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
   color: #1f2937;
@@ -1164,6 +1167,8 @@ td {
 
 .focus-detail {
   min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 
 .focus-table-wrap,

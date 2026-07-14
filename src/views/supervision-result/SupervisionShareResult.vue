@@ -1,5 +1,5 @@
 <template>
-  <div class="supervision-page" data-supervision-result-page>
+  <div class="supervision-page route-fill-page" data-supervision-result-page>
     <main class="supervision-board" aria-label="监督共享信息分析结果">
       <section class="filter-panel" data-result-region="source-filters">
         
@@ -1694,17 +1694,17 @@ tr:focus-visible {
   align-items: start;
   width: 100%;
   max-width: none;
-  height: auto;
-  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  height: 0;
+  min-height: 0;
   margin: 0;
-  overflow: visible;
+  overflow: auto;
 }
 
 .supervision-board {
   grid-template-rows: 72px 92px minmax(224px, .9fr) minmax(314px, 1.25fr) minmax(139px, .7fr);
   gap: 6px;
   min-width: 0;
-  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  min-height: 100%;
 }
 
 .source-detail-panel {
@@ -1714,7 +1714,8 @@ tr:focus-visible {
   grid-template-rows: 34px minmax(0, 1fr);
   gap: 12px;
   min-width: 0;
-  height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  height: 100%;
+  min-height: 0;
 }
 
 .new-analysis {

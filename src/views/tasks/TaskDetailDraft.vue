@@ -158,7 +158,7 @@ function confirmDelete() {
 </script>
 
 <style scoped>
-.task-detail-draft-page{--draft-red:#c50000;--draft-line:#dfe5ec;padding:0 2px 18px;color:#252c37}
+.task-detail-draft-page{--draft-red:var(--color-primary);--draft-line:#dfe5ec;padding:0 2px 18px;color:#252c37}
 
 :global(.task-detail-shell:has(.task-detail-draft-page) .sidebar) {
   width: clamp(182px, 13.25vw, 212px);
@@ -180,7 +180,7 @@ function confirmDelete() {
 
 :global(.task-detail-shell:has(.task-detail-draft-page) .brand) {
   margin-bottom: 23px;
-  background: #c50000;
+  background: var(--color-primary);
 }
 
 :global(.task-detail-shell:has(.task-detail-draft-page) .brand strong) { font-size: 21px; }
@@ -190,6 +190,17 @@ function confirmDelete() {
   flex: 0 0 118px;
   align-content: start;
   padding-top: 18px;
+}
+
+@media (max-width: 1366px) {
+  :global(.task-detail-shell:has(.task-detail-draft-page) .sidebar) {
+    width: 72px;
+    flex-basis: 72px;
+  }
+
+  :global(.task-detail-shell:has(.task-detail-draft-page) .brand strong) {
+    font-size: 0;
+  }
 }
 
 .task-detail-draft-header {
@@ -382,7 +393,7 @@ function confirmDelete() {
 
 .task-detail-draft-placeholder h2 { margin: 0 0 10px; font-size: 17px; }
 .task-detail-draft-placeholder p { margin: 0 0 14px; color: #687386; font-size: 14px; }
-.task-detail-draft-placeholder a { color: #1677ff; font-size: 14px; text-decoration: none; }
+.task-detail-draft-placeholder a { color: var(--color-info); font-size: 14px; text-decoration: none; }
 
 .task-detail-draft-dialog-mask {
   position: fixed;
@@ -436,7 +447,7 @@ function confirmDelete() {
 .task-detail-draft-tabs button:focus-visible,
 .task-detail-draft-placeholder a:focus-visible,
 .task-detail-draft-dialog-actions button:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: 2px;
 }
 

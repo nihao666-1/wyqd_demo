@@ -176,12 +176,12 @@ function formatAmount(amount) {
 </script>
 
 <style scoped>
-.expense-anomaly-table { display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-width:0; height:336px; border:1px solid #dfe5ec; background:#fff; }
+.expense-anomaly-table { display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-width:0; height:100%; min-height:336px; border:1px solid #dfe5ec; background:#fff; }
 .table-head { display:flex; min-height:48px; align-items:center; justify-content:space-between; gap:12px; padding:0 12px; border-bottom:1px solid #e5e9ef; }
 .result-tabs { display:flex; min-width:0; gap:22px; overflow-x:auto; scrollbar-width:none; }
 .result-tabs button { position:relative; height:48px; flex:0 0 auto; border:0; background:transparent; color:#303846; font-size:13px; font-weight:600; }
-.result-tabs button.active { color:#d00000; }
-.result-tabs button.active::after { position:absolute; right:0; bottom:0; left:0; height:2px; background:#d00000; content:""; }
+.result-tabs button.active { color:var(--color-primary); }
+.result-tabs button.active::after { position:absolute; right:0; bottom:0; left:0; height:2px; background:var(--color-primary); content:""; }
 .export-button { display:inline-flex; height:30px; flex:0 0 auto; align-items:center; gap:6px; border:1px solid #cfd8e3; border-radius:4px; padding:0 12px; background:#fff; color:#303846; font-size:12px; }
 .table-scroll { min-height:0; overflow:auto; }
 table { width:100%; min-width:990px; table-layout:fixed; border-collapse:collapse; font-size:12px; }
@@ -201,18 +201,18 @@ tbody tr { cursor:pointer; }
 tbody tr:hover, tbody tr.selected { background:#fff8f8; }
 .amount { text-align:right; font-variant-numeric:tabular-nums; }
 .risk-tag { display:inline-flex; min-width:44px; justify-content:center; border-radius:4px; padding:2px 6px; font-size:12px; }
-.risk-tag.high { border:1px solid #ffd7d7; color:#d00000; background:#fff0f0; }
-.risk-tag.medium { border:1px solid #ffd9b7; color:#d46b08; background:#fff7e8; }
+.risk-tag.high { border:1px solid #ffd7d7; color:var(--color-primary); background:#fff0f0; }
+.risk-tag.medium { border:1px solid #ffd9b7; color:var(--color-warning); background:#fff7e8; }
 .risk-tag.low { border:1px solid #bfe8d4; color:#0f8f55; background:#ebf8f1; }
 .row-actions { display:flex; gap:6px; }
-.row-actions button { border:0; padding:0; background:transparent; color:#1677ff; font-size:12px; }
+.row-actions button { border:0; padding:0; background:transparent; color:var(--color-info); font-size:12px; }
 .row-actions button:disabled { cursor:not-allowed; color:#a9b4c2; }
 .empty-state { height:120px; text-align:center; color:#7a8491; }
 .pagination { display:flex; min-height:48px; align-items:center; justify-content:flex-end; gap:10px; padding:0 12px; color:#4b5563; font-size:12px; }
 .pagination .total { margin-right:auto; }
 .page-buttons { display:inline-flex; align-items:center; gap:6px; }
 .page-buttons button { min-width:24px; height:24px; border:1px solid #d6dde8; border-radius:4px; background:#fff; color:#465366; }
-.page-buttons button.active { border-color:#d00000; background:#d00000; color:#fff; }
+.page-buttons button.active { border-color:var(--color-primary); background:var(--color-primary); color:#fff; }
 .page-buttons button.ellipsis { border-color:transparent; }
 .pagination select, .jump input { height:26px; border:1px solid #d6dde8; border-radius:4px; background:#fff; color:#475467; font-size:12px; }
 .pagination select { padding:0 8px; }

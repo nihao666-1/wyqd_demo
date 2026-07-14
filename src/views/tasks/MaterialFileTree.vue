@@ -156,7 +156,7 @@ function fileTone(type) {
 
 <style scoped>
 .material-file-tree {
-  --tree-primary: var(--color-primary, #c80000);
+  --tree-primary: var(--color-primary, var(--color-primary));
   --tree-line: var(--color-line, #e4e7ed);
   display: grid;
   min-width: 0;
@@ -308,7 +308,7 @@ summary:focus-visible {
 }
 
 .tree-file svg.pdf { color: #ed3038; }
-.tree-file svg.excel { color: #159447; }
+.tree-file svg.excel { color: var(--color-success); }
 .tree-file svg.word { color: #2d6fd2; }
 .tree-file svg.zip { color: #ef8a18; }
 .tree-file svg.default { color: #778397; }

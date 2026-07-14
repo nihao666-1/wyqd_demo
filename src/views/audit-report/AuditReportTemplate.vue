@@ -1,10 +1,11 @@
 <template>
+  <div class="audit-report-template-page route-fill-page">
   <PageHeader eyebrow="模板管理" title="报告模板管理" description="查询模板版本、引用状态、样式规则和检查规则绑定情况。">
     <RouterLink class="btn" to="/audit-report/workbench">返回入口</RouterLink>
     <RouterLink class="btn primary" to="/audit-report/template-upload">上传模板</RouterLink>
   </PageHeader>
   <FilterPanel :items="filters" @query="store.setNotice('已按模板名称、版本、覆盖部门和有效状态查询。')" />
-  <section class="panel">
+  <section class="panel report-table-panel">
     <div class="panel-title"><h3>模板版本</h3></div>
     <DataTable :columns="columns" :rows="store.db.reportTemplates" row-key="templateId">
       <template #actions="{ row }">
@@ -13,6 +14,7 @@
       </template>
     </DataTable>
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -38,3 +40,32 @@ const columns = [
   { key: 'styleStatus', label: '样式/规则状态' }
 ];
 </script>
+
+<style scoped>
+.audit-report-template-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.report-table-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

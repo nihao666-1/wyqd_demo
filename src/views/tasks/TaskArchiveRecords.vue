@@ -65,9 +65,9 @@ const ArchivePager = defineComponent({
 .version-table th:nth-child(1){width:46px}.version-table th:nth-child(2){width:52px}.version-table th:nth-child(3){width:61px}.version-table th:nth-child(4){width:64px}.version-table th:nth-child(5){width:86px}.version-table th:nth-child(6){width:88px}.version-table th:nth-child(7){width:48px}.version-table th:nth-child(8){width:81px}
 .export-table th:nth-child(1){width:125px}.export-table th:nth-child(2){width:62px}.export-table th:nth-child(3){width:46px}.export-table th:nth-child(4){width:60px}.export-table th:nth-child(5){width:94px}.export-table th:nth-child(6){width:50px}.export-table th:nth-child(7){width:75px}
 .record-status { display: inline-block; padding: 1px 3px; border: 1px solid #a9dfbd; border-radius: 3px; color: #079447; background: #f3fbf6; font-size: 8px; }.record-status.archived { color: #078247; }
-.record-actions { display: flex; align-items: center; gap: 4px; }.record-actions button { padding: 0; border: 0; background: transparent; color: #1677ff; font-size: 8px; }.record-actions span { color: #a8adb5; font-size: 8px; }
+.record-actions { display: flex; align-items: center; gap: 4px; }.record-actions button { padding: 0; border: 0; background: transparent; color: var(--color-info); font-size: 8px; }.record-actions span { color: #a8adb5; font-size: 8px; }
 :deep(.archive-pager) { height: 37px; padding: 0 5px; border-top: 1px solid #e5e8ec; display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: #505762; font-size: 9px; }
 :deep(.archive-pager > span:first-child) { margin-right: auto; }
-:deep(.pager-controls) { display: flex; gap: 3px; }:deep(.pager-controls button) { width: 22px; height: 22px; padding: 0; border: 1px solid #e0e4e9; border-radius: 3px; background: #fff; font-size: 10px; }:deep(.pager-controls .current) { border-color: #c7000b; background: #c7000b; color: #fff; }
+:deep(.pager-controls) { display: flex; gap: 3px; }:deep(.pager-controls button) { width: 22px; height: 22px; padding: 0; border: 1px solid #e0e4e9; border-radius: 3px; background: #fff; font-size: 10px; }:deep(.pager-controls .current) { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
 :deep(.page-input) { width: 32px; height: 22px; border: 1px solid #e0e4e9; border-radius: 3px; display: inline-grid; place-items: center; }
 </style>

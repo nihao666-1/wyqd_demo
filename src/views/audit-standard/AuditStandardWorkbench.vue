@@ -1,4 +1,5 @@
 <template>
+  <div class="audit-standard-workbench-page route-fill-page">
   <PageHeader eyebrow="审计规范智能化" title="审计规范工作台" description="明确 0-1 生成、1-2 优化、上传标准规范三种入口，来源、部门、时间范围均受权限控制。">
     <RouterLink class="btn primary" to="/audit-standard/generate?mode=0-1">0-1 生成</RouterLink>
     <RouterLink class="btn" to="/audit-standard/generate?mode=1-2">1-2 优化</RouterLink>
@@ -35,6 +36,7 @@
     </div>
     <DataTable :columns="columns" :rows="store.db.standardSources" row-key="sourceId" />
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -59,3 +61,20 @@ const columns = [
   { key: 'status', label: '状态' }
 ];
 </script>
+
+<style scoped>
+.audit-standard-workbench-page {
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.audit-standard-workbench-page > .panel {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+</style>

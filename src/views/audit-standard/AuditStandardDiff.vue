@@ -1,4 +1,5 @@
 <template>
+  <div class="audit-standard-diff-page route-fill-page">
   <PageHeader eyebrow="版本差异" title="标准规范版本差异分析" description="入库前必须展示新旧版本差异，并保存差异结果。">
     <RouterLink class="btn" to="/audit-standard/upload">返回上传</RouterLink>
     <RouterLink class="btn primary" to="/audit-standard/library">确认入审计规范库</RouterLink>
@@ -8,6 +9,7 @@
     <div class="panel-title"><h3>差异明细</h3></div>
     <DataTable :columns="columns" :rows="store.db.standardDiffItems" row-key="diffId" />
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -29,3 +31,34 @@ const columns = [
   { key: 'summary', label: '差异摘要' }
 ];
 </script>
+
+<style scoped>
+.audit-standard-diff-page {
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.audit-standard-diff-page > .panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: auto;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

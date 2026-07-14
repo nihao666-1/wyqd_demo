@@ -1,4 +1,5 @@
 <template>
+  <div class="audit-standard-library-page route-fill-page">
   <PageHeader eyebrow="规范库" title="审计规范库版本管理" description="查看当前有效版本、历史版本和引用锁定状态。">
     <RouterLink class="btn" to="/audit-standard/workbench">返回工作台</RouterLink>
   </PageHeader>
@@ -11,6 +12,7 @@
       </template>
     </DataTable>
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -36,3 +38,20 @@ const columns = [
   { key: 'createdAt', label: '创建时间' }
 ];
 </script>
+
+<style scoped>
+.audit-standard-library-page {
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.audit-standard-library-page > .panel {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+</style>

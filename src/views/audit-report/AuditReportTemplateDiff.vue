@@ -1,4 +1,5 @@
 <template>
+  <div class="audit-report-template-diff-page route-fill-page">
   <PageHeader eyebrow="模板差异" title="模板新旧版本差异识别" description="展示结构、样式和检查规则差异，确认后发布新版本。">
     <RouterLink class="btn" to="/audit-report/template-upload">返回上传</RouterLink>
     <button class="btn primary" @click="store.publishTemplateVersion()">发布版本</button>
@@ -11,10 +12,11 @@
       <p>发布后写入版本记录；旧版本保留引用关系，不覆盖历史报告。</p>
     </div>
   </section>
-  <section class="panel">
+  <section class="panel report-table-panel">
     <div class="panel-title"><h3>差异明细</h3></div>
     <DataTable :columns="columns" :rows="store.db.templateDiffItems" row-key="diffId" />
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -40,3 +42,32 @@ const columns = [
   { key: 'summary', label: '差异摘要' }
 ];
 </script>
+
+<style scoped>
+.audit-report-template-diff-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.report-table-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

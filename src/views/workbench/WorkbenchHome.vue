@@ -1,5 +1,5 @@
 <template>
-  <div class="workbench-page" :class="isEmptyMode ? 'is-empty' : 'has-data'">
+  <div class="workbench-page route-fill-page" :class="isEmptyMode ? 'is-empty' : 'has-data'">
     <section class="workbench-top">
       <div class="metric-grid workbench-metrics">
         <RouterLink v-for="item in topMetrics" :key="item.label" class="metric-card workbench-metric" :to="item.to">
@@ -506,16 +506,18 @@ const operationRows = computed(() => store.db.operationLogs);
 <style scoped>
 .workbench-page {
   display: grid;
-  gap: 10px;
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  gap: var(--ui-space-3);
+  overflow: auto;
 }
 
 .workbench-page.is-empty {
-  min-height: calc(100dvh - 98px);
   grid-template-rows: auto minmax(0, 1fr);
 }
 
 .workbench-page.has-data {
-  min-height: calc(100vh - 98px);
   grid-template-rows:
     auto
     minmax(clamp(260px, 26vh, 320px), 0.28fr)
@@ -1168,7 +1170,7 @@ const operationRows = computed(() => store.db.operationLogs);
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-primary), #d46b76);
+  background: var(--color-primary);
 }
 
 .progress-cell b,
@@ -1457,5 +1459,37 @@ const operationRows = computed(() => store.db.operationLogs);
   .row-actions {
     justify-content: flex-start;
   }
+}
+
+/* Viewport-scaled visible dimensions for the shared 2560x1440 baseline. */
+.workbench-page :deep(.panel),
+.workbench-page .panel {
+  padding: var(--ui-space-4) var(--ui-space-5);
+}
+
+.workbench-page :deep(.panel-title h3),
+.workbench-page .panel-title h3,
+.workbench-page strong {
+  font-size: var(--ui-font-sm);
+}
+
+.workbench-page p,
+.workbench-page span,
+.workbench-page td,
+.workbench-page th,
+.workbench-page a,
+.workbench-page button {
+  font-size: var(--ui-font-xs);
+}
+
+.workbench-page .btn {
+  min-height: var(--ui-control-sm);
+  padding: var(--ui-space-2) var(--ui-space-4);
+}
+
+.workbench-page .metric-icon,
+.workbench-page .start-icon {
+  width: var(--ui-icon-lg);
+  height: var(--ui-icon-lg);
 }
 </style>

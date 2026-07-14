@@ -179,7 +179,7 @@ tr.selected td {
 }
 
 tr:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: -2px;
 }
 
@@ -207,7 +207,7 @@ tr:focus-visible {
   padding: 1px 3px;
   border-radius: 3px;
   background: #fff0f0;
-  color: #c9000b;
+  color: var(--color-primary);
   line-height: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -227,7 +227,7 @@ tr:focus-visible {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #1677ff;
+  color: var(--color-info);
   font: inherit;
   cursor: pointer;
 }
@@ -259,8 +259,8 @@ tr:focus-visible {
 }
 
 .pagination button[aria-current='page'] {
-  border-color: #c9000b;
-  color: #c9000b;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .pagination select { width: 56px; }

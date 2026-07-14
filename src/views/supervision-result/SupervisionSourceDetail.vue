@@ -158,7 +158,7 @@ dd {
 .page-marker {
   display: block;
   margin-top: 7px;
-  color: #1677ff;
+  color: var(--color-info);
   font-size: 10px;
 }
 
@@ -183,11 +183,11 @@ li {
 }
 
 .status-dot.active {
-  background: #1677ff;
+  background: var(--color-info);
 }
 
 .status-dot.failed {
-  background: #c9000b;
+  background: var(--color-primary);
 }
 
 .log-copy {
@@ -222,10 +222,10 @@ li {
 
 .detail-footer button {
   height: 34px;
-  border: 1px solid #c9000b;
+  border: 1px solid var(--color-primary);
   border-radius: 4px;
   background: #fff;
-  color: #c9000b;
+  color: var(--color-primary);
   font-size: 12px;
   cursor: pointer;
 }
@@ -233,7 +233,7 @@ li {
 .detail-footer .save-button {
   width: 100%;
   border-color: #b90008;
-  background: #c9000b;
+  background: var(--color-primary);
   color: #fff;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="record-center-page" :class="{ 'is-empty': isEmptyView }">
+  <div class="record-center-page route-fill-page" :class="{ 'is-empty': isEmptyView }">
     <div class="record-layout">
       <main class="record-main">
         <section class="metric-strip" aria-label="记录统计">
@@ -363,16 +363,23 @@ function noop() {}
 
 <style scoped>
 .record-center-page {
+  height: 0;
   min-width: 0;
-  min-height: calc(100vh - 84px);
-  overflow: visible;
+  min-height: 0;
+  overflow: hidden;
   color: #1f2937;
+}
+
+.record-center-page.is-empty {
+  overflow: auto;
 }
 
 .record-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 348px;
-  gap: 12px;
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) var(--ui-panel-rail-lg);
+  gap: var(--ui-space-4);
   align-items: stretch;
 }
 
@@ -415,10 +422,10 @@ function noop() {}
 }
 
 .metric-icon.red { color: #ef2929; background: #fff0f0; }
-.metric-icon.orange { color: #ff8a00; background: #fff4e4; }
-.metric-icon.blue { color: #1f7aff; background: #edf5ff; }
-.metric-icon.purple { color: #7657ff; background: #f2edff; }
-.metric-icon.green { color: #16a36a; background: #eaf8f1; }
+.metric-icon.orange { color: var(--color-warning); background: #fff4e4; }
+.metric-icon.blue { color: var(--color-info); background: #edf5ff; }
+.metric-icon.purple { color: #6f668f; background: #f2edff; }
+.metric-icon.green { color: var(--color-success); background: #eaf8f1; }
 .metric-icon.gray { color: #667085; background: #f2f4f7; }
 
 .record-metric p {
@@ -452,7 +459,7 @@ function noop() {}
 }
 
 .record-metric em.up {
-  color: #d92d20;
+  color: var(--color-primary);
 }
 
 .record-metric em.down {
@@ -566,8 +573,8 @@ function noop() {}
 
 .filter-actions .query-btn,
 .detail-actions .primary {
-  border-color: #c40000;
-  background: #c40000;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -598,7 +605,7 @@ function noop() {}
 }
 
 .record-tabs button.active {
-  color: #d00000;
+  color: var(--color-primary);
 }
 
 .record-tabs button.active::after {
@@ -608,7 +615,7 @@ function noop() {}
   right: 0;
   bottom: 0;
   height: 3px;
-  background: #d00000;
+  background: var(--color-primary);
 }
 
 .record-table-wrap {
@@ -617,6 +624,13 @@ function noop() {}
 
 .record-center-page:not(.is-empty) .record-table-wrap {
   flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.record-center-page:not(.is-empty) .record-side {
+  min-height: 0;
+  overflow: auto;
 }
 
 .record-table {
@@ -685,7 +699,7 @@ function noop() {}
   white-space: nowrap;
 }
 
-.type-tag.blue { color: #1f7aff; background: #eef6ff; }
+.type-tag.blue { color: var(--color-info); background: #eef6ff; }
 .type-tag.green { color: #159a62; background: #eaf8f1; }
 .type-tag.orange { color: #f27a00; background: #fff3df; }
 .type-tag.purple { color: #6848ef; background: #f2edff; }
@@ -706,7 +720,7 @@ function noop() {}
 .table-actions button {
   border: 0;
   background: transparent;
-  color: #1f7aff;
+  color: var(--color-info);
   font-weight: 700;
   font-size: 10.5px;
 }
@@ -772,7 +786,7 @@ function noop() {}
   justify-content: center;
   border-radius: 4px;
   color: #fff;
-  background: #c40000;
+  background: var(--color-primary);
   font-weight: 800;
 }
 
@@ -800,8 +814,8 @@ function noop() {}
 
 .record-pagination button.active {
   color: #fff;
-  border-color: #c40000;
-  background: #c40000;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
 }
 
 .record-pagination select {
@@ -862,8 +876,8 @@ function noop() {}
 }
 
 .trace-step.red span { color: #e52a2a; background: #fff0f0; }
-.trace-step.orange span { color: #ff8a00; background: #fff8ed; }
-.trace-step.blue span { color: #1f7aff; background: #eef6ff; }
+.trace-step.orange span { color: var(--color-warning); background: #fff8ed; }
+.trace-step.blue span { color: var(--color-info); background: #eef6ff; }
 .trace-step.purple span { color: #6848ef; background: #f2edff; }
 .trace-step.green span { color: #15a065; background: #eaf8f1; }
 .trace-step.gray span { color: #667085; background: #f6f7f9; }
@@ -922,10 +936,10 @@ function noop() {}
 }
 
 .guide-side span.red { color: #ef2929; }
-.guide-side span.orange { color: #ff8a00; }
-.guide-side span.blue { color: #1f7aff; }
+.guide-side span.orange { color: var(--color-warning); }
+.guide-side span.blue { color: var(--color-info); }
 .guide-side span.purple { color: #6848ef; }
-.guide-side span.green { color: #16a36a; }
+.guide-side span.green { color: var(--color-success); }
 .guide-side span.gray { color: #667085; }
 
 .guide-side strong {
@@ -1033,7 +1047,7 @@ function noop() {}
 .related-row button {
   min-height: 22px;
   padding: 0 7px;
-  color: #1f7aff;
+  color: var(--color-info);
   font-size: 10px;
   white-space: nowrap;
 }
@@ -1049,7 +1063,7 @@ function noop() {}
 }
 
 .file-dot {
-  background: #16a36a;
+  background: var(--color-success);
 }
 
 .pdf-dot {
@@ -1058,7 +1072,7 @@ function noop() {}
 
 .review-line span {
   float: right;
-  color: #16a36a;
+  color: var(--color-success);
 }
 
 .detail-timeline {
@@ -1102,13 +1116,13 @@ function noop() {}
 }
 
 .detail-timeline li.current {
-  color: #d00000;
+  color: var(--color-primary);
   font-weight: 800;
 }
 
 .detail-timeline li.current i {
-  border-color: #d00000;
-  background: #d00000;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
 }
 
 .detail-timeline b {
@@ -1205,5 +1219,62 @@ function noop() {}
   .filter-actions {
     flex-wrap: wrap;
   }
+}
+
+/* Viewport-scaled visible dimensions for the shared 2560x1440 baseline. */
+.record-center-page {
+  font-size: var(--ui-font-xs);
+}
+
+.metric-strip,
+.filter-form,
+.filter-actions,
+.detail-actions {
+  gap: var(--ui-space-3);
+}
+
+.record-metric,
+.filter-form,
+.record-side,
+.trace-preview {
+  padding: var(--ui-space-4);
+}
+
+.record-metric p,
+.record-metric strong small,
+.record-metric em,
+.filter-form label,
+.filter-form input,
+.filter-form select,
+.filter-actions button,
+.record-table th,
+.record-table td,
+.record-pagination,
+.detail-side button {
+  font-size: var(--ui-font-xs);
+}
+
+.record-tabs button,
+.record-side h3,
+.trace-preview h3 {
+  font-size: var(--ui-font-sm);
+}
+
+.record-metric strong {
+  font-size: var(--ui-font-xl);
+}
+
+.filter-form input,
+.filter-form select,
+.filter-actions button,
+.detail-actions button {
+  height: var(--ui-control-sm);
+}
+
+.metric-icon {
+  width: var(--ui-icon-lg);
+  height: var(--ui-icon-lg);
+  flex-basis: var(--ui-icon-lg);
+  font-size: var(--ui-icon-md);
 }
 </style>

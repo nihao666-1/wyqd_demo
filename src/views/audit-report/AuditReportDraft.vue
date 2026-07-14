@@ -1,5 +1,5 @@
 <template>
-  <section class="report-generation-page" data-report-region="report-generation-page">
+  <section class="report-generation-page route-fill-page" data-report-region="report-generation-page">
     <header class="report-titlebar" data-report-region="title-actions">
       <h2>报告生成</h2>
       <div class="title-actions">
@@ -346,4 +346,5 @@ function sourceIcon(tone) {
 .doc-paper{height:calc(100% - 34px);overflow:auto}
 .source-rail{height:auto;min-height:654px;align-self:stretch}
 @media (max-width:1400px){.source-rail{min-height:480px}}
+.report-generation-page{height:0;min-height:0;overflow:auto}
 </style>

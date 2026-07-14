@@ -69,11 +69,11 @@ test('file and record centers consume the global demo data mode instead of local
   compileVue(recordCenterUrl);
 });
 
-test('expense section shells use one stable shared frame size', () => {
+test('expense section shells inherit the shared viewport-scaled frame size', () => {
   const css = read(layoutCssUrl);
   assert.match(css, /\.expense-section-shell,\s*\.expense-empty-shell,\s*\.expense-audit-result-shell,\s*\.expense-trend-shell\s*\{/);
-  assert.match(css, /\.expense-section-shell \.sidebar,\s*\.expense-empty-shell \.sidebar,\s*\.expense-audit-result-shell \.sidebar,\s*\.expense-trend-shell \.sidebar\s*\{[\s\S]*width: 208px/);
-  assert.match(css, /\.expense-section-shell \.topbar,\s*\.expense-empty-shell \.topbar,\s*\.expense-audit-result-shell \.topbar,\s*\.expense-trend-shell \.topbar\s*\{[\s\S]*height: 60px/);
+  assert.match(css, /\.app-shell \.sidebar\s*\{[^}]*width:\s*var\(--shell-sidebar-width\)/s);
+  assert.match(css, /\.app-shell \.topbar\s*\{[^}]*height:\s*var\(--ui-topbar-height\)/s);
   assert.doesNotMatch(css, /\.expense-empty-shell \.sidebar \{[\s\S]*width: 226px/);
   assert.doesNotMatch(css, /\.expense-trend-shell \.sidebar \{[\s\S]*width: 200px/);
 });

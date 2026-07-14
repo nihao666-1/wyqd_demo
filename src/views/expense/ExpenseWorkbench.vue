@@ -1,6 +1,6 @@
 <template>
   <template v-if="isEmptyMode">
-  <div class="expense-empty-page" aria-label="费用审计分析">
+  <div class="expense-empty-page route-fill-page" aria-label="费用审计分析">
     <div class="expense-empty-layout">
       <main class="expense-empty-main">
         <section class="expense-metrics-strip" aria-label="费用审计指标概览">
@@ -109,7 +109,7 @@
   </template>
 
   <template v-else>
-    <div class="expense-data-entry-page" aria-labelledby="expense-data-title">
+    <div class="expense-data-entry-page route-fill-page" aria-labelledby="expense-data-title">
       <section class="expense-data-hero">
         <div>
           <h1 id="expense-data-title">费用审计分析</h1>
@@ -250,7 +250,7 @@ const dataEntries = [
 </script>
 
 <style scoped>
-.expense-empty-page{--red:#d50000;--line:#e3e8ef;--muted:#606b7b;--soft:#f7f8fa;box-sizing:border-box;width:100%;max-width:1338px;margin:0 auto;padding:16px 56px 12px 8px;color:#111827}
+.expense-empty-page{--red:var(--color-primary);--line:#e3e8ef;--muted:#606b7b;--soft:#f7f8fa;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:16px 56px 12px 8px;color:#111827}
 .expense-empty-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start;min-width:0}
 .expense-empty-main{display:grid;min-width:0;gap:12px}
 .expense-metrics-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));height:116px;border:1px solid var(--line);border-radius:4px;background:#fff;overflow:hidden}
@@ -262,7 +262,7 @@ const dataEntries = [
 .expense-metric strong{display:block;color:#06080d;font-size:30px;line-height:32px;font-weight:700}
 .expense-metric em{font-size:15px;font-style:normal;font-weight:500}
 .expense-metric small{display:block;margin-top:10px;color:#596677;font-size:12px}
-.red{color:#d60b0b;background:#fff1f1}.orange{color:#f08300;background:#fff4e8}.green{color:#12a66c;background:#eaf8f0}.blue{color:#1677ff;background:#edf5ff}.purple{color:#7a49e8;background:#f3edff}
+.red{color:#d60b0b;background:#fff1f1}.orange{color:var(--color-warning);background:#fff4e8}.green{color:var(--color-success);background:#eaf8f0}.blue{color:var(--color-info);background:#edf5ff}.purple{color:#6f668f;background:#f3edff}
 .expense-empty-hero{display:grid;grid-template-columns:320px minmax(0,1fr);align-items:center;height:176px;padding:18px 42px;border:1px solid var(--line);border-radius:6px;background:#fff}
 .hero-illustration{width:260px;max-width:100%;height:auto;opacity:.92}
 .expense-empty-hero h2{margin:0 0 16px;font-size:28px;line-height:36px;font-weight:700}
@@ -297,9 +297,9 @@ const dataEntries = [
 .source-card h3{margin:0 0 6px;font-size:14px;line-height:20px}
 .source-card p{max-height:36px;margin:0 0 6px;overflow:hidden;color:#566171;font-size:12px;line-height:18px}
 .source-badge{display:inline-flex;align-items:center;min-height:22px;padding:1px 7px;border:1px solid #ffb5b5;border-radius:4px;background:#fff2f2;color:#e00000;font-size:12px;font-weight:700}
-.source-badge.optional{border-color:#bcd8ff;background:#edf5ff;color:#1677ff}
+.source-badge.optional{border-color:#bcd8ff;background:#edf5ff;color:var(--color-info)}
 .source-guide{display:flex;height:40px;align-items:center;justify-content:center;gap:9px;border:1px solid #d5dbe4;border-radius:4px;background:#fff;color:#394453;font-size:14px}
-.expense-data-entry-page{--red:#d50000;--line:#e3e8ef;--muted:#606b7b;max-width:1338px;margin:0 auto;padding:16px 8px 20px;color:#111827}
+.expense-data-entry-page{--red:var(--color-primary);--line:#e3e8ef;--muted:#606b7b;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:16px 8px 20px;color:#111827}
 .expense-data-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:132px;padding:22px 28px;border:1px solid var(--line);border-radius:6px;background:#fff}
 .expense-data-hero h1{margin:0 0 10px;font-size:26px;line-height:34px}
 .expense-data-hero p{max-width:660px;margin:0;color:#384252;font-size:14px;line-height:22px}
@@ -323,4 +323,59 @@ const dataEntries = [
 @media (max-width: 900px){.expense-metrics-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-metric:nth-child(2n){border-right:0}.expense-metric:last-child{grid-column:1/-1;border-top:1px solid #eef1f5}.expense-empty-hero{grid-template-columns:1fr;padding:22px;text-align:center}.hero-illustration{justify-self:center}.expense-entry-grid{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:1fr}.source-guide{grid-column:auto}.expense-data-hero{align-items:flex-start;flex-direction:column}.expense-data-actions{justify-content:flex-start}}
 @media (max-width: 760px){.expense-empty-page{padding:12px 10px 18px}.expense-metrics-strip{grid-template-columns:1fr}.expense-metric,.expense-metric:nth-child(2n){border-right:0;border-bottom:1px solid #eef1f5}.expense-metric:last-child{grid-column:auto;border-top:0;border-bottom:0}.expense-entry-card{min-height:auto}.entry-flow{gap:4px}.entry-flow small{font-size:11px}.entry-action{width:min(176px,100%)}.expense-task-panel{padding-left:10px;padding-right:10px}.expense-table-wrap td{height:170px}}
 @media (max-width: 480px){.expense-empty-hero h2{font-size:24px}.expense-metric{grid-template-columns:46px minmax(0,1fr)}.metric-icon,.entry-icon{width:46px;height:46px}.expense-entry-card header{grid-template-columns:46px minmax(0,1fr);gap:12px}.source-card{grid-template-columns:40px minmax(0,1fr);padding:16px 10px}.source-icon{width:40px;height:40px}}
+.expense-empty-page,
+.expense-data-entry-page {
+  height: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.expense-data-entry-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.expense-data-grid {
+  min-height: 0;
+  flex: 1;
+}
+
+@media (min-width: 1701px) {
+  .expense-empty-layout {
+    height: 100%;
+    align-items: stretch;
+  }
+
+  .expense-empty-main {
+    min-height: 0;
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+  }
+
+  .expense-task-panel {
+    display: flex;
+    height: auto;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .expense-table-wrap {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  .expense-table-wrap table,
+  .expense-table-wrap tbody,
+  .expense-table-wrap tr,
+  .expense-table-wrap td,
+  .expense-task-empty {
+    height: 100%;
+  }
+
+  .expense-source-panel {
+    height: 100%;
+    align-content: start;
+  }
+}
 </style>

@@ -60,8 +60,8 @@ test('费用审计空白页任务表和数据源文案与设计一致', () => {
 
 test('费用审计空白页使用专用响应式网格并避免真实任务数据', () => {
   const content = read(workbenchUrl);
-  assert.match(content, /class="expense-empty-page"/);
-  assert.match(content, /\.expense-empty-layout\s*\{[\s\S]*grid-template-columns:minmax\(0,1fr\) 292px/);
+  assert.match(content, /class="expense-empty-page[^\"]*"/);
+  assert.match(content, /\.expense-empty-layout\s*\{[\s\S]*grid-template-columns:minmax\(0,1fr\) 320px/);
   assert.match(content, /\.expense-metrics-strip\s*\{[\s\S]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(content, /\.expense-entry-grid\s*\{[\s\S]*grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
   assert.match(content, /@media \(max-width: 1199px\)/);

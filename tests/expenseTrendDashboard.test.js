@@ -48,8 +48,8 @@ test('布局为费用趋势页提供专用壳层面包屑和导航状态', () =>
   assert.match(layout, /const isExpenseTrendResult = computed\(\(\) => route\.path === '\/expense\/usage\/dashboard'\)/);
   assert.match(layout, /费用审计分析<\/span><i>\/<\/i><strong>费用趋势分析<\/strong>/);
   assert.match(layout, /class="global-data-mode"/);
-  assert.match(css, /\.expense-trend-shell \.sidebar \{[\s\S]*width: 208px/);
-  assert.match(css, /\.expense-trend-shell \.topbar \{[\s\S]*height: 60px/);
+  assert.match(css, /\.expense-trend-shell \.sidebar \{[\s\S]*width: var\(--shell-sidebar-width\)/);
+  assert.match(css, /\.expense-trend-shell \.topbar \{[\s\S]*height: var\(--ui-topbar-height\)/);
   compileVue(layoutUrl);
 });
 
@@ -96,12 +96,12 @@ test('费用趋势页包含红框拆分的主内容和右侧洞察栏', () => {
 test('费用趋势页锁定截图式紧凑布局和响应式降级', () => {
   const content = read(dashboardUrl);
   assert.match(content, /\.expense-trend-page\{[\s\S]*grid-template-columns:minmax\(0,1fr\) 345px/);
-  assert.match(content, /\.trend-filter\{[\s\S]*min-height:97px/);
+  assert.match(content, /\.trend-filter\{[\s\S]*min-height:54px/);
   assert.match(content, /\.metric-row\{[\s\S]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(content, /\.chart-row\{[\s\S]*grid-template-columns:1\.25fr 1fr \.92fr \.95fr/);
   assert.match(content, /\.summary-row\{[\s\S]*grid-template-columns:minmax\(0,2fr\) minmax\(270px,\.9fr\)/);
   assert.match(content, /\.trend-detail\{[\s\S]*min-height:254px/);
-  assert.match(content, /@media\(max-width:1500px\)\{[\s\S]*\.expense-trend-page\{grid-template-columns:1fr/);
+  assert.match(content, /@media\(max-width:1500px\)\{[\s\S]*\.expense-trend-page\{grid-template-columns:minmax\(0,1fr\)/);
   assert.match(content, /@media\(max-width:1199px\)\{[\s\S]*\.expense-trend-page\{grid-template-columns:1fr/);
   assert.match(content, /@media\(max-width:760px\)\{[\s\S]*\.trend-filter-row,\.chart-row,\.metric-row\{grid-template-columns:1fr/);
 });

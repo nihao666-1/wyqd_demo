@@ -1,11 +1,12 @@
 <template>
+  <div class="audit-report-diff-page route-fill-page">
   <PageHeader eyebrow="回传比对" title="系统锁定版本与线下修改稿比对" description="差异确认后，可以形成新版本，也可以仅归档线下修改稿。">
     <RouterLink class="btn" to="/audit-report/offline-upload">返回回传</RouterLink>
     <button class="btn primary" @click="store.handleReportDiffAction('newVersion')">形成新版本</button>
     <button class="btn" @click="store.handleReportDiffAction('archive')">仅归档</button>
   </PageHeader>
   <MetricGrid :metrics="metrics" />
-  <section class="panel">
+  <section class="panel report-table-panel">
     <div class="panel-title"><h3>差异明细</h3></div>
     <DataTable :columns="columns" :rows="store.db.reportDiffItems" row-key="diffId">
       <template #actions="{ row }">
@@ -14,6 +15,7 @@
       </template>
     </DataTable>
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -36,3 +38,32 @@ const columns = [
   { key: 'decision', label: '处理方式' }
 ];
 </script>
+
+<style scoped>
+.audit-report-diff-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.report-table-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

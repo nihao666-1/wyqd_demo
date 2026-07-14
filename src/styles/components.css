@@ -11,10 +11,10 @@
 .page-head {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--ui-space-5);
   align-items: flex-start;
-  padding: 24px 26px;
-  margin-bottom: 20px;
+  padding: var(--ui-space-6);
+  margin-bottom: var(--ui-space-5);
   border-top: 3px solid var(--color-primary);
 }
 
@@ -23,8 +23,8 @@
 }
 
 .page-head h2 {
-  margin: 7px 0 9px;
-  font-size: 20px;
+  margin: var(--ui-space-2) 0 var(--ui-space-3);
+  font-size: var(--ui-font-xl);
   line-height: 1.25;
 }
 
@@ -36,27 +36,28 @@
 .eyebrow {
   color: var(--color-primary);
   font-weight: 700;
-  font-size: 12px;
+  font-size: var(--ui-font-xs);
 }
 
 .head-actions,
 .panel-actions {
   display: flex;
-  gap: 10px;
+  gap: var(--ui-space-3);
   flex-wrap: wrap;
   align-items: center;
 }
 
 .btn {
-  min-height: 36px;
-  padding: 8px 14px;
+  min-height: var(--ui-control-md);
+  padding: var(--ui-space-3) var(--ui-space-5);
   border: 1px solid #c8d2df;
-  border-radius: 6px;
+  border-radius: var(--ui-radius-md);
   background: #fff;
   color: var(--color-text);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-size: var(--ui-font-sm);
   line-height: 1;
   transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
 }
@@ -80,29 +81,29 @@
 }
 
 .panel {
-  padding: 20px 22px;
-  margin-bottom: 18px;
+  padding: var(--ui-space-5);
+  margin-bottom: var(--ui-space-5);
 }
 
 .panel-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  gap: var(--ui-space-4);
+  margin-bottom: var(--ui-space-5);
+  padding-bottom: var(--ui-space-4);
   border-bottom: 1px solid var(--color-line);
 }
 
 .panel-title h3 {
-  font-size: 16px;
+  font-size: var(--ui-font-lg);
 }
 
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: var(--ui-space-4);
+  margin-bottom: var(--ui-space-5);
 }
 
 .metric-card {
@@ -125,18 +126,18 @@
 
 .metric-card span {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: var(--ui-font-xs);
 }
 
 .metric-card strong {
   display: block;
   margin: 8px 0;
-  font-size: 24px;
+  font-size: var(--ui-font-xl);
 }
 
 .metric-card p {
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: var(--ui-font-xs);
 }
 
 .filter-grid {
@@ -201,10 +202,10 @@ table {
 
 th,
 td {
-  padding: 13px 14px;
+  padding: var(--ui-space-4);
   border-bottom: 1px solid var(--color-line);
   text-align: left;
-  font-size: 13px;
+  font-size: var(--ui-font-sm);
 }
 
 th {
@@ -564,7 +565,7 @@ tbody tr:hover td {
 .bar-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--color-primary), #d46b76);
+  background: var(--color-primary);
 }
 
 .document-workspace {
@@ -626,22 +627,6 @@ tbody tr:hover td {
   .evidence-layout {
     grid-template-columns: 1fr;
   }
-
-  .sidebar {
-    width: 264px;
-    flex: 0 0 264px;
-  }
-}
-
-@media (max-width: 900px) {
-  .sidebar { width: 264px; flex: 0 0 264px; padding-left: 8px; padding-right: 8px; }
-  .brand { margin-left: -8px; margin-right: -8px; padding: 0 16px; justify-content: stretch; }
-  .brand strong, .sidebar a:not(.nav-icon) { font-size: inherit; }
-  .sidebar a { justify-content: flex-start; padding: 8px 12px; }
-  .sidebar a.router-link-active::before { left: -8px; }
-  .bottom-nav { margin-left: -8px; margin-right: -8px; padding-left: 12px; padding-right: 12px; }
-  .main { padding-left: 10px; padding-right: 10px; }
-  .topbar { margin-left: -10px; margin-right: -10px; padding: 0 12px; }
 }
 
 @media (max-width: 640px) {

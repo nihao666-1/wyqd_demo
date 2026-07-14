@@ -1,5 +1,5 @@
 <template>
-  <div class="expense-audit-overview-page">
+  <div class="expense-audit-overview-page route-fill-page" aria-label="费用审计分析">
     <section class="overview-main">
       <section class="filter-panel" aria-label="费用审计筛选">
         <label v-for="filter in filters" :key="filter.label">
@@ -17,7 +17,7 @@
 
       <section class="metric-grid" aria-label="费用审计指标">
         <article v-for="metric in metrics" :key="metric.label" class="metric-card" :class="metric.tone">
-          <span class="metric-icon">{{ metric.icon }}</span>
+          <span class="metric-icon"><FontAwesomeIcon :icon="metric.icon" /></span>
           <div>
             <p>{{ metric.label }}</p>
             <strong>{{ metric.value }}</strong>
@@ -48,10 +48,10 @@
                 <span>{{ item.month }}</span>
               </div>
               <svg class="trend-line" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
-                <polyline points="36,62 150,38 264,38" fill="none" stroke="#ff8a00" stroke-width="3" />
-                <circle cx="36" cy="62" r="4" fill="#fff" stroke="#ff8a00" stroke-width="3" />
-                <circle cx="150" cy="38" r="4" fill="#fff" stroke="#ff8a00" stroke-width="3" />
-                <circle cx="264" cy="38" r="4" fill="#fff" stroke="#ff8a00" stroke-width="3" />
+                <polyline points="36,62 150,38 264,38" fill="none" stroke="var(--color-warning)" stroke-width="3" />
+                <circle cx="36" cy="62" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
+                <circle cx="150" cy="38" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
+                <circle cx="264" cy="38" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
               </svg>
             </div>
           </div>
@@ -174,6 +174,9 @@
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faChartLine, faCoins, faGaugeHigh, faReceipt, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+
 const filters = [
   { label: '被审计单位', value: '上海分公司', type: 'select' },
   { label: '审计期间', value: '2025年Q1（2025-01 ~ 2025-03）', type: 'select' },
@@ -184,11 +187,11 @@ const filters = [
 ];
 
 const metrics = [
-  { label: '费用总额', value: '12,856,230.45 元', delta: '+8.62%', icon: '总', tone: 'red' },
-  { label: '预算使用率', value: '82.45 %', delta: '+5.21%', icon: '预', tone: 'blue' },
-  { label: '异常金额', value: '1,256,780.32 元', delta: '+23.18%', icon: '异', tone: 'orange' },
-  { label: '异常笔数', value: '256 笔', delta: '+18.52%', icon: '笔', tone: 'green' },
-  { label: '高风险异常数', value: '48 笔', delta: '+26.32%', icon: '险', tone: 'red' }
+  { label: '费用总额', value: '12,856,230.45 元', delta: '+8.62%', icon: faCoins, tone: 'red' },
+  { label: '预算使用率', value: '82.45 %', delta: '+5.21%', icon: faGaugeHigh, tone: 'blue' },
+  { label: '异常金额', value: '1,256,780.32 元', delta: '+23.18%', icon: faChartLine, tone: 'orange' },
+  { label: '异常笔数', value: '256 笔', delta: '+18.52%', icon: faReceipt, tone: 'green' },
+  { label: '高风险异常数', value: '48 笔', delta: '+26.32%', icon: faShieldHalved, tone: 'red' }
 ];
 
 const budgetTrend = [
@@ -198,12 +201,12 @@ const budgetTrend = [
 ];
 
 const categoryStructure = [
-  { name: '差旅费', value: '28.63%', color: '#3b82f6' },
-  { name: '业务招待费', value: '18.75%', color: '#22c55e' },
-  { name: '办公费', value: '15.42%', color: '#06b6d4' },
-  { name: '会议费', value: '9.88%', color: '#ef4444' },
-  { name: '培训费', value: '7.31%', color: '#f59e0b' },
-  { name: '其他', value: '19.01%', color: '#fbbf24' }
+  { name: '差旅费', value: '28.63%', color: 'var(--color-info)' },
+  { name: '业务招待费', value: '18.75%', color: 'var(--color-success)' },
+  { name: '办公费', value: '15.42%', color: '#5b8790' },
+  { name: '会议费', value: '9.88%', color: 'var(--color-primary)' },
+  { name: '培训费', value: '7.31%', color: 'var(--color-warning)' },
+  { name: '其他', value: '19.01%', color: '#b8944f' }
 ];
 
 const employeeRank = [
@@ -220,11 +223,11 @@ const employeeRank = [
 ];
 
 const anomalyTypes = [
-  { name: '超预算未审批', value: '34.38%', color: '#ef4444' },
-  { name: '费用违规报销', value: '26.56%', color: '#22c55e' },
-  { name: '疑似不合规报销', value: '21.88%', color: '#f97316' },
-  { name: '重复报销', value: '9.38%', color: '#fbbf24' },
-  { name: '其他', value: '7.80%', color: '#f87171' }
+  { name: '超预算未审批', value: '34.38%', color: 'var(--color-primary)' },
+  { name: '费用违规报销', value: '26.56%', color: 'var(--color-success)' },
+  { name: '疑似不合规报销', value: '21.88%', color: 'var(--color-warning)' },
+  { name: '重复报销', value: '9.38%', color: '#b8944f' },
+  { name: '其他', value: '7.80%', color: '#b97575' }
 ];
 
 const anomalyTabs = [
@@ -271,8 +274,42 @@ const approvalChain = [
 </script>
 
 <style scoped>
-.expense-audit-overview-page{--audit-red:#c8000b;--audit-line:#e6ebf2;--audit-text:#1f2937;--audit-muted:#667085;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) clamp(286px,19vw,318px);min-height:calc(100dvh - 58px);overflow:visible;background:#f5f7fa;color:var(--audit-text);font-size:12px}.overview-main{min-width:0;overflow:visible;padding:12px 10px 10px 14px}.filter-actions,.drawer-actions{display:flex;gap:8px}.expense-audit-overview-page button{height:30px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#344054;font-size:12px;cursor:pointer}.expense-audit-overview-page button.primary{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.filter-panel{display:grid;grid-template-columns:1.05fr 1.7fr .95fr .85fr 1.35fr .75fr auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--audit-line);background:#fff}.filter-panel label{display:grid;gap:5px;min-width:0;color:#3f4a5a}.filter-panel span{font-size:11px}.filter-panel select,.filter-panel input{box-sizing:border-box;width:100%;height:30px;border:1px solid #d9e0e9;border-radius:4px;background:#fff;color:#475467;font-size:12px}.filter-actions button{min-width:54px}.metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:10px;border:1px solid var(--audit-line);background:#fff}.metric-card{display:flex;gap:8px;min-width:0;padding:13px 12px;border-right:1px solid var(--audit-line)}.metric-card:last-child{border-right:0}.metric-icon{display:grid;flex:0 0 36px;height:36px;place-items:center;border-radius:8px;font-weight:700}.metric-card.red .metric-icon{border:1px solid #fecaca;background:#fff1f2;color:#dc2626}.metric-card.blue .metric-icon{border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb}.metric-card.orange .metric-icon{border:1px solid #fed7aa;background:#fff7ed;color:#f97316}.metric-card.green .metric-icon{border:1px solid #bbf7d0;background:#ecfdf5;color:#16a34a}.metric-card p{margin:0 0 5px;color:#475467}.metric-card strong{display:block;min-width:0;overflow:hidden;font-size:15px;line-height:24px;text-overflow:clip;white-space:nowrap}.metric-card small{display:block;margin-top:8px;color:#667085}.metric-card small b{color:#e60012;font-weight:500}.chart-grid{display:grid;grid-template-columns:1.18fr 1.05fr 1.08fr 1.05fr;gap:10px;margin-top:10px}.chart-card{box-sizing:border-box;min-width:0;height:272px;padding:12px;border:1px solid var(--audit-line);background:#fff}.chart-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.chart-title h2{margin:0;font-size:14px}.chart-title span,.trend-legend{color:#667085;font-size:10px}.trend-legend{display:flex;gap:12px;margin-bottom:8px}.trend-legend i,.chart-list i{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:2px;vertical-align:-1px}.trend-legend .blue{background:#2f78e6}.trend-legend .green{background:#14b86a}.trend-legend .orange{background:#ff8a00}.trend-plot{display:grid;grid-template-columns:36px minmax(0,1fr);height:200px}.trend-scale{display:flex;flex-direction:column;justify-content:space-between;color:#7b8794;font-size:10px;text-align:right}.trend-bars{position:relative;display:grid;grid-template-columns:repeat(3,1fr);align-items:end;padding:10px 10px 18px;border-bottom:1px solid #dce3eb;background:repeating-linear-gradient(to bottom,#fff 0,#fff 38px,#eef2f6 39px)}.trend-month{display:grid;justify-items:center;gap:6px;color:#667085}.bar-pair{display:flex;height:150px;align-items:end;gap:8px}.bar{width:13px;border-radius:2px 2px 0 0}.bar.actual{background:#2f78e6}.bar.budget{background:#14b86a}.trend-line{position:absolute;right:5px;bottom:36px;left:5px;width:calc(100% - 10px);height:120px;pointer-events:none}.donut-layout{display:grid;grid-template-columns:minmax(104px,1fr) minmax(110px,1fr);gap:12px;align-items:center;height:210px}.donut{position:relative;display:grid;width:min(138px,100%);aspect-ratio:1;margin:auto;place-items:center;border-radius:50%}.category-donut{background:conic-gradient(#3b82f6 0 28.63%,#22c55e 28.63% 47.38%,#06b6d4 47.38% 62.8%,#ef4444 62.8% 72.68%,#f59e0b 72.68% 79.99%,#fbbf24 79.99% 100%)}.anomaly-donut{background:conic-gradient(#3b82f6 0 34.38%,#22c55e 34.38% 60.94%,#f97316 60.94% 82.82%,#fbbf24 82.82% 92.2%,#f87171 92.2% 100%)}.donut::after{position:absolute;inset:28%;border-radius:50%;background:#fff;content:""}.donut span{position:relative;z-index:1;color:#344054;font-size:11px;line-height:1.35;text-align:center}.donut b{font-size:12px}.chart-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.chart-list li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;color:#344054;font-size:11px}.chart-list b{font-weight:500}.rank-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}.rank-list li{display:grid;grid-template-columns:42px minmax(80px,1fr) 66px;gap:8px;align-items:center}.rank-list span,.rank-list strong{font-size:11px;font-weight:500}.rank-list i{height:7px;overflow:hidden;border-radius:4px;background:#e9eef6}.rank-list b{display:block;height:100%;border-radius:inherit;background:#3c7df0}.exception-section{margin-top:10px;border:1px solid var(--audit-line);background:#fff}.exception-tabs{display:flex;align-items:center;gap:24px;min-height:46px;padding:0 12px;border-bottom:1px solid var(--audit-line)}.exception-tabs button{border:0;background:transparent;color:#344054}.exception-tabs button.active{color:var(--audit-red);font-weight:700}.exception-tabs .export{margin-left:auto;padding:0 14px;border:1px solid #d7dee8;background:#fff}.table-wrap{overflow-x:auto;overflow-y:visible;padding:12px 12px 0}.exception-section table{width:100%;min-width:940px;border-collapse:collapse;font-size:11px}.exception-section th,.exception-section td{height:36px;border:1px solid #edf1f5;padding:0 10px;text-align:left;white-space:nowrap}.exception-section th{background:#f8fafc;color:#344054;font-weight:600}.risk-tag{display:inline-flex;height:20px;align-items:center;padding:0 7px;border-radius:4px;font-size:10px}.risk-tag.high{border:1px solid #fecaca;background:#fff1f2;color:#dc2626}.risk-tag.medium{border:1px solid #fed7aa;background:#fff7ed;color:#f97316}.risk-tag.low{border:1px solid #bbf7d0;background:#ecfdf5;color:#16a34a}.table-actions{display:flex;gap:8px;align-items:center}.table-actions button{height:auto;border:0;background:transparent;color:#1677ff;font-size:11px}.table-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 14px;color:#475467}.table-footer>div{display:flex;align-items:center;gap:8px}.table-footer button{width:26px;height:26px}.table-footer button.active{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.table-footer select,.table-footer input{height:26px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#475467}.table-footer input{width:46px;text-align:center}.detail-drawer{min-width:0;overflow:visible;border-left:1px solid var(--audit-line);background:#fff;padding:16px 16px 20px}.detail-drawer header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.detail-drawer h2{margin:0;font-size:15px}.detail-drawer header button{width:28px;border:0;font-size:20px}.detail-drawer section{padding:12px 0;border-bottom:1px solid var(--audit-line)}.detail-drawer h3{margin:0 0 10px;font-size:13px}.detail-drawer dl{display:grid;gap:10px;margin:0}.detail-drawer dl div{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px}.detail-drawer dt{color:#667085}.detail-drawer dd{margin:0;color:#344054}.approval-chain{display:grid;gap:10px;margin:0;padding:0;list-style:none}.approval-chain li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:start;color:#667085}.approval-chain li span{width:7px;height:7px;margin-top:5px;border-radius:50%;background:#cbd5e1}.approval-chain li.done span{background:#16a34a}.approval-chain li.warning span{background:#f97316}.approval-chain p{margin:0}.approval-chain time{font-size:10px}.drawer-actions button{min-width:72px}.drawer-actions button.primary{background:var(--audit-red)}
+.expense-audit-overview-page{--audit-red:var(--color-primary);--audit-line:#e6ebf2;--audit-text:#1f2937;--audit-muted:#667085;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) clamp(286px,19vw,318px);min-height:calc(100dvh - 58px);overflow:visible;background:#f5f7fa;color:var(--audit-text);font-size:12px}.overview-main{min-width:0;overflow:visible;padding:12px 10px 10px 14px}.filter-actions,.drawer-actions{display:flex;gap:8px}.expense-audit-overview-page button{height:30px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#344054;font-size:12px;cursor:pointer}.expense-audit-overview-page button.primary{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.filter-panel{display:grid;grid-template-columns:1.05fr 1.7fr .95fr .85fr 1.35fr .75fr auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--audit-line);background:#fff}.filter-panel label{display:grid;gap:5px;min-width:0;color:#3f4a5a}.filter-panel span{font-size:11px}.filter-panel select,.filter-panel input{box-sizing:border-box;width:100%;height:30px;border:1px solid #d9e0e9;border-radius:4px;background:#fff;color:#475467;font-size:12px}.filter-actions button{min-width:54px}.metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:10px;border:1px solid var(--audit-line);background:#fff}.metric-card{display:flex;gap:8px;min-width:0;padding:13px 12px;border-right:1px solid var(--audit-line)}.metric-card:last-child{border-right:0}.metric-icon{display:grid;flex:0 0 36px;height:36px;place-items:center;border-radius:8px;font-weight:700}.metric-card.red .metric-icon{border:1px solid #fecaca;background:#fff1f2;color:var(--color-primary)}.metric-card.blue .metric-icon{border:1px solid #bfdbfe;background:#eff6ff;color:var(--color-info)}.metric-card.orange .metric-icon{border:1px solid #fed7aa;background:#fff7ed;color:var(--color-warning)}.metric-card.green .metric-icon{border:1px solid #bbf7d0;background:#ecfdf5;color:var(--color-success)}.metric-card p{margin:0 0 5px;color:#475467}.metric-card strong{display:block;min-width:0;overflow:hidden;font-size:15px;line-height:24px;text-overflow:clip;white-space:nowrap}.metric-card small{display:block;margin-top:8px;color:#667085}.metric-card small b{color:var(--color-primary);font-weight:500}.chart-grid{display:grid;grid-template-columns:1.18fr 1.05fr 1.08fr 1.05fr;gap:10px;margin-top:10px}.chart-card{box-sizing:border-box;min-width:0;height:272px;padding:12px;border:1px solid var(--audit-line);background:#fff}.chart-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.chart-title h2{margin:0;font-size:14px}.chart-title span,.trend-legend{color:#667085;font-size:10px}.trend-legend{display:flex;gap:12px;margin-bottom:8px}.trend-legend i,.chart-list i{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:2px;vertical-align:-1px}.trend-legend .blue{background:var(--color-info)}.trend-legend .green{background:var(--color-success)}.trend-legend .orange{background:var(--color-warning)}.trend-plot{display:grid;grid-template-columns:36px minmax(0,1fr);height:200px}.trend-scale{display:flex;flex-direction:column;justify-content:space-between;color:#7b8794;font-size:10px;text-align:right}.trend-bars{position:relative;display:grid;grid-template-columns:repeat(3,1fr);align-items:end;padding:10px 10px 18px;border-bottom:1px solid #dce3eb;background:repeating-linear-gradient(to bottom,#fff 0,#fff 38px,#eef2f6 39px)}.trend-month{display:grid;justify-items:center;gap:6px;color:#667085}.bar-pair{display:flex;height:150px;align-items:end;gap:8px}.bar{width:13px;border-radius:2px 2px 0 0}.bar.actual{background:var(--color-info)}.bar.budget{background:var(--color-success)}.trend-line{position:absolute;right:5px;bottom:36px;left:5px;width:calc(100% - 10px);height:120px;pointer-events:none}.donut-layout{display:grid;grid-template-columns:minmax(104px,1fr) minmax(110px,1fr);gap:12px;align-items:center;height:210px}.donut{position:relative;display:grid;width:min(138px,100%);aspect-ratio:1;margin:auto;place-items:center;border-radius:50%}.category-donut{background:conic-gradient(var(--color-info) 0 28.63%,var(--color-success) 28.63% 47.38%,#5b8790 47.38% 62.8%,var(--color-primary) 62.8% 72.68%,var(--color-warning) 72.68% 79.99%,#b8944f 79.99% 100%)}.anomaly-donut{background:conic-gradient(var(--color-info) 0 34.38%,var(--color-success) 34.38% 60.94%,var(--color-warning) 60.94% 82.82%,#b8944f 82.82% 92.2%,#b97575 92.2% 100%)}.donut::after{position:absolute;inset:28%;border-radius:50%;background:#fff;content:""}.donut span{position:relative;z-index:1;color:#344054;font-size:11px;line-height:1.35;text-align:center}.donut b{font-size:12px}.chart-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.chart-list li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;color:#344054;font-size:11px}.chart-list b{font-weight:500}.rank-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}.rank-list li{display:grid;grid-template-columns:42px minmax(80px,1fr) 66px;gap:8px;align-items:center}.rank-list span,.rank-list strong{font-size:11px;font-weight:500}.rank-list i{height:7px;overflow:hidden;border-radius:4px;background:#e9eef6}.rank-list b{display:block;height:100%;border-radius:inherit;background:var(--color-info)}.exception-section{margin-top:10px;border:1px solid var(--audit-line);background:#fff}.exception-tabs{display:flex;align-items:center;gap:24px;min-height:46px;padding:0 12px;border-bottom:1px solid var(--audit-line)}.exception-tabs button{border:0;background:transparent;color:#344054}.exception-tabs button.active{color:var(--audit-red);font-weight:700}.exception-tabs .export{margin-left:auto;padding:0 14px;border:1px solid #d7dee8;background:#fff}.table-wrap{overflow-x:auto;overflow-y:visible;padding:12px 12px 0}.exception-section table{width:100%;min-width:940px;border-collapse:collapse;font-size:11px}.exception-section th,.exception-section td{height:36px;border:1px solid #edf1f5;padding:0 10px;text-align:left;white-space:nowrap}.exception-section th{background:#f8fafc;color:#344054;font-weight:600}.risk-tag{display:inline-flex;height:20px;align-items:center;padding:0 7px;border-radius:4px;font-size:10px}.risk-tag.high{border:1px solid #fecaca;background:#fff1f2;color:var(--color-primary)}.risk-tag.medium{border:1px solid #fed7aa;background:#fff7ed;color:var(--color-warning)}.risk-tag.low{border:1px solid #bbf7d0;background:#ecfdf5;color:var(--color-success)}.table-actions{display:flex;gap:8px;align-items:center}.table-actions button{height:auto;border:0;background:transparent;color:var(--color-info);font-size:11px}.table-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 14px;color:#475467}.table-footer>div{display:flex;align-items:center;gap:8px}.table-footer button{width:26px;height:26px}.table-footer button.active{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.table-footer select,.table-footer input{height:26px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#475467}.table-footer input{width:46px;text-align:center}.detail-drawer{min-width:0;overflow:visible;border-left:1px solid var(--audit-line);background:#fff;padding:16px 16px 20px}.detail-drawer header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.detail-drawer h2{margin:0;font-size:15px}.detail-drawer header button{width:28px;border:0;font-size:20px}.detail-drawer section{padding:12px 0;border-bottom:1px solid var(--audit-line)}.detail-drawer h3{margin:0 0 10px;font-size:13px}.detail-drawer dl{display:grid;gap:10px;margin:0}.detail-drawer dl div{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px}.detail-drawer dt{color:#667085}.detail-drawer dd{margin:0;color:#344054}.approval-chain{display:grid;gap:10px;margin:0;padding:0;list-style:none}.approval-chain li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:start;color:#667085}.approval-chain li span{width:7px;height:7px;margin-top:5px;border-radius:50%;background:#cbd5e1}.approval-chain li.done span{background:var(--color-success)}.approval-chain li.warning span{background:var(--color-warning)}.approval-chain p{margin:0}.approval-chain time{font-size:10px}.drawer-actions button{min-width:72px}.drawer-actions button.primary{background:var(--audit-red)}
 @media(max-width:1380px){.expense-audit-overview-page{grid-template-columns:minmax(0,1fr) 286px}.filter-panel{grid-template-columns:repeat(3,minmax(0,1fr));}.filter-actions{justify-content:flex-end}.chart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-card{height:260px}.metric-card{padding:12px}.metric-card strong{font-size:16px}.exception-tabs{gap:12px;overflow-x:auto}.exception-tabs button{flex:0 0 auto}}
-@media(max-width:1080px){.expense-audit-overview-page{display:block;height:auto;overflow:visible}.overview-main{overflow:visible;padding:12px}.detail-drawer{border-top:1px solid var(--audit-line);border-left:0}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-card:nth-child(2n){border-right:0}.chart-grid{grid-template-columns:1fr}.filter-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.expense-audit-overview-page{display:block;height:auto;overflow:visible}.overview-main{overflow:visible;padding:12px}.detail-drawer{border-top:1px solid var(--audit-line);border-left:0}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-card:nth-child(2n){border-right:0}.chart-grid{grid-template-columns:1fr}.filter-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.filter-panel,.metric-grid{grid-template-columns:1fr}.metric-card{border-right:0;border-bottom:1px solid var(--audit-line)}.donut-layout{grid-template-columns:1fr}.chart-card{height:auto;min-height:260px}.table-footer{align-items:flex-start;flex-direction:column;gap:10px}.detail-drawer dl div{grid-template-columns:68px minmax(0,1fr)}}
+.expense-audit-overview-page {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.overview-main {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.detail-drawer {
+  min-height: 0;
+  overflow: auto;
+}
+
+.exception-section {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.exception-section .table-wrap {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+
+.exception-section table {
+  height: 100%;
+}
 </style>

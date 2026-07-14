@@ -1,5 +1,5 @@
 <template>
-  <section class="report-review-page" aria-labelledby="report-review-title">
+  <section class="report-review-page route-fill-page" aria-labelledby="report-review-title">
     <header class="review-titlebar">
       <h2 id="report-review-title">报告审核</h2>
       <div class="review-actions" aria-label="报告审核操作">
@@ -277,7 +277,7 @@
 </template>
 
 <script setup>
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, inject, nextTick, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faArrowsRotate,
@@ -299,10 +299,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const store = inject('store');
-const DESIGN_WIDTH = 1586;
-const DESIGN_HEIGHT = 994;
-let shell;
-let scaleFrame;
 
 const taskInfo = [
   { label: '被审计单位', value: '上海分公司' },
@@ -382,25 +378,6 @@ function createIssues() {
     riskTone: risk === '高风险' ? 'danger' : risk === '中风险' ? 'warning' : 'low',
     statusTone: status === '已采纳' ? 'done' : 'pending'
   }));
-}
-
-function updateScale() {
-  if (!shell) return;
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  const scale = viewportWidth < 1600 ? Math.min(1, viewportWidth / DESIGN_WIDTH, viewportHeight / DESIGN_HEIGHT) : 1;
-  const offset = scale < 1 ? Math.max(0, (viewportWidth - DESIGN_WIDTH * scale) / 2 / scale) : 0;
-  shell.style.setProperty('--report-review-scale', String(scale));
-  shell.style.setProperty('--report-review-offset-x', `${offset}px`);
-}
-
-function connectShell() {
-  shell = document.querySelector('.report-review-shell');
-  if (!shell) {
-    scaleFrame = window.requestAnimationFrame(connectShell);
-    return;
-  }
-  updateScale();
 }
 
 function selectIssue(issue) {
@@ -485,30 +462,24 @@ function notice(message) {
   store.setNotice(message);
 }
 
-onMounted(() => {
-  connectShell();
-  window.addEventListener('resize', updateScale);
-});
-
-onBeforeUnmount(() => {
-  if (scaleFrame) window.cancelAnimationFrame(scaleFrame);
-  window.removeEventListener('resize', updateScale);
-  if (shell) {
-    shell.style.removeProperty('--report-review-scale');
-    shell.style.removeProperty('--report-review-offset-x');
-  }
-});
 </script>
 
 <style scoped>
 .report-review-page {
-  --review-red: #c9000b;
-  --review-red-dark: #a80000;
+  --review-red: var(--color-primary);
+  --review-red-dark: var(--color-primary-dark);
   --review-line: #dfe5ee;
-  --review-soft: #f7f8fa;
+  --review-soft: var(--color-bg);
   --review-muted: #6b7280;
-  width: 1366px;
-  height: 922px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+  margin: 0;
   color: #111827;
   font-size: 12px;
 }
@@ -519,7 +490,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
-  border-bottom: 4px solid #ff4d4f;
+  border-bottom: 2px solid var(--review-red);
 }
 
 .review-titlebar h2 {
@@ -552,14 +523,14 @@ onBeforeUnmount(() => {
 .detail-actions .primary,
 .upload-actions button:first-child {
   border-color: var(--review-red);
-  background: linear-gradient(180deg, #d7000f, #b90000);
+  background: var(--review-red);
   color: #fff;
 }
 
 .task-info-strip {
   height: 63px;
   display: grid;
-  grid-template-columns: 112px 252px 145px 174px 86px 172px 1fr;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   align-items: center;
   margin-bottom: 12px;
   border: 1px solid var(--review-line);
@@ -605,8 +576,8 @@ onBeforeUnmount(() => {
 
 .review-layout {
   display: grid;
-  grid-template-columns: 230px 773px 1fr;
-  grid-template-rows: 615px 169px;
+  grid-template-columns: minmax(210px, 240px) minmax(0, 1fr) minmax(300px, 360px);
+  grid-template-rows: auto auto;
   gap: 14px;
 }
 
@@ -685,10 +656,10 @@ onBeforeUnmount(() => {
 }
 
 .file-icon.word,
-.file-icon.csv { background: #2f6fd6; }
-.file-icon.excel { background: #16824a; }
-.file-icon.pdf { background: #cf1b1b; }
-.ok-mark { color: #16a34a; }
+.file-icon.csv { background: var(--color-info); }
+.file-icon.excel { background: var(--color-success); }
+.file-icon.pdf { background: var(--color-primary); }
+.ok-mark { color: var(--color-success); }
 
 select {
   width: 100%;
@@ -704,7 +675,7 @@ select {
 .text-link {
   border: 0;
   background: transparent;
-  color: #1d6fe8;
+  color: var(--color-info);
   font-size: 11px;
   font-weight: 700;
 }
@@ -844,10 +815,10 @@ input[type="radio"] {
 }
 
 .review-metric.total .metric-icon,
-.review-metric.danger .metric-icon { background: #ffe8e8; color: #d00000; }
+.review-metric.danger .metric-icon { background: #ffe8e8; color: var(--color-danger); }
 .review-metric.warning .metric-icon { background: #fff3df; color: #f08a00; }
 .review-metric.blue .metric-icon { background: #eaf3ff; color: #2b77e5; }
-.review-metric.success .metric-icon { background: #e8f8ef; color: #16a34a; }
+.review-metric.success .metric-icon { background: #e8f8ef; color: var(--color-success); }
 
 .review-metric span {
   color: #4b5563;
@@ -951,11 +922,11 @@ input[type="radio"] {
   font-weight: 800;
 }
 
-.risk-tag.danger { background: #ffe8e8; color: #d00000; }
+.risk-tag.danger { background: #ffe8e8; color: var(--color-danger); }
 .risk-tag.warning { background: #fff3df; color: #e67800; }
-.risk-tag.low { background: #e8f8ef; color: #16824a; }
+.risk-tag.low { background: #e8f8ef; color: var(--color-success); }
 .status-pill.pending { background: #fff5e6; color: #e67800; }
-.status-pill.done { background: #e8f8ef; color: #16824a; }
+.status-pill.done { background: #e8f8ef; color: var(--color-success); }
 .status-pill.located { background: #eaf3ff; color: #2b77e5; }
 .status-pill.ignored { background: #f1f5f9; color: #64748b; }
 
@@ -967,7 +938,7 @@ input[type="radio"] {
 .table-actions button {
   border: 0;
   background: transparent;
-  color: #1d6fe8;
+  color: var(--color-info);
   font-size: 10px;
 }
 
@@ -1052,7 +1023,7 @@ input[type="radio"] {
 }
 
 .pin.danger { background: #e00000; }
-.pin.warning { background: #ff8a00; }
+.pin.warning { background: var(--color-warning); }
 .pin.blue { background: #2b77e5; }
 
 .doc-table {
@@ -1100,7 +1071,7 @@ input[type="radio"] {
 }
 
 .legend-row .danger { background: #e00000; }
-.legend-row .warning { background: #ff8a00; }
+.legend-row .warning { background: var(--color-warning); }
 .legend-row .blue { background: #2b77e5; }
 
 .detail-panel {
@@ -1153,7 +1124,7 @@ input[type="radio"] {
   padding: 4px 8px;
   border-radius: 3px;
   background: #ffe8e8;
-  color: #d00000;
+  color: var(--color-danger);
   font-weight: 800;
 }
 
@@ -1212,7 +1183,7 @@ dd {
 .compare-row .before {
   border: 1px solid #ffb3b3;
   background: #fff5f5;
-  color: #b90000;
+  color: var(--color-primary-dark);
 }
 
 .compare-row .after {
@@ -1349,13 +1320,8 @@ dd {
   padding: 13px 12px;
 }
 
-.version-panel {
-  transform: translateX(240px);
-  width: 531px;
-}
-
 .export-panel {
-  width: 498px;
+  min-width: 0;
 }
 
 .version-line {
@@ -1389,7 +1355,7 @@ dd {
   height: 14px;
   border: 3px solid #fff;
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--color-info);
   box-shadow: 0 0 0 1px #8aa5ca;
 }
 
@@ -1423,11 +1389,6 @@ dd {
 }
 
 @media (max-width: 1199px) {
-  .report-review-page {
-    width: auto;
-    height: auto;
-  }
-
   .review-titlebar,
   .task-info-strip,
   .review-layout,
@@ -1460,6 +1421,87 @@ dd {
     grid-row: auto;
     width: auto;
     transform: none;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1700px) {
+  .review-layout {
+    grid-template-columns: minmax(210px, 240px) minmax(0, 1fr);
+  }
+
+  .workbench-panel {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+
+  .issue-table {
+    min-width: 780px;
+  }
+
+  .preview-card {
+    min-height: 432px;
+  }
+
+  .detail-panel,
+  .export-panel,
+  .version-panel {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    width: auto;
+    transform: none;
+  }
+}
+
+@media (min-width: 1701px) and (max-width: 2150px) {
+  .issue-table th:nth-child(3),
+  .issue-table td:nth-child(3),
+  .issue-table th:nth-child(4),
+  .issue-table td:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (min-width: 1701px) {
+  .report-review-page {
+    overflow: hidden;
+  }
+
+  .review-layout {
+    min-height: 0;
+    flex: 1;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .review-center {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+  }
+
+  .workbench-panel {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .issue-list-card,
+  .preview-card,
+  .detail-panel {
+    min-height: 0;
+  }
+
+  .issue-list-card,
+  .preview-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .issue-table-wrap,
+  .report-page {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+    overflow: auto;
   }
 }
 </style>

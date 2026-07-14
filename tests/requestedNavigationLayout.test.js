@@ -49,6 +49,19 @@ test('files config and records pages remove the redundant local title bands', ()
   compileVue(configUrl);
 });
 
+test('config center exposes one fill workspace and three independent table scrollers', () => {
+  const config = read(configUrl);
+  assert.match(config, /class="config-page route-fill-page"/);
+  assert.equal((config.match(/class="table-scroll"/g) || []).length, 3);
+  assert.equal((config.match(/<\/div>\s*<footer class="pager">/g) || []).length, 3);
+  assert.match(config, /\.config-page\s*\{[^}]*(?:^|\n)\s*height:\s*0;[^}]*overflow:\s*hidden/ms);
+  assert.match(config, /\.config-page\.mode-initial[\s\S]*grid-template-rows:\s*auto auto minmax\(0,\s*1fr\)/);
+  assert.match(config, /\.config-page\.mode-params[\s\S]*grid-template-rows:\s*auto minmax\(0,\s*1fr\)/);
+  assert.match(config, /\.right-card\s*\{[^}]*overflow-x:\s*hidden[^}]*overflow-y:\s*auto/s);
+  assert.match(config, /\.trace-side \.mini-table th,[\s\S]*\.param-side \.mini-table td\s*\{[^}]*white-space:\s*normal/s);
+  compileVue(configUrl);
+});
+
 test('special audit navigation links to the existing entry and result pages', () => {
   const layout = read(layoutUrl);
   const workbench = read(regulatoryWorkbenchUrl);
@@ -64,8 +77,8 @@ test('special audit navigation links to the existing entry and result pages', ()
   assert.match(workbench, /v-if="isEmptyMode"/);
   assert.match(workbench, /class="special-empty-page"/);
   assert.doesNotMatch(workbench, /<h1>专项审计分析<\/h1>/);
-  assert.match(workbench, /special-empty-grid\s*\{[^}]*grid-template-columns:minmax\(0,1fr\) 282px;[^}]*gap:12px/s);
-  assert.match(workbench, /special-audit-page\s*\{[^}]*box-sizing:border-box; width:100%;[^}]*padding:10px 8px 10px/s);
+  assert.match(workbench, /special-empty-grid\s*\{[^}]*grid-template-columns:minmax\(0,1fr\) var\(--ui-panel-rail-lg\);[^}]*gap:var\(--ui-space-4\)/s);
+  assert.match(workbench, /special-audit-page\s*\{[^}]*box-sizing:border-box; width:100%;[^}]*height:0; min-height:0;[^}]*padding:var\(--ui-space-3\)/s);
   assert.doesNotMatch(workbench, /@media \(max-width:1700px\)\{\.special-empty-grid\{grid-template-columns:1fr\}/);
 
   compileVue(layoutUrl);
@@ -89,41 +102,34 @@ test('expense result pages remove the redundant local title bands', () => {
   compileVue(expenseTrendUrl);
 });
 
-test('supervision result scales content without shrinking the shared shell', () => {
+test('supervision result keeps its content grid without whole-page scaling', () => {
   const css = read(layoutCssUrl);
   const result = read(supervisionResultUrl);
 
   assert.match(css, /\.supervision-result-shell\s*\{[^}]*width:\s*100%/s);
   assert.match(css, /\.supervision-result-shell \.main\s*\{[^}]*flex:\s*1 1 auto/s);
   assert.doesNotMatch(css, /html\.supervision-result-scaled \.supervision-result-shell\s*\{[^}]*zoom:\s*var\(--supervision-result-scale\)/s);
-  assert.match(result, /const availableWidth = Math\.max\(1, window\.innerWidth - sidebarWidth - 40\)/);
-  assert.match(result, /const scaleNeeded = availableWidth < PAGE_WIDTH/);
-  assert.match(result, /: '1\.0000'/);
-  assert.match(result, /grid-template-rows:\s*72px 92px 224px 314px 139px/);
+  assert.doesNotMatch(result, /\bPAGE_WIDTH\b/);
+  assert.doesNotMatch(result, /\bscaleNeeded\b/);
+  assert.doesNotMatch(result, /transform:\s*scale\(/);
+  assert.match(result, /grid-template-rows:\s*72px 92px minmax\(224px, \.9fr\) minmax\(314px, 1\.25fr\) minmax\(139px, \.7fr\)/);
   assert.match(result, /\.filter-panel\s*\{[^}]*display:\s*grid;[^}]*align-items:\s*center;[^}]*padding:\s*4px 14px 8px/s);
 });
 
-test('task special audit and expense shells keep the same figure-three sidebar width and spacing', () => {
+test('task special audit and expense shells inherit the same viewport-scaled shell tokens', () => {
   const css = read(layoutCssUrl);
   const components = read(new URL('../src/styles/components.css', import.meta.url));
   const expenseWorkbench = read(expenseWorkbenchUrl);
 
-  assert.match(css, /\.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.task-empty-shell \.brand strong\s*\{[^}]*font-size:\s*16px;/s);
-  assert.match(css, /\.task-empty-shell \.sidebar a\s*\{[^}]*min-height:\s*38px;[^}]*padding:\s*8px 12px;[^}]*font-size:\s*13px;/s);
-  assert.match(css, /\.task-detail-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.task-generating-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.regulatory-empty-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.regulatory-result-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.regulatory-result-shell \.brand\s*\{[^}]*min-height:\s*58px;[^}]*margin:\s*0 -8px 10px;[^}]*padding:\s*0 16px;/s);
-  assert.match(css, /\.regulatory-result-shell \.sidebar a\s*\{[^}]*min-height:\s*38px;[^}]*padding:\s*8px 12px;[^}]*font-size:\s*13px;/s);
-  assert.match(css, /\.supervision-result-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.expense-section-shell \.sidebar,\s*\.expense-empty-shell \.sidebar,\s*\.expense-audit-result-shell \.sidebar,\s*\.expense-trend-shell \.sidebar\s*\{[^}]*width:\s*264px;[^}]*flex:\s*0 0 264px;/s);
-  assert.match(css, /\.regulatory-empty-shell \.brand,\s*\.expense-section-shell \.brand,[\s\S]*\.expense-trend-shell \.brand\s*\{[^}]*min-height:\s*58px;[^}]*margin:\s*0 -8px 10px;[^}]*padding:\s*0 16px;/s);
-  assert.match(css, /\.regulatory-empty-shell \.sidebar a,\s*\.expense-section-shell \.sidebar a,[\s\S]*\.expense-trend-shell \.sidebar a\s*\{[^}]*min-height:\s*38px;[^}]*padding:\s*8px 12px;[^}]*font-size:\s*13px;/s);
+  assert.match(css, /--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/);
+  assert.match(css, /--shell-page-gutter:\s*var\(--ui-page-gutter\)/);
+  assert.match(css, /\.app-shell \.sidebar\s*\{[^}]*width:\s*var\(--shell-sidebar-width\)[^}]*flex-basis:\s*var\(--shell-sidebar-width\)/s);
+  assert.match(css, /\.app-shell \.brand\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
+  assert.match(css, /\.app-shell \.sidebar a\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
+  assert.match(css, /\.app-shell \.topbar\s*\{[^}]*height:\s*var\(--ui-topbar-height\)/s);
   assert.match(css, /\.expense-section-shell \.bottom-nav,\s*\.expense-empty-shell \.bottom-nav,\s*\.expense-audit-result-shell \.bottom-nav,\s*\.expense-trend-shell \.bottom-nav\s*\{[^}]*min-height:\s*auto;[^}]*margin:\s*0 -8px -16px;[^}]*padding:\s*10px 12px 14px;/s);
   assert.doesNotMatch(components, /\.sidebar\s*\{\s*width:\s*(64|210)px/);
-  assert.match(components, /@media \(max-width: 900px\)[\s\S]*\.sidebar \{ width: 264px; flex: 0 0 264px;/);
+  assert.doesNotMatch(components, /@media \(max-width: 900px\)[\s\S]*\.sidebar \{ width: 264px; flex: 0 0 264px;/);
   assert.match(expenseWorkbench, /expense-empty-layout\{display:grid;grid-template-columns:minmax\(0,1fr\) 320px;gap:32px/);
   assert.match(expenseWorkbench, /expense-empty-page\{[^}]*box-sizing:border-box;width:100%;[^}]*padding:16px 56px 12px 8px/s);
   assert.match(expenseWorkbench, /@media \(max-width: 1700px\)\{\.expense-empty-layout\{grid-template-columns:1fr\}/);
@@ -139,8 +145,8 @@ test('expense detail and anomaly drawers avoid duplicate vertical scrollbars and
   assert.match(overview, /detail-drawer\{min-width:0;overflow:visible/);
   assert.match(anomalyPage, /expense-monitor-body\{display:grid;grid-template-columns:minmax\(0,1fr\) 320px;align-items:stretch;gap:16px/);
   assert.match(anomalyPage, /expense-main-column\{display:grid;min-width:0;gap:8px;align-content:start\}/);
-  assert.match(anomalyDrawer, /expense-anomaly-drawer\{position:sticky;[^}]*grid-template-rows:auto auto auto;[^}]*width:320px;[^}]*height:100%;[^}]*align-self:stretch/s);
-  assert.match(anomalyDrawer, /drawer-body\{min-height:0;overflow:visible/);
+  assert.match(anomalyDrawer, /expense-anomaly-drawer\{position:sticky;[^}]*grid-template-rows:auto minmax\(0,1fr\) auto;[^}]*width:320px;[^}]*height:100%;[^}]*align-self:stretch/s);
+  assert.match(anomalyDrawer, /drawer-body\{min-height:0;overflow:auto/);
   assert.doesNotMatch(anomalyDrawer, /position:fixed;top:58px;right:0/);
 });
 

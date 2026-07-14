@@ -1,5 +1,6 @@
 <template>
-  <PageHeader eyebrow="综合分析报告" title="费用综合分析报告草稿" description="综合分析报告草稿确认后才能锁定和导出，来源快照必须保留。">
+  <div class="expense-usage-report-page route-fill-page">
+    <PageHeader eyebrow="综合分析报告" title="费用综合分析报告草稿" description="综合分析报告草稿确认后才能锁定和导出，来源快照必须保留。">
     <button class="btn" @click="store.handleExpenseUsageReportAction('confirm')">确认</button>
     <button class="btn primary" @click="store.handleExpenseUsageReportAction('lock')">锁定</button>
     <button class="btn" @click="store.handleExpenseUsageReportAction('export')">导出</button>
@@ -21,7 +22,8 @@
       <p>费用总额、预算执行率、费用结构、人均费用、员工报销集中度、供应商集中度均已绑定来源快照。</p>
       <p>来源快照：SNAP-FEE-2026Q2-001。</p>
     </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup>
@@ -43,3 +45,36 @@ const columns = [
   { key: 'status', label: '状态' }
 ];
 </script>
+
+<style scoped>
+.expense-usage-report-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.expense-usage-report-page > .two-col {
+  min-height: 0;
+  flex: 1;
+}
+
+.expense-usage-report-page > .two-col > .panel:first-child {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

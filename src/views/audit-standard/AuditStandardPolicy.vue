@@ -1,4 +1,5 @@
 <template>
+  <div class="audit-standard-policy-page route-fill-page">
   <PageHeader eyebrow="制度能力" title="制度查询、变更与比对" description="制度能力以结构化执行页呈现，结果沉淀到任务详情，不提供开放式聊天入口。">
     <RouterLink class="btn" to="/audit-standard/workbench">返回规范工作台</RouterLink>
     <RouterLink class="btn primary" to="/tasks/detail">沉淀到任务详情</RouterLink>
@@ -42,6 +43,7 @@
       <div class="workflow-note">被引用制度版本不能直接覆盖或失效，只能形成新版本并触发相关草稿重新确认。</div>
     </aside>
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -72,3 +74,57 @@ const compareColumns = [
   { key: 'action', label: '处理动作' }
 ];
 </script>
+
+<style scoped>
+.audit-standard-policy-page {
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: var(--ui-space-4);
+  overflow: auto;
+}
+
+.audit-standard-policy-page > .page-head,
+.audit-standard-policy-page > .three-col,
+.audit-standard-policy-page > .section-grid,
+.audit-standard-policy-page .panel {
+  margin-bottom: 0;
+}
+
+.audit-standard-policy-page > .section-grid,
+.audit-standard-policy-page > .section-grid > div,
+.audit-standard-policy-page > .section-grid > aside {
+  min-height: 0;
+}
+
+.audit-standard-policy-page > .section-grid > div,
+.audit-standard-policy-page > .section-grid > aside {
+  overflow: auto;
+}
+
+.audit-standard-policy-page > .section-grid > div {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-space-4);
+}
+
+.audit-standard-policy-page > .section-grid .panel {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

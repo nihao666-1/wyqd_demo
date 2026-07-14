@@ -1,14 +1,18 @@
 <template>
+  <div class="audit-report-gap-list-page route-fill-page">
   <PageHeader eyebrow="资料完整性预检" title="资料缺口清单" description="关键资料缺失时，不能锁定正式报告；可选资料缺失可生成带提示草稿。">
     <RouterLink class="btn" to="/audit-report/source-select">返回来源选择</RouterLink>
     <RouterLink class="btn" to="/audit-report/material/supplement-preview">补充上传</RouterLink>
     <button class="btn primary" @click="generateDraft">生成草稿</button>
   </PageHeader>
-  <DataTable :columns="columns" :rows="store.db.gapItems" row-key="gapId" />
+  <section class="report-table-panel">
+    <DataTable :columns="columns" :rows="store.db.gapItems" row-key="gapId" />
+  </section>
   <section class="panel">
     <div class="panel-title"><h3>预检结论</h3></div>
     <p>当前存在 1 条关键资料缺口。可先生成待确认草稿，但锁定正式报告必须满足报告确认、关键缺口处理完成等动作条件。</p>
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -32,3 +36,32 @@ function generateDraft() {
   router.push('/audit-report/draft');
 }
 </script>
+
+<style scoped>
+.audit-report-gap-list-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.report-table-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: var(--ui-space-5);
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

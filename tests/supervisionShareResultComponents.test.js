@@ -76,7 +76,7 @@ test('header scoped styles preserve the measured title, action and metadata dime
   assert.match(source, /\.task-meta\s*\{[^}]*height:\s*72px/s);
   assert.match(source, /\.task-meta\s*\{[^}]*width:\s*1043px/s);
   assert.match(source, /grid-template-columns:\s*147px 249px 230px 101px 173px 143px/);
-  assert.match(source, /#c9000b/);
+  assert.match(source, /var\(--color-primary\)/);
   assert.match(source, /#b90008/);
   assert.match(source, /#f08a00/);
 });

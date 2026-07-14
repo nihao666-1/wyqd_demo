@@ -109,7 +109,7 @@ defineEmits(['back', 'restart', 'generate-report', 'export-excel']);
 }
 
 .header-action:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: 2px;
 }
 
@@ -119,13 +119,13 @@ defineEmits(['back', 'restart', 'generate-report', 'export-excel']);
 }
 
 .action-outline {
-  border-color: #c9000b;
+  border-color: var(--color-primary);
   color: #b90008;
 }
 
 .action-primary {
   border-color: #b90008;
-  background: #c9000b;
+  background: var(--color-primary);
   color: #fff;
 }
 

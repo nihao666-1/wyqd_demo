@@ -131,7 +131,7 @@ li {
 }
 
 .active .version-node {
-  border: 3px solid #c9000b;
+  border: 3px solid var(--color-primary);
   background: #fff;
 }
 
@@ -167,6 +167,6 @@ footer {
 
 .history-link {
   margin-left: auto;
-  color: #1677ff;
+  color: var(--color-info);
 }
 </style>

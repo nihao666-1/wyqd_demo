@@ -1,16 +1,18 @@
 <template>
-  <PageHeader eyebrow="费用下钻" :title="`${name || '费用对象'} 明细来源`" description="从类别、部门、员工、供应商维度下钻到费用明细和来源快照。">
+  <div class="expense-usage-drilldown-page route-fill-page">
+    <PageHeader eyebrow="费用下钻" :title="`${name || '费用对象'} 明细来源`" description="从类别、部门、员工、供应商维度下钻到费用明细和来源快照。">
     <RouterLink class="btn" to="/expense/usage/dashboard">返回看板</RouterLink>
     <RouterLink class="btn primary" to="/expense/anomaly/candidates">查看相关异常</RouterLink>
   </PageHeader>
-  <section class="panel">
+  <section class="panel source-detail-panel">
     <div class="panel-title"><h3>来源明细</h3></div>
     <DataTable :columns="columns" :rows="rows" row-key="id" />
   </section>
   <section class="panel">
     <div class="panel-title"><h3>来源快照</h3></div>
     <p>数据来自费控/报销、预算系统、财务总账、发票平台/OCR、OA 审批和合同系统，快照编号 SNAP-FEE-2026Q2-001。</p>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup>
@@ -35,3 +37,32 @@ const columns = [
   { key: 'source', label: '证据来源' }
 ];
 </script>
+
+<style scoped>
+.expense-usage-drilldown-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.source-detail-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.table-wrap > table) {
+  height: 100%;
+}
+</style>

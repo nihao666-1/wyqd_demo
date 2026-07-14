@@ -1,4 +1,5 @@
 <template>
+  <div class="file-detail-page route-fill-page">
   <PageHeader eyebrow="文件资产详情" title="风险事项台账.xlsx" description="展示解析、元数据、引用关系、版本和阻断原因。">
     <button class="btn primary" @click="store.handleAssetAction('FA-001', 'invalidate')">设置失效校验</button>
     <RouterLink class="btn" to="/files">返回文件中心</RouterLink>
@@ -30,10 +31,11 @@
     </div>
   </section>
   <DataTable :columns="columns" :rows="references" row-key="id" />
-  <section class="panel">
+  <section class="panel file-workflow-panel">
     <div class="panel-title"><h3>解锁与回退状态链</h3></div>
     <DataTable :columns="requestColumns" :rows="requests" row-key="requestId" />
   </section>
+  </div>
 </template>
 
 <script setup>
@@ -62,3 +64,41 @@ const requestColumns = [
   { key: 'createdAt', label: '时间' }
 ];
 </script>
+
+<style scoped>
+.file-detail-page {
+  display: flex;
+  height: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--ui-space-4);
+  overflow: auto;
+  font-size: var(--ui-font-sm);
+}
+
+.file-detail-page > :deep(.table-wrap),
+.file-detail-page > .panel,
+.file-detail-page > .two-col,
+.file-detail-page > .page-head {
+  margin-bottom: 0;
+}
+
+.file-workflow-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+:deep(.file-workflow-panel .table-wrap) {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+:deep(.file-workflow-panel .table-wrap > table) {
+  height: 100%;
+}
+</style>

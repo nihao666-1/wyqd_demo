@@ -1,4 +1,5 @@
 <template>
+  <div class="regulatory-history-page route-fill-page">
   <PageHeader eyebrow="历史查询" title="监管分析历史查询" description="按覆盖部门、生效部门、创建人、确认人、时间和有效状态查询历史分析。">
     <RouterLink class="btn" to="/regulatory/workbench">返回工作台</RouterLink>
   </PageHeader>
@@ -21,6 +22,7 @@
     <div class="summary-item"><strong>状态</strong><p>{{ store.drawerPayload.status }}</p></div>
     <div class="summary-item"><strong>引用次数</strong><p>{{ store.drawerPayload.referenceCount }}</p></div>
   </aside>
+  </div>
 </template>
 
 <script setup>
@@ -46,3 +48,20 @@ const columns = [
   { key: 'referenceCount', label: '引用次数' }
 ];
 </script>
+
+<style scoped>
+.regulatory-history-page {
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.regulatory-history-page > .panel {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+</style>

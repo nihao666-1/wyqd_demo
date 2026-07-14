@@ -132,7 +132,7 @@ test('归档壳层使用流式网格并共享视口尺寸变量', () => {
   assert.doesNotMatch(detail, /--task-archived-scale/);
   assert.match(main, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
   assert.match(layoutCss, /\.task-archived-shell \.sidebar[\s\S]*width:\s*var\(--shell-sidebar-width\)[^}]*flex:\s*0 0 var\(--shell-sidebar-width\)/s);
-  assert.match(layoutCss, /\.task-archived-shell \.topbar[\s\S]*height:\s*58px[^}]*margin:\s*0 calc\(-1 \* var\(--shell-page-gutter\)\) 12px/s);
+  assert.match(layoutCss, /\.task-detail-shell \.topbar,\s*\.task-generating-shell \.topbar,\s*\.task-archived-shell \.topbar[\s\S]*height:\s*var\(--ui-topbar-height\)[^}]*margin:\s*0 calc\(0px - var\(--shell-page-gutter\)\) var\(--ui-space-4\)/s);
   assert.doesNotMatch(layoutCss, /\bzoom\s*:/);
   assert.doesNotMatch(layoutCss, /transform:\s*scale\(/);
 });

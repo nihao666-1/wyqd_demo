@@ -1,5 +1,5 @@
 <template>
-  <div class="expense-monitor-page">
+  <div class="expense-monitor-page route-fill-page">
     <div class="expense-monitor-body" :class="{ 'drawer-closed': !drawerOpen || !selectedRow }">
       <main class="expense-main-column">
         <ExpenseAuditAnalysis :context="analysisContext" :filters="queryFilters" :metrics="metrics" :charts="charts" @update-filter="updateFilter" @query="applyFilters" @reset="resetFilters" />
@@ -91,4 +91,26 @@ function exportExcel() {
 
 <style scoped>
 .expense-monitor-page{min-height:calc(100vh - 58px);margin:0;padding:8px 16px 10px 12px;background:#f7f8fa;color:#1f2937}.expense-monitor-body{display:grid;grid-template-columns:minmax(0,1fr) 320px;align-items:stretch;gap:16px}.expense-monitor-body.drawer-closed{grid-template-columns:minmax(0,1fr)}.expense-main-column{display:grid;min-width:0;gap:8px;align-content:start}@media(max-width:1479px){.expense-monitor-page{padding:8px 16px 10px 10px}.expense-monitor-body{grid-template-columns:minmax(0,1fr) 320px;gap:16px}}@media(max-width:900px){.expense-monitor-body{grid-template-columns:1fr}}@media(max-width:760px){.expense-monitor-page{padding:8px}}
+.expense-monitor-page {
+  height: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+@media (min-width: 901px) {
+  .expense-monitor-page {
+    overflow: hidden;
+  }
+
+  .expense-monitor-body {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .expense-main-column {
+    min-height: 0;
+    grid-template-rows: auto minmax(336px, 1fr);
+    align-content: stretch;
+  }
+}
 </style>

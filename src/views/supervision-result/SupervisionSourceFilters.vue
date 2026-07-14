@@ -218,7 +218,7 @@ h2 {
 
 .filter-control:focus-visible,
 button:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: 1px;
 }
 
@@ -262,7 +262,7 @@ button:focus-visible {
 .wide-action {
   width: 207px;
   height: 33px;
-  border: 1px solid #c9000b;
+  border: 1px solid var(--color-primary);
   border-radius: 4px;
   font: inherit;
   font-size: 12px;
@@ -270,7 +270,7 @@ button:focus-visible {
 }
 
 .action-primary {
-  background: #c9000b;
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -319,7 +319,7 @@ button:focus-visible {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #1677ff;
+  color: var(--color-info);
   font: inherit;
   font-size: 10px;
   cursor: pointer;
@@ -401,7 +401,7 @@ button:focus-visible {
 
 .file-picker footer .confirm-button {
   border-color: #b90008;
-  background: #c9000b;
+  background: var(--color-primary);
   color: #fff;
 }
 

@@ -77,9 +77,9 @@ li:last-child {
   font-size: 9px;
 }
 
-.icon-1 { background: #c9000b; }
+.icon-1 { background: var(--color-primary); }
 .icon-2 { background: #f08a00; }
-.icon-3 { background: #1677ff; }
+.icon-3 { background: var(--color-info); }
 .icon-4 { background: #0b9b50; }
 .icon-5 { background: #667085; }
 
@@ -109,7 +109,7 @@ li:last-child {
 }
 
 .section-status.active {
-  color: #c9000b;
+  color: var(--color-primary);
 }
 
 .chevron {

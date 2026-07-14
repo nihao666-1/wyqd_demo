@@ -120,7 +120,7 @@ function toggle(section) {
 .detail-list dd { min-width: 0; margin: 0; color: #303744; overflow-wrap: anywhere; }
 .detail-list--compact { gap: 6px; }
 .policy-action { display: flex; justify-content: flex-end; margin-top: 8px; }
-.policy-action button, .file-reference button { border: 0; background: transparent; color: #1677ff; font-size: inherit; cursor: pointer; }
+.policy-action button, .file-reference button { border: 0; background: transparent; color: var(--color-info); font-size: inherit; cursor: pointer; }
 .policy-action button { min-width: 74px; height: 26px; border: 1px solid #d9dfe8; border-radius: 3px; color: #333b48; background: #fff; }
 .file-reference { display: grid; grid-template-columns: 25px minmax(0, 1fr) auto auto; align-items: center; gap: 6px; }
 .file-reference__icon { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 2px; background: #e52920; color: #fff; font-size: 7px; font-weight: 700; }
@@ -146,10 +146,10 @@ function toggle(section) {
 .process-trace li.is-active .process-trace__dot { border-color: #d20b0b; box-shadow: 0 0 0 2px #ffe0e0; background: #d20b0b; }
 .evidence-trace__actions { flex: 0 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 12px 12px; border-top: 1px solid #e7e9ee; background: #fff; }
 .evidence-trace__actions button { min-width: 0; height: 30px; border: 1px solid #d6dce5; border-radius: 3px; background: #fff; color: #303744; font-size: 11px; cursor: pointer; white-space: nowrap; }
-.evidence-trace__actions .is-primary { border-color: #c70000; background: #c70000; color: #fff; }
+.evidence-trace__actions .is-primary { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
 .evidence-trace__actions .is-danger { border-color: #e53935; color: #d30e0e; }
 .evidence-trace__actions .is-wide { grid-column: 1 / -1; }
-.evidence-trace button:focus-visible { outline: 2px solid #1677ff; outline-offset: 1px; }
+.evidence-trace button:focus-visible { outline: 2px solid var(--color-info); outline-offset: 1px; }
 @media (max-width: 1199px) {
   .evidence-trace { min-height: 560px; }
   .evidence-trace__body { grid-template-columns: minmax(230px, 1fr) 78px; }

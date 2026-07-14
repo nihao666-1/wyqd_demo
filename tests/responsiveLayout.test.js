@@ -19,16 +19,34 @@ const archiveSidebar = read('../src/views/tasks/TaskArchiveSidebar.vue');
 test('shared layout exposes a flexible route content region', () => {
   assert.match(appLayout, /<div class="route-content">\s*<RouterView\s*\/>\s*<\/div>/);
   assert.match(layoutCss, /--shell-viewport-height:\s*100vh/);
-  assert.match(layoutCss, /--shell-sidebar-width:\s*clamp\(/);
-  assert.match(layoutCss, /--shell-page-gutter:\s*clamp\(/);
+  assert.match(layoutCss, /--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/);
+  assert.match(layoutCss, /--shell-page-gutter:\s*var\(--ui-page-gutter\)/);
   assert.match(layoutCss, /@supports\s*\(height:\s*100dvh\)/);
   assert.match(layoutCss, /\.main\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/s);
   assert.match(layoutCss, /\.route-content\s*\{[^}]*flex:\s*1[^}]*min-width:\s*0[^}]*min-height:\s*0/s);
 });
 
+test('shared route content passes remaining height only to opt-in pages', () => {
+  assert.match(layoutCss, /\.route-content\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/s);
+  assert.match(layoutCss, /\.route-fill-page\s*\{[^}]*min-height:\s*0[^}]*flex:\s*1 1 auto/s);
+  assert.match(layoutCss, /\.main:has\(> \.route-content > \.route-fill-page\)\s*\{[^}]*padding-bottom:\s*0[^}]*overflow:\s*hidden/s);
+  assert.match(layoutCss, /\.main-nav\s*\{[^}]*min-height:\s*0[^}]*overflow-y:\s*auto/s);
+  assert.match(layoutCss, /\.sidebar\s*\{[^}]*height:\s*var\(--shell-viewport-height\)[^}]*overflow:\s*hidden/s);
+  assert.doesNotMatch(layoutCss, /\bzoom\s*:/);
+  assert.doesNotMatch(layoutCss, /transform:\s*scale\(/);
+});
+
 test('shared shell uses native responsive sizing without whole-page scaling', () => {
   assert.match(layoutCss, /\.app-shell[\s\S]*min-height:\s*var\(--shell-viewport-height\)/);
+  assert.match(layoutCss, /--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/);
+  assert.match(layoutCss, /--shell-page-gutter:\s*var\(--ui-page-gutter\)/);
   assert.match(layoutCss, /\.sidebar\s*\{[^}]*width:\s*var\(--shell-sidebar-width\)[^}]*height:\s*var\(--shell-viewport-height\)/s);
+  assert.match(layoutCss, /\.brand\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
+  assert.match(layoutCss, /\.topbar\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
+  assert.match(layoutCss, /\.sidebar a\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
+  assert.match(layoutCss, /\.nav-icon\s*\{[^}]*width:\s*var\(--ui-icon-md\)[^}]*font-size:\s*var\(--ui-icon-sm\)/s);
+  assert.doesNotMatch(layoutCss, /--shell-sidebar-width:\s*clamp\(/);
+  assert.doesNotMatch(layoutCss, /@media \(max-width: 1599px\)[\s\S]*?width:\s*220px/);
   assert.doesNotMatch(layoutCss, /\bzoom\s*:/);
   assert.doesNotMatch(layoutCss, /transform:\s*scale\(/);
   assert.match(layoutCss, /@media \(min-width: 901px\) and \(max-width: 1366px\)[\s\S]*\.nav-label,[\s\S]*display:\s*initial/);
@@ -42,7 +60,7 @@ test('large workspaces are not capped to legacy screenshot heights', () => {
   assert.doesNotMatch(regulatoryResult, /\.reg-result-page\s*\{[^}]*height:\s*927px/s);
   assert.match(reportDraft, /\.source-rail\s*\{[^}]*height:\s*auto[^}]*align-self:\s*stretch/s);
   assert.doesNotMatch(reportDraft, /\.source-rail\s*\{[^}]*height:\s*778px/s);
-  assert.match(auditStandardDraft, /\.audit-standard-result-page\s*\{[^}]*min-height:\s*calc\(var\(--shell-viewport-height/s);
+  assert.match(auditStandardDraft, /\.audit-standard-result-page\s*\{[^}]*height:\s*0[^}]*min-height:\s*0/s);
   assert.doesNotMatch(auditStandardDraft, /\.audit-standard-result-page\s*\{[^}]*height:\s*933px/s);
   assert.match(auditStandardDraft, /\.audit-standard-result-page\s*\{[^}]*display:\s*flex[^}]*flex-direction:\s*column/s);
   assert.match(auditStandardDraft, /\.result-stage\s*\{[^}]*flex:\s*1[^}]*grid-template-columns:\s*minmax\(0,1fr\)\s+minmax\(300px,360px\)/s);

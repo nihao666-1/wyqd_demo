@@ -251,7 +251,7 @@ function fileTone(type) {
 
 <style scoped>
 .material-file-list {
-  --list-primary: var(--color-primary, #c80000);
+  --list-primary: var(--color-primary, var(--color-primary));
   --list-line: var(--color-line, #e4e7ed);
   display: grid;
   min-width: 0;
@@ -376,7 +376,7 @@ tbody tr:focus-visible td:first-child {
 .file-name-cell svg.pdf,
 .card-title svg.pdf { color: #ed3038; }
 .file-name-cell svg.excel,
-.card-title svg.excel { color: #159447; }
+.card-title svg.excel { color: var(--color-success); }
 .file-name-cell svg.word,
 .card-title svg.word { color: #2d6fd2; }
 .file-name-cell svg.zip,
@@ -398,7 +398,7 @@ tbody tr:focus-visible td:first-child {
 
 :deep(.status-tag svg) { flex: 0 0 auto; }
 :deep(.status-tag.success) { background: #eaf8ef; color: #078a3f; }
-:deep(.status-tag.processing) { background: #edf5ff; color: #1677ff; }
+:deep(.status-tag.processing) { background: #edf5ff; color: var(--color-info); }
 :deep(.status-tag.danger) { background: #fff0f0; color: #d91f2a; }
 :deep(.status-tag.duplicate) { background: #fff5e8; color: #e87500; }
 :deep(.status-tag.warning) { background: #fff6e5; color: #c96d00; }

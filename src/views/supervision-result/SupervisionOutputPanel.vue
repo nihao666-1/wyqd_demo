@@ -95,7 +95,7 @@ h2 {
 }
 
 .file-icon-2 {
-  background: #1677ff;
+  background: var(--color-info);
 }
 
 .file-icon-3 {
@@ -131,7 +131,7 @@ small {
 }
 
 .status.generating {
-  color: #c9000b;
+  color: var(--color-primary);
 }
 
 .status.complete {

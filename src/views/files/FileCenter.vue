@@ -1,5 +1,5 @@
 <template>
-  <div class="file-center" :class="{ 'file-empty': isEmptyMode, 'is-data-view': !isEmptyMode }" :data-demo-mode="demoDataMode">
+  <div class="file-center route-fill-page" :class="{ 'file-empty': isEmptyMode, 'is-data-view': !isEmptyMode }" :data-demo-mode="demoDataMode">
     <section v-if="isEmptyView" class="empty-layout">
       <main class="main-stack">
         <section class="panel filter-panel">
@@ -543,8 +543,20 @@ function showNotice(message) {
 
 <style scoped>
 .file-center {
+  height: 0;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   color: #111827;
+}
+
+.file-center.file-empty {
+  overflow: auto;
+}
+
+.file-center.is-data-view {
+  overflow: hidden;
 }
 
 button,
@@ -572,20 +584,22 @@ button {
 }
 
 .primary {
-  border-color: #c40000 !important;
-  background: #c40000 !important;
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary) !important;
   color: #fff !important;
 }
 
 .empty-layout,
 .data-layout {
   display: grid;
-  grid-template-columns: minmax(720px, 1fr) clamp(260px, 22vw, 300px);
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) var(--ui-panel-rail-lg);
+  gap: var(--ui-space-3);
   align-items: start;
 }
 
 .data-layout {
+  flex: 1;
+  min-height: 0;
   align-items: stretch;
 }
 
@@ -596,6 +610,7 @@ button {
 }
 
 .data-layout .main-stack {
+  min-height: 0;
   grid-template-rows: auto 1fr;
 }
 
@@ -656,7 +671,7 @@ button {
 .filter-actions .outline-danger {
   min-width: 112px;
   border-color: #e8a5a5;
-  color: #c40000;
+  color: var(--color-primary);
 }
 
 .metric-strip {
@@ -688,7 +703,7 @@ button {
 
 .red { color: #e42f2f; background: #fff0f0; }
 .orange { color: #fb8b1e; background: #fff4e6; }
-.green { color: #16a36a; background: #eaf8f1; }
+.green { color: var(--color-success); background: #eaf8f1; }
 .blue { color: #2676f6; background: #edf5ff; }
 .purple { color: #7257e8; background: #f2edff; }
 
@@ -715,6 +730,12 @@ button {
 .data-layout .list-panel,
 .reference-rail {
   height: 100%;
+}
+
+.data-layout .list-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .asset-tabs,
@@ -758,7 +779,7 @@ button {
 
 .asset-tabs button.active,
 .top-tabs button.active {
-  color: #d00000;
+  color: var(--color-primary);
 }
 
 .asset-tabs button.active::after,
@@ -769,7 +790,7 @@ button {
   right: 0;
   bottom: 0;
   height: 3px;
-  background: #d00000;
+  background: var(--color-primary);
 }
 
 .data-tabs {
@@ -796,6 +817,12 @@ button {
 
 .table-shell {
   overflow-x: auto;
+}
+
+.data-layout .table-shell {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .file-table {
@@ -949,8 +976,8 @@ button {
 }
 
 .pager button.active {
-  border-color: #c40000;
-  background: #c40000;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -1025,7 +1052,7 @@ button {
 
 .flow-card li.red .flow-icon { background: #e42f2f; }
 .flow-card li.orange .flow-icon { background: #fb8b1e; }
-.flow-card li.green .flow-icon { background: #16a36a; }
+.flow-card li.green .flow-icon { background: var(--color-success); }
 .flow-card li.blue .flow-icon { background: #2676f6; }
 .flow-card li.purple .flow-icon { background: #7257e8; }
 
@@ -1076,9 +1103,9 @@ button {
   border-radius: 4px;
 }
 
-.pdf { background: #f04438; }
-.doc { background: #2f80ed; }
-.xls { background: #16a36a; }
+.pdf { background: var(--color-primary); }
+.doc { background: var(--color-info); }
+.xls { background: var(--color-success); }
 .zip { background: #f79009; }
 
 .note-list {
@@ -1104,7 +1131,7 @@ button {
 }
 
 .subpage-summary strong {
-  color: #c40000;
+  color: var(--color-primary);
 }
 
 .data-filter-grid {
@@ -1197,9 +1224,9 @@ button {
   white-space: nowrap;
 }
 
-.state-tag.success { color: #16a36a; background: #eaf8f1; }
-.state-tag.processing { color: #1f7aff; background: #eef6ff; }
-.state-tag.failed { color: #d92d20; background: #fff1f1; }
+.state-tag.success { color: var(--color-success); background: #eaf8f1; }
+.state-tag.processing { color: var(--color-info); background: #eef6ff; }
+.state-tag.failed { color: var(--color-primary); background: #fff1f1; }
 .state-tag.pending { color: #667085; background: #f2f4f7; }
 .state-tag.used { color: #f27a00; background: #fff3df; }
 
@@ -1216,13 +1243,13 @@ button {
   margin: 0 1px;
   border: 0;
   background: transparent;
-  color: #1f7aff;
+  color: var(--color-info);
   font-size: 10px;
   font-weight: 800;
 }
 
 .ops .danger-link {
-  color: #d00000;
+  color: var(--color-primary);
 }
 
 .more-menu {
@@ -1250,7 +1277,7 @@ button {
   min-height: 22px;
   margin: 0;
   padding: 0 5px;
-  color: #1f7aff;
+  color: var(--color-info);
   white-space: nowrap;
 }
 
@@ -1321,7 +1348,7 @@ button {
 
 .detail-actions .danger {
   border-color: #efb2b8;
-  color: #d00000;
+  color: var(--color-primary);
 }
 
 .ref-block {
@@ -1346,7 +1373,7 @@ button {
 .more-btn {
   border: 0;
   background: transparent;
-  color: #1f7aff;
+  color: var(--color-info);
   font-size: 11px;
   font-weight: 800;
 }
@@ -1413,7 +1440,7 @@ button {
 }
 
 .history-block .ok {
-  color: #16a36a;
+  color: var(--color-success);
   font-weight: 800;
 }
 
@@ -1472,5 +1499,62 @@ button {
     flex-wrap: wrap;
     flex-direction: row;
   }
+}
+
+/* Viewport-scaled visible dimensions for the shared 2560x1440 baseline. */
+.file-center {
+  font-size: var(--ui-font-xs);
+}
+
+.filter-panel,
+.metric-tile,
+.rail-card,
+.reference-rail {
+  padding: var(--ui-space-4);
+}
+
+.filter-grid,
+.metric-strip,
+.main-stack,
+.side-rail {
+  gap: var(--ui-space-4);
+}
+
+.filter-grid label,
+.filter-grid input,
+.filter-grid select,
+.filter-actions button,
+.asset-tabs button,
+.top-tabs button,
+.file-table th,
+.file-table td,
+.pager,
+.ref-block article p,
+.ref-block > p,
+.history-block th,
+.history-block td {
+  font-size: var(--ui-font-xs);
+}
+
+.metric-tile p,
+.metric-tile small,
+.ref-block article strong {
+  font-size: var(--ui-font-sm);
+}
+
+.metric-tile strong {
+  font-size: var(--ui-font-xl);
+}
+
+.filter-grid input,
+.filter-grid select,
+.filter-actions button {
+  height: var(--ui-control-md);
+}
+
+.metric-icon {
+  width: var(--ui-icon-lg);
+  height: var(--ui-icon-lg);
+  font-size: var(--ui-icon-md);
 }
 </style>

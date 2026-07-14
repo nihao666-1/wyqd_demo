@@ -59,7 +59,7 @@ const outcomeIcons = {
 .outcome-card { min-width: 0; padding: 8px 10px; border-right: 1px solid #e5e8ec; display: flex; align-items: flex-start; gap: 10px; }
 .outcome-card:last-child { border-right: 0; }
 .outcome-icon { width: 40px; height: 40px; border-radius: 9px; display: inline-grid; place-items: center; flex: 0 0 40px; font-size: 23px; }
-.tone-blue { color: #1677ff; background: #eef5ff; }.tone-green { color: #079447; background: #edf9f2; }.tone-orange { color: #f26b1d; background: #fff3e9; }.tone-purple { color: #7447e8; background: #f3efff; }
+.tone-blue { color: var(--color-info); background: #eef5ff; }.tone-green { color: #079447; background: #edf9f2; }.tone-orange { color: #f26b1d; background: #fff3e9; }.tone-purple { color: #7447e8; background: #f3efff; }
 .outcome-card h2 { margin: 0 0 2px; font-size: 12px; line-height: 16px; white-space: nowrap; }
 .outcome-card p { display: flex; align-items: baseline; gap: 5px; margin: 0; line-height: 21px; }.outcome-card strong { font-size: 19px; }.outcome-card p span { font-size: 10px; }.outcome-card small { color: #747c88; font-size: 10px; }
 .relation-section { height: 94px; margin-top: 37px; padding: 0 2px; border-top: 1px solid #e5e8ec; }

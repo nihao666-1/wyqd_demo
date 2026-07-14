@@ -140,20 +140,20 @@ const timelineIcons = Object.freeze({ 创建任务: 'create', 上传资料: 'upl
 }
 
 .task-detail-draft-action:hover {
-  border-color: #c7000b;
-  color: #c7000b;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .task-detail-draft-action:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: 2px;
 }
 
 .task-detail-draft-action--primary {
   padding-right: 22px;
   padding-left: 22px;
-  border-color: #c7000b;
-  background: #c7000b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -291,7 +291,7 @@ const timelineIcons = Object.freeze({ 创建任务: 'create', 上传资料: 'upl
 }
 
 .task-detail-draft-timeline-step--complete + .task-detail-draft-timeline-step::before {
-  background: #d71920;
+  background: var(--color-primary);
 }
 
 .task-detail-draft-timeline-node {
@@ -312,13 +312,13 @@ const timelineIcons = Object.freeze({ 创建任务: 'create', 上传资料: 'upl
 }
 
 .task-detail-draft-timeline-step--complete::before {
-  background: #d71920;
+  background: var(--color-primary);
 }
 
 .task-detail-draft-timeline-step--complete .task-detail-draft-timeline-node {
   border-color: #f2b7ba;
   background: #fff5f5;
-  color: #d71920;
+  color: var(--color-primary);
 }
 
 .task-detail-draft-timeline-step strong,
@@ -343,7 +343,7 @@ const timelineIcons = Object.freeze({ 创建任务: 'create', 上传资料: 'upl
 
 .task-detail-draft-timeline-step--complete strong,
 .task-detail-draft-timeline-step--complete .task-detail-draft-timeline-state {
-  color: #d71920;
+  color: var(--color-primary);
 }
 
 @media (max-width: 900px) {

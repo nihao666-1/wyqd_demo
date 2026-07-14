@@ -32,13 +32,12 @@ test('任务详情包含目标操作、分析页签和确定性交互', () => {
   assert.match(dispatcher, /const showGeneratingState = computed/);
 });
 
-test('任务详情按1586基准宽度缩放并只在1200以下重排', () => {
-  assert.match(source, /const DESIGN_WIDTH = 1586/);
-  assert.match(source, /function updateTaskDetailScale\(/);
-  assert.match(source, /viewportWidth \/ DESIGN_WIDTH/);
-  assert.match(source, /--task-detail-scale/);
+test('任务详情生成中页面使用自适应宽度并只在1200以下重排', () => {
+  assert.match(source, /\.task-detail-generating-page\{[^}]*width:100%[^}]*max-width:none/s);
+  assert.match(source, /\.task-detail-generating-workspace\{[^}]*grid-template-columns:minmax\(0,3\.23fr\) clamp\(300px,23\.4%,340px\)/s);
   assert.match(source, /task-detail-density-compact/);
   assert.match(source, /@media\(max-width:1199px\)/);
+  assert.doesNotMatch(source, /const DESIGN_WIDTH|updateTaskDetailScale|viewportWidth \/ DESIGN_WIDTH|--task-detail-scale/);
   assert.doesNotMatch(source, /min-width:\s*1586px/);
 });
 
