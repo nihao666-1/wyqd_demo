@@ -1,6 +1,5 @@
 <template>
   <div class="expense-monitor-page">
-    <h1 class="expense-page-title">费用异常监控</h1>
     <div class="expense-monitor-body" :class="{ 'drawer-closed': !drawerOpen || !selectedRow }">
       <main class="expense-main-column">
         <ExpenseAuditAnalysis :context="analysisContext" :filters="queryFilters" :metrics="metrics" :charts="charts" @update-filter="updateFilter" @query="applyFilters" @reset="resetFilters" />
@@ -91,5 +90,5 @@ function exportExcel() {
 </script>
 
 <style scoped>
-.expense-monitor-page{min-height:calc(100vh - 58px);margin:0;padding:14px 12px 10px;background:#f7f8fa;color:#1f2937}.expense-page-title{margin:0 0 6px;color:#1d2733;font-size:21px;line-height:28px;font-weight:800}.expense-monitor-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;align-items:start;gap:10px}.expense-monitor-body.drawer-closed{grid-template-columns:minmax(0,1fr)}.expense-main-column{display:grid;min-width:0;gap:8px}@media(max-width:1479px){.expense-monitor-page{padding:12px 10px}.expense-monitor-body{grid-template-columns:minmax(0,1fr)}}@media(max-width:760px){.expense-monitor-page{padding:10px 8px}.expense-page-title{font-size:18px}}
+.expense-monitor-page{min-height:calc(100vh - 58px);margin:0;padding:8px 16px 10px 12px;background:#f7f8fa;color:#1f2937}.expense-monitor-body{display:grid;grid-template-columns:minmax(0,1fr) 320px;align-items:stretch;gap:16px}.expense-monitor-body.drawer-closed{grid-template-columns:minmax(0,1fr)}.expense-main-column{display:grid;min-width:0;gap:8px;align-content:start}@media(max-width:1479px){.expense-monitor-page{padding:8px 16px 10px 10px}.expense-monitor-body{grid-template-columns:minmax(0,1fr) 320px;gap:16px}}@media(max-width:900px){.expense-monitor-body{grid-template-columns:1fr}}@media(max-width:760px){.expense-monitor-page{padding:8px}}
 </style>

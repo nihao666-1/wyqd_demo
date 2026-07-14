@@ -22,7 +22,9 @@ test('确认提交阶段使用confirm查询态和整页缩放shell', async () =>
     readFile(appLayoutPath, 'utf8')
   ]);
 
-  assert.match(taskCreate, /query\.phase === ['"]confirm['"]/);
+  assert.match(taskCreate, /const taskCreateEntry = resolveTaskCreateEntry\(route\.query\)/);
+  assert.match(taskCreate, /const step = ref\(taskCreateEntry\.step\)/);
+  assert.match(taskCreate, /const stepFourStage = ref\(taskCreateEntry\.stage\)/);
   assert.match(taskCreate, /step\.value = 4; stepFourStage\.value = ['"]template['"]/);
   assert.match(taskCreate, /syncStepFourQuery\(['"]confirm['"]\)/);
   assert.match(appLayout, /task-template-shell/);

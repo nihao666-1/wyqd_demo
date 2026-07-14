@@ -1,11 +1,6 @@
 <template>
-  <section class="reg-result-page" data-regulatory-result-page aria-labelledby="regulatory-result-title">
+  <section class="reg-result-page" data-regulatory-result-page aria-label="监管案例舆情分析">
     <div class="reg-result-main">
-      <header class="reg-page-title">
-        <h2 id="regulatory-result-title">监管案例舆情分析</h2>
-        <span aria-label="页面说明">i</span>
-      </header>
-
       <section class="filter-strip" data-result-region="filters" aria-label="分析筛选条件">
         <label v-for="filter in filters" :key="filter.label">
           <span>{{ filter.label }}</span>
@@ -405,32 +400,9 @@ onBeforeUnmount(() => {
 
 .reg-result-main {
   display: grid;
-  grid-template-rows: 29px 74px 88px 218px 244px 78px 145px;
+  grid-template-rows: 74px 88px 218px 244px 78px 145px;
   gap: 8px;
   min-width: 0;
-}
-
-.reg-page-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.reg-page-title h2 {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.reg-page-title span {
-  width: 15px;
-  height: 15px;
-  border: 1px solid #9aa4b2;
-  border-radius: 50%;
-  display: inline-grid;
-  place-items: center;
-  color: #64748b;
-  font-size: 10px;
-  font-weight: 800;
 }
 
 .filter-strip,

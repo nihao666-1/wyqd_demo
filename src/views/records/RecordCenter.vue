@@ -1,20 +1,5 @@
 <template>
   <div class="record-center-page" :class="{ 'is-empty': isEmptyView }">
-    <div class="record-page-head">
-      <h2>记录中心</h2>
-      <div class="state-switch" aria-label="页面状态切换">
-        <button
-          v-for="item in viewModes"
-          :key="item.key"
-          type="button"
-          :class="{ active: currentView === item.key }"
-          @click="currentView = item.key"
-        >
-          {{ item.label }}
-        </button>
-      </div>
-    </div>
-
     <div class="record-layout">
       <main class="record-main">
         <section class="metric-strip" aria-label="记录统计">
@@ -249,19 +234,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
-const viewModes = [
-  { key: 'empty', label: '空页面' },
-  { key: 'data', label: '有数据页面' }
-];
-
-const initialView = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mode') === 'data' ? 'data' : 'empty';
-const currentView = ref(initialView);
+const store = inject('store');
 const activeTab = ref('operation');
 
-const isEmptyView = computed(() => currentView.value === 'empty');
+const isEmptyView = computed(() => store.demoDataMode === 'empty');
 
 const emptyMetrics = [
   { label: '版本记录', value: '0', hint: '较昨日 0', icon: 'report', tone: 'red' },
@@ -388,43 +367,6 @@ function noop() {}
   min-height: calc(100vh - 84px);
   overflow: visible;
   color: #1f2937;
-}
-
-.record-page-head {
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.record-page-head h2 {
-  font-size: 20px;
-  line-height: 1.2;
-}
-
-.state-switch {
-  display: inline-flex;
-  padding: 3px;
-  border: 1px solid #d9e0ea;
-  border-radius: 6px;
-  background: #fff;
-}
-
-.state-switch button {
-  min-height: 30px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: #667085;
-  font-weight: 700;
-}
-
-.state-switch button.active {
-  color: #fff;
-  background: #c40000;
 }
 
 .record-layout {
@@ -1248,7 +1190,6 @@ function noop() {}
 }
 
 @media (max-width: 640px) {
-  .record-page-head,
   .record-pagination,
   .record-pagination > div {
     align-items: flex-start;

@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell" :class="{ 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }">
+  <div class="app-shell" :class="{ 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }">
     <aside class="sidebar">
       <div class="brand">
         <strong>审计大模型系统</strong>
@@ -50,7 +50,7 @@
         </div>
 
         <div class="topbar-right">
-          <div v-if="!isParsingPhase && !isTaskDetailRoute && !isAuditStandardResult && !isSupervisionShareResultRoute && !isExpenseWorkbenchRoute && !isExpenseAuditResult && !isExpenseTrendResult && !isAuditReportGeneration && !isReportReviewRoute && !isSpecialAuditWorkbench && !isRegulatoryResultRoute" class="global-data-mode" aria-label="统一演示数据切换">
+          <div class="global-data-mode" aria-label="统一演示数据切换">
             <span>演示数据</span>
             <button type="button" :class="{ active: !isEmptyMode }" @click="setDemoDataMode('data')">有</button>
             <button type="button" :class="{ active: isEmptyMode }" @click="setDemoDataMode('empty')">无</button>
@@ -110,8 +110,9 @@ const businessNavItems = [
     label: '专项审计分析',
     path: '/regulatory/workbench',
     children: [
-      { label: '监管案例舆情分析', path: '/regulatory/workbench' },
-      { label: '监督共享信息分析', path: '/supervision/workbench' }
+      { label: '专项审计入口', path: '/regulatory/workbench' },
+      { label: '监管案例舆情分析', path: '/regulatory/result' },
+      { label: '监督共享信息分析', path: '/tasks/detail/supervision-share' }
     ]
   },
   {
@@ -152,7 +153,7 @@ const isAuditReportGeneration = computed(() => route.path === '/audit-report/dra
 const isReportReviewRoute = computed(() => route.path === '/audit-report/check-result');
 const isRegulatoryResultRoute = computed(() => route.path === '/regulatory/result');
 const isSpecialAuditWorkbench = computed(() => route.path === '/regulatory/workbench');
-const isSpecialAuditSection = computed(() => route.path.startsWith('/regulatory') || route.path.startsWith('/supervision'));
+const isSpecialAuditSection = computed(() => route.path.startsWith('/regulatory') || route.path.startsWith('/supervision') || isSupervisionShareResultRoute.value);
 const isExpenseSection = computed(() => route.path.startsWith('/expense'));
 const selectedTask = computed(() => taskRows.find((task) => task.id === route.query.taskId));
 const detailView = computed(() => resolveTaskDetailView(route.query, selectedTask.value));

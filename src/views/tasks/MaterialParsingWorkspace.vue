@@ -1,6 +1,6 @@
 <template>
   <section class="parsing-workspace" aria-labelledby="parsing-title">
-    <h2 id="parsing-title" class="visually-hidden">资料解析与预检</h2>
+   
 
     <section class="parse-summary" aria-label="解析总览">
       <article class="progress-card">

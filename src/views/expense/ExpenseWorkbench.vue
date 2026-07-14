@@ -1,7 +1,6 @@
 <template>
-  <div class="expense-empty-page" aria-labelledby="expense-empty-title">
-    <h1 id="expense-empty-title">费用审计分析</h1>
-
+  <template v-if="isEmptyMode">
+  <div class="expense-empty-page" aria-label="费用审计分析">
     <div class="expense-empty-layout">
       <main class="expense-empty-main">
         <section class="expense-metrics-strip" aria-label="费用审计指标概览">
@@ -107,9 +106,49 @@
       </aside>
     </div>
   </div>
+  </template>
+
+  <template v-else>
+    <div class="expense-data-entry-page" aria-labelledby="expense-data-title">
+      <section class="expense-data-hero">
+        <div>
+          <h1 id="expense-data-title">费用审计分析</h1>
+          <p>已载入模拟费用、预算、审批和凭证数据，可进入总览、异常监控和趋势分析继续演示。</p>
+        </div>
+        <div class="expense-data-actions">
+          <RouterLink class="primary-link" to="/expense/audit/overview">查看费用总览</RouterLink>
+          <RouterLink to="/expense/anomaly/dashboard">费用异常监控</RouterLink>
+          <RouterLink to="/expense/usage/dashboard">费用趋势分析</RouterLink>
+        </div>
+      </section>
+
+      <section class="expense-data-metrics" aria-label="费用审计关键指标">
+        <article v-for="item in dataMetrics" :key="item.label" class="expense-data-metric">
+          <span class="metric-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
+          <div>
+            <p>{{ item.label }}</p>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
+          </div>
+        </article>
+      </section>
+
+      <section class="expense-data-grid" aria-label="费用审计有数据页面入口">
+        <RouterLink v-for="entry in dataEntries" :key="entry.title" class="expense-data-card" :to="entry.to">
+          <span class="entry-icon" :class="entry.tone"><FontAwesomeIcon :icon="entry.icon" /></span>
+          <div>
+            <h2>{{ entry.title }}</h2>
+            <p>{{ entry.description }}</p>
+            <small>{{ entry.meta }}</small>
+          </div>
+        </RouterLink>
+      </section>
+    </div>
+  </template>
 </template>
 
 <script setup>
+import { computed, inject } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faBookOpen,
@@ -124,6 +163,9 @@ import {
   faShieldHalved,
   faWallet
 } from '@fortawesome/free-solid-svg-icons';
+
+const store = inject('store');
+const isEmptyMode = computed(() => store.demoDataMode === 'empty');
 
 const metrics = [
   { label: '费用数据快照', unit: '个', tone: 'red', icon: faDatabase },
@@ -170,12 +212,46 @@ const sources = [
   { title: '财务凭证', description: '会计凭证、发票、记账数据与附件。', badge: '必需', tone: 'blue', icon: faFileInvoice },
   { title: '固定资产台账', description: '资产购置、折旧、处置及使用信息。', badge: '可选', optional: true, tone: 'purple', icon: faFolderOpen }
 ];
+
+const dataMetrics = [
+  { label: '费用总额', value: '12,856,230.45', hint: '同比 +8.62%', tone: 'red', icon: faWallet },
+  { label: '预算使用率', value: '82.45%', hint: '较上期 +5.21%', tone: 'blue', icon: faChartColumn },
+  { label: '异常金额', value: '1,256,780.32', hint: '高风险 48 笔', tone: 'orange', icon: faShieldHalved },
+  { label: '异常监控任务', value: '3', hint: '待确认 36 条', tone: 'green', icon: faClipboardCheck },
+  { label: '趋势预警', value: '12', hint: '已加入审计重点 5 条', tone: 'purple', icon: faChartLine }
+];
+
+const dataEntries = [
+  {
+    title: '费用审计总览',
+    description: '查看费用总额、预算使用率、异常金额、异常分类和明细清单。',
+    meta: '进入总览看板',
+    to: '/expense/audit/overview',
+    tone: 'red',
+    icon: faChartColumn
+  },
+  {
+    title: '费用异常监控',
+    description: '处理规则命中、凭证依据、审批链路和人工确认/排除。',
+    meta: '进入异常监控',
+    to: '/expense/anomaly/dashboard',
+    tone: 'orange',
+    icon: faShieldHalved
+  },
+  {
+    title: '费用趋势分析',
+    description: '分析月度趋势、预算偏差、员工离群和未来预测建议。',
+    meta: '进入趋势分析',
+    to: '/expense/usage/dashboard',
+    tone: 'blue',
+    icon: faChartLine
+  }
+];
 </script>
 
 <style scoped>
-.expense-empty-page{--red:#d50000;--line:#e3e8ef;--muted:#606b7b;--soft:#f7f8fa;max-width:1338px;margin:0 auto;padding:16px 8px 12px;color:#111827}
-.expense-empty-page h1{margin:0 0 17px;font-size:24px;line-height:32px;font-weight:700}
-.expense-empty-layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:28px;align-items:start}
+.expense-empty-page{--red:#d50000;--line:#e3e8ef;--muted:#606b7b;--soft:#f7f8fa;box-sizing:border-box;width:100%;max-width:1338px;margin:0 auto;padding:16px 56px 12px 8px;color:#111827}
+.expense-empty-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px;align-items:start;min-width:0}
 .expense-empty-main{display:grid;min-width:0;gap:12px}
 .expense-metrics-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));height:116px;border:1px solid var(--line);border-radius:4px;background:#fff;overflow:hidden}
 .expense-metric{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:18px;min-width:0;padding:18px;border-right:1px solid #eef1f5}
@@ -214,7 +290,7 @@ const sources = [
 .expense-task-empty svg{width:118px;height:88px;margin-bottom:4px}
 .expense-task-empty strong{color:#66717f;font-size:16px;line-height:24px}
 .expense-task-empty p{margin:4px 0 0;color:#697586;font-size:13px;line-height:20px}
-.expense-source-panel{display:grid;gap:14px;min-width:0;padding:16px 10px 12px;border:1px solid var(--line);background:#fff}
+.expense-source-panel{display:grid;gap:14px;min-width:0;position:relative;z-index:0;padding:16px 10px 12px;border:1px solid var(--line);background:#fff}
 .expense-source-panel h2{margin:0 8px 4px;font-size:18px;line-height:24px}
 .source-card{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:start;height:104px;padding:16px 12px 10px;border:1px solid var(--line);border-radius:7px;background:#fff}
 .source-icon{width:44px;height:44px;border:1px solid currentColor;border-radius:8px;font-size:23px}
@@ -223,9 +299,28 @@ const sources = [
 .source-badge{display:inline-flex;align-items:center;min-height:22px;padding:1px 7px;border:1px solid #ffb5b5;border-radius:4px;background:#fff2f2;color:#e00000;font-size:12px;font-weight:700}
 .source-badge.optional{border-color:#bcd8ff;background:#edf5ff;color:#1677ff}
 .source-guide{display:flex;height:40px;align-items:center;justify-content:center;gap:9px;border:1px solid #d5dbe4;border-radius:4px;background:#fff;color:#394453;font-size:14px}
-@media (max-width: 1300px){.expense-empty-page{padding-left:10px;padding-right:10px}.expense-empty-layout{gap:16px;grid-template-columns:minmax(0,1fr) 280px}.expense-metric{gap:12px;padding:14px}.expense-entry-grid{gap:16px;padding-left:14px;padding-right:14px}.expense-entry-card{padding-left:18px;padding-right:18px}.entry-flow small{white-space:normal}}
-@media (max-width: 1199px){.expense-empty-layout{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-source-panel h2,.source-guide{grid-column:1/-1}.expense-source-panel{gap:12px}.source-card{min-height:96px}.expense-empty-hero{grid-template-columns:260px minmax(0,1fr)}}
-@media (max-width: 900px){.expense-metrics-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-metric:nth-child(2n){border-right:0}.expense-metric:last-child{grid-column:1/-1;border-top:1px solid #eef1f5}.expense-empty-hero{grid-template-columns:1fr;padding:22px;text-align:center}.hero-illustration{justify-self:center}.expense-entry-grid{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:1fr}.source-guide{grid-column:auto}}
-@media (max-width: 760px){.expense-empty-page{padding:12px 10px 18px}.expense-empty-page h1{font-size:22px}.expense-metrics-strip{grid-template-columns:1fr}.expense-metric,.expense-metric:nth-child(2n){border-right:0;border-bottom:1px solid #eef1f5}.expense-metric:last-child{grid-column:auto;border-top:0;border-bottom:0}.expense-entry-card{min-height:auto}.entry-flow{gap:4px}.entry-flow small{font-size:11px}.entry-action{width:min(176px,100%)}.expense-task-panel{padding-left:10px;padding-right:10px}.expense-table-wrap td{height:170px}}
+.expense-data-entry-page{--red:#d50000;--line:#e3e8ef;--muted:#606b7b;max-width:1338px;margin:0 auto;padding:16px 8px 20px;color:#111827}
+.expense-data-hero{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:132px;padding:22px 28px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.expense-data-hero h1{margin:0 0 10px;font-size:26px;line-height:34px}
+.expense-data-hero p{max-width:660px;margin:0;color:#384252;font-size:14px;line-height:22px}
+.expense-data-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.expense-data-actions a{display:inline-flex;height:38px;align-items:center;justify-content:center;padding:0 14px;border:1px solid #d5dbe4;border-radius:4px;background:#fff;color:#394453;font-size:14px;font-weight:700;text-decoration:none}
+.expense-data-actions .primary-link{border-color:var(--red);background:var(--red);color:#fff}
+.expense-data-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:12px;border:1px solid var(--line);border-radius:4px;background:#fff;overflow:hidden}
+.expense-data-metric{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:14px;min-height:108px;padding:16px;border-right:1px solid #eef1f5}
+.expense-data-metric:last-child{border-right:0}
+.expense-data-metric p{margin:0 0 8px;color:#2d3542;font-size:14px;font-weight:700}
+.expense-data-metric strong{display:block;color:#06080d;font-size:24px;line-height:30px}
+.expense-data-metric small{display:block;margin-top:7px;color:#596677;font-size:12px}
+.expense-data-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
+.expense-data-card{display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;min-height:148px;padding:20px;border:1px solid var(--line);border-radius:6px;background:#fff;color:inherit;text-decoration:none}
+.expense-data-card h2{margin:0 0 8px;font-size:17px;line-height:24px}
+.expense-data-card p{margin:0;color:#4b5565;font-size:13px;line-height:20px}
+.expense-data-card small{display:block;margin-top:14px;color:var(--red);font-size:13px;font-weight:700}
+@media (max-width: 1300px){.expense-empty-page{padding-left:10px;padding-right:56px}.expense-empty-layout{gap:16px}.expense-metric{gap:12px;padding:14px}.expense-entry-grid{gap:16px;padding-left:14px;padding-right:14px}.expense-entry-card{padding-left:18px;padding-right:18px}.entry-flow small{white-space:normal}}
+@media (max-width: 1700px){.expense-empty-layout{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.expense-source-panel h2,.source-guide{grid-column:1/-1}.source-card{min-height:104px;height:auto}}
+@media (max-width: 1199px){.expense-empty-layout{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-source-panel h2,.source-guide{grid-column:1/-1}.expense-source-panel{gap:12px}.source-card{min-height:96px}.expense-empty-hero{grid-template-columns:260px minmax(0,1fr)}.expense-data-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-data-metric:nth-child(2n){border-right:0}.expense-data-grid{grid-template-columns:1fr}}
+@media (max-width: 900px){.expense-metrics-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.expense-metric:nth-child(2n){border-right:0}.expense-metric:last-child{grid-column:1/-1;border-top:1px solid #eef1f5}.expense-empty-hero{grid-template-columns:1fr;padding:22px;text-align:center}.hero-illustration{justify-self:center}.expense-entry-grid{grid-template-columns:1fr}.expense-source-panel{grid-template-columns:1fr}.source-guide{grid-column:auto}.expense-data-hero{align-items:flex-start;flex-direction:column}.expense-data-actions{justify-content:flex-start}}
+@media (max-width: 760px){.expense-empty-page{padding:12px 10px 18px}.expense-metrics-strip{grid-template-columns:1fr}.expense-metric,.expense-metric:nth-child(2n){border-right:0;border-bottom:1px solid #eef1f5}.expense-metric:last-child{grid-column:auto;border-top:0;border-bottom:0}.expense-entry-card{min-height:auto}.entry-flow{gap:4px}.entry-flow small{font-size:11px}.entry-action{width:min(176px,100%)}.expense-task-panel{padding-left:10px;padding-right:10px}.expense-table-wrap td{height:170px}}
 @media (max-width: 480px){.expense-empty-hero h2{font-size:24px}.expense-metric{grid-template-columns:46px minmax(0,1fr)}.metric-icon,.entry-icon{width:46px;height:46px}.expense-entry-card header{grid-template-columns:46px minmax(0,1fr);gap:12px}.source-card{grid-template-columns:40px minmax(0,1fr);padding:16px 10px}.source-icon{width:40px;height:40px}}
 </style>

@@ -1,11 +1,5 @@
 <template>
   <div class="config-page" :class="`mode-${currentMode}`">
-    <header class="page-head">
-      <h2>{{ pageMeta.title }}</h2>
-      <span>{{ pageMeta.desc }}</span>
-      <button class="initial-return" type="button" @click="goInitial">初始状态</button>
-    </header>
-
     <template v-if="currentMode === 'initial'">
       <nav class="top-tabs compact">
         <button v-for="tab in setupTabs" :key="tab" :class="{ active: tab === '模板配置' }" type="button">{{ tab }}</button>
@@ -328,7 +322,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const pageModes = [
@@ -338,7 +332,6 @@ const pageModes = [
 ];
 
 const route = useRoute();
-const router = useRouter();
 
 function normalizeMode(value) {
   return pageModes.some((mode) => mode.key === value) ? value : 'initial';
@@ -352,20 +345,6 @@ watch(
     currentMode.value = normalizeMode(mode);
   }
 );
-
-function goInitial() {
-  router.push('/config');
-}
-
-const pageMeta = computed(() => {
-  if (currentMode.value === 'records') {
-    return { eyebrow: '配置中心', title: '配置与记录中心', desc: '统一管理模板、规则、标签、权限，以及版本记录、操作留痕、导出记录和复核记录。' };
-  }
-  if (currentMode.value === 'params') {
-    return { eyebrow: '配置中心', title: '系统参数配置', desc: '管理模型、文件、安全、通知、导出与审计留痕参数，确保参数变更可复核、可追溯。' };
-  }
-  return { eyebrow: '审计工作台 / 配置中心', title: '配置中心', desc: '集中管理模板、规则、标签、权限与系统参数，支持启用、停用、版本管理与操作追溯。' };
-});
 
 const setupTabs = ['模板配置', '规则配置', '标签配置', '权限配置', '系统参数配置'];
 const recordTabs = ['模板配置', '规则配置', '标签配置', '权限配置', '版本记录', '操作留痕', '导出记录', '复核记录'];
@@ -468,54 +447,12 @@ const paramVersions = [
   color: #101828;
 }
 
-.page-head {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  min-height: 48px;
-  margin: -2px 0 12px;
-  padding: 0 6px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.page-head h2 {
-  flex: 0 0 auto;
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.page-head span,
 .tab-desc {
   display: block;
   margin-top: 6px;
   color: #667085;
   font-size: 13px;
   line-height: 1.5;
-}
-
-.page-head span {
-  flex: 1;
-  min-width: 0;
-  margin-top: 0;
-}
-
-.initial-return {
-  min-width: 92px;
-  height: 34px;
-  border: 1px solid #d6deea;
-  border-radius: 5px;
-  background: #fff;
-  color: #344054;
-  font-weight: 800;
-}
-
-.mode-initial .initial-return {
-  border-color: #c40000;
-  background: #c40000;
-  color: #fff;
 }
 
 button,
@@ -1334,7 +1271,6 @@ th {
 }
 
 @media (max-width: 760px) {
-  .page-head,
   .toolbar,
   .param-head,
   .pager {

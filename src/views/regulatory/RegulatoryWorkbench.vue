@@ -1,10 +1,99 @@
 <template>
-  <div class="special-audit-page" aria-labelledby="special-audit-title">
-    <div class="title-row">
-      <h1 id="special-audit-title">专项审计分析</h1>
-    </div>
+  <div class="special-audit-page">
+    <section v-if="isEmptyMode" class="special-empty-page" aria-label="专项审计分析空白页">
+      <div class="special-empty-grid">
+        <main class="special-empty-main">
+          <section class="empty-metric-grid" aria-label="专项审计分析空态指标">
+            <article v-for="item in emptyMetrics" :key="item.label" class="empty-metric-card">
+              <span class="empty-metric-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
+              <div>
+                <p>{{ item.label }}</p>
+                <strong>0 <em>{{ item.unit }}</em></strong>
+                <small>较昨日 <b>-</b></small>
+              </div>
+            </article>
+          </section>
 
-    <div class="page-grid">
+          <section class="empty-task-hero" aria-labelledby="special-empty-title">
+            <svg class="empty-hero-art" viewBox="0 0 260 150" role="img" aria-label="暂无专项审计分析任务">
+              <rect x="36" y="24" width="136" height="108" rx="8" fill="#f7f9fc" stroke="#dce3ed" />
+              <line x1="58" y1="48" x2="122" y2="48" stroke="#d5dde9" stroke-width="7" stroke-linecap="round" />
+              <line x1="58" y1="72" x2="132" y2="72" stroke="#e0e6ef" stroke-width="5" stroke-linecap="round" />
+              <rect x="58" y="94" width="12" height="30" fill="#d9e2ec" />
+              <rect x="80" y="83" width="12" height="41" fill="#cfd9e6" />
+              <rect x="102" y="68" width="12" height="56" fill="#dde5ee" />
+              <circle cx="146" cy="101" r="35" fill="none" stroke="#cfd9e6" stroke-width="10" />
+              <line x1="171" y1="126" x2="208" y2="148" stroke="#c7d2df" stroke-width="12" stroke-linecap="round" />
+              <rect x="180" y="84" width="52" height="48" rx="6" fill="#fbfcfe" stroke="#dce3ed" />
+            </svg>
+            <div>
+              <h2 id="special-empty-title">暂无专项审计分析任务</h2>
+              <p>可以监管案例舆情或监督共享信息发起分析，形成监管关注点、审计检查建议和汇总分析报告。</p>
+              <div class="empty-ability-grid">
+                <article v-for="item in emptyAbilities" :key="item.title">
+                  <header>
+                    <span :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
+                    <h3>{{ item.title }}</h3>
+                  </header>
+                  <small>可执行操作</small>
+                  <ol>
+                    <li v-for="(step, index) in item.steps" :key="step.text">
+                      <span><FontAwesomeIcon :icon="step.icon" /></span>
+                      <em>{{ step.text }}</em>
+                      <i v-if="index < item.steps.length - 1">→</i>
+                    </li>
+                  </ol>
+                  <RouterLink :to="item.to">{{ item.action }}</RouterLink>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <section class="empty-recent-panel" aria-labelledby="special-empty-recent-title">
+            <header>
+              <h2 id="special-empty-recent-title">最近分析任务</h2>
+            </header>
+            <div class="empty-table-wrap">
+              <table>
+                <thead>
+                  <tr><th>任务编号</th><th>分析类型</th><th>被分析单位</th><th>分析期间</th><th>状态</th><th>输出结果</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="7">
+                      <div class="empty-table-state">
+                        <svg viewBox="0 0 92 72" aria-hidden="true">
+                          <path d="M24 30h44l10 14-8 20H22l-8-20 10-14Z" fill="#f6f8fb" stroke="#d8e1ec" />
+                          <path d="M24 30l12 16h20l12-16M14 44h22l6 7h8l6-7h22" fill="none" stroke="#cbd6e4" />
+                        </svg>
+                        <strong>暂无数据</strong>
+                        <p>当前暂无专项审计分析任务，快去创建吧！</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <RouterLink class="view-all-empty" to="/tasks">查看全部任务 <FontAwesomeIcon :icon="faChevronRight" /></RouterLink>
+          </section>
+        </main>
+
+        <aside class="special-empty-aside" aria-label="所需资料说明">
+          <section class="empty-info-panel">
+            <h2>所需资料说明</h2>
+            <article v-for="item in emptyMaterials" :key="item.title">
+              <span class="material-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
+              <div>
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.desc }}</p>
+              </div>
+            </article>
+          </section>
+        </aside>
+      </div>
+    </section>
+
+    <div v-else class="page-grid">
       <main class="main-stack">
         <section class="metric-grid" aria-label="专项审计分析概览">
           <article v-for="item in metrics" :key="item.label" class="metric-card">
@@ -136,7 +225,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { RouterLink } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -156,6 +245,44 @@ import {
   faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons';
 
+const store = inject('store');
+const isEmptyMode = computed(() => store.demoDataMode === 'empty');
+
+const emptyMetrics = [
+  { label: '分析任务', unit: '个', tone: 'red', icon: faBriefcase },
+  { label: '监管关注点', unit: '条', tone: 'orange', icon: faUserCheck },
+  { label: '舆情风险', unit: '条', tone: 'purple', icon: faComments },
+  { label: '共享文件', unit: '份', tone: 'green', icon: faFolder },
+  { label: '汇总报告', unit: '份', tone: 'blue', icon: faChartColumn }
+];
+
+const emptyAbilities = [
+  {
+    title: '监管案例舆情分析',
+    tone: 'purple',
+    icon: faMessage,
+    to: '/regulatory/result',
+    action: '新建案例舆情分析',
+    steps: [{ text: '输入单位/业务', icon: faFileLines }, { text: '获取案例舆情', icon: faDatabase }, { text: '加入审计重点', icon: faUser }]
+  },
+  {
+    title: '监督共享信息分析',
+    tone: 'green',
+    icon: faFolder,
+    to: '/tasks/detail/supervision-share',
+    action: '新建共享信息分析',
+    steps: [{ text: '选择共享文件', icon: faFileLines }, { text: '提取标签', icon: faTag }, { text: '生成汇总报告', icon: faClipboardList }]
+  }
+];
+
+const emptyMaterials = [
+  { title: '监管案例库', desc: '收集最新监管处罚、现场检查、通报等案例信息。', tone: 'red', icon: faDatabase },
+  { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments },
+  { title: '合规/风险/审计共享文件', desc: '来自合规、风险、审计条线的共享文档与数据。', tone: 'green', icon: faFolder },
+  { title: '数据标签', desc: '基于业务、风险、监管主题的标准标签体系。', tone: 'blue', icon: faTag },
+  { title: '使用提示', desc: '可按照组合两类分析能力使用；分析结果可引用到审计报告；所有过程留痕，支持追溯与复核。', tone: 'orange', icon: faLightbulb }
+];
+
 const metrics = [
   { label: '分析任务', value: '18', unit: '个', delta: '3', tone: 'red', icon: faBriefcase },
   { label: '监管关注点', value: '126', unit: '条', delta: '8', tone: 'orange', icon: faUserCheck },
@@ -170,7 +297,7 @@ const abilities = [
     desc: '分析监管案例与舆情信息，识别监管关注点与舆情风险。',
     tone: 'purple',
     icon: faMessage,
-    to: '/regulatory/new',
+    to: '/regulatory/result',
     action: '新建案例舆情分析',
     steps: [{ text: '输入单位/业务', icon: faUser }, { text: '获取案例舆情', icon: faFileLines }, { text: '加入审计重点', icon: faWandMagicSparkles }],
     stats: [{ label: '监管案例', value: '58', unit: '条' }, { label: '舆情风险', value: '24', unit: '条' }, { label: '审计建议', value: '12', unit: '条' }, { label: '最新分析', value: '2025-04-28 10:21' }]
@@ -180,7 +307,7 @@ const abilities = [
     desc: '整合监督共享信息，提取标签并生成汇总分析报告。',
     tone: 'green',
     icon: faClipboardList,
-    to: '/supervision/report/source-select',
+    to: '/tasks/detail/supervision-share',
     action: '新建共享信息分析',
     steps: [{ text: '选择共享文件', icon: faFileLines }, { text: '提取标签', icon: faTag }, { text: '生成汇总报告', icon: faClipboardList }],
     stats: [{ label: '共享文件', value: '384', unit: '份' }, { label: '标签命中', value: '1,268', unit: '条' }, { label: '汇总报告', value: '16', unit: '份' }, { label: '最新生成', value: '2025-04-28 09:52' }]
@@ -229,8 +356,52 @@ const pendingItems = [
 </script>
 
 <style scoped>
-.special-audit-page { --line:#dde3ec; --soft:#e9edf3; --red:#d60812; --blue:#1677ff; max-width:1362px; margin:0 auto; padding:14px 8px 12px; color:#111827; }
-.title-row h1 { margin:0 0 12px; font-size:24px; line-height:32px; font-weight:700; }
+.special-audit-page { --line:#dde3ec; --soft:#e9edf3; --red:#d60812; --blue:#1677ff; box-sizing:border-box; width:100%; max-width:1362px; margin:0 auto; padding:10px 8px 10px; color:#111827; }
+.special-empty-page { display:grid; gap:8px; min-height:calc(100vh - 74px); color:#111827; }
+.special-empty-grid { display:grid; grid-template-columns:minmax(0,1fr) 282px; gap:12px; align-items:start; min-width:0; }
+.special-empty-main { min-width:0; display:grid; gap:8px; }
+.empty-metric-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+.empty-metric-card { min-height:84px; display:grid; grid-template-columns:40px minmax(0,1fr); align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--line); border-radius:5px; background:#fff; }
+.empty-metric-icon { width:40px; height:40px; display:grid; place-items:center; border-radius:8px; color:#fff; font-size:18px; }
+.empty-metric-card p { margin:0 0 6px; color:#2d3542; font-size:13px; font-weight:700; }
+.empty-metric-card strong { display:block; color:#030712; font-size:26px; line-height:30px; font-weight:700; }
+.empty-metric-card em { font-size:13px; font-style:normal; font-weight:600; }
+.empty-metric-card small { display:block; margin-top:6px; color:#4b5563; font-size:12px; }
+.empty-task-hero { min-height:300px; display:grid; grid-template-columns:260px minmax(0,1fr); align-items:center; gap:22px; padding:20px 24px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+.empty-hero-art { width:238px; max-width:100%; opacity:.95; }
+.empty-task-hero h2 { margin:0 0 10px; font-size:24px; line-height:32px; text-align:center; }
+.empty-task-hero p { max-width:620px; margin:0 auto 18px; color:#364253; font-size:13px; line-height:22px; text-align:center; }
+.empty-ability-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.empty-ability-grid article { min-height:166px; padding:16px; border:1px solid var(--line); border-radius:5px; background:#fff; }
+.empty-ability-grid header { display:flex; align-items:center; gap:10px; }
+.empty-ability-grid header span { width:34px; height:34px; display:grid; place-items:center; border-radius:7px; color:#fff; }
+.empty-ability-grid h3 { margin:0; font-size:17px; line-height:24px; }
+.empty-ability-grid small { display:block; margin:14px 0 10px; color:#3a4554; font-size:12px; font-weight:700; }
+.empty-ability-grid ol { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0 0 14px; padding:0; list-style:none; }
+.empty-ability-grid li { position:relative; display:grid; justify-items:center; gap:6px; min-width:0; color:#263241; font-size:11px; text-align:center; }
+.empty-ability-grid li > span { width:30px; height:30px; display:grid; place-items:center; border:1px solid #d7dee8; border-radius:50%; color:#4b5565; }
+.empty-ability-grid li i { position:absolute; top:6px; right:-10px; color:#7d8795; font-style:normal; }
+.empty-ability-grid li em { font-style:normal; line-height:16px; }
+.empty-ability-grid a { width:188px; height:34px; display:flex; align-items:center; justify-content:center; margin:0 auto; border:1px solid var(--red); border-radius:4px; color:var(--red); font-size:13px; font-weight:700; }
+.empty-recent-panel { min-height:204px; padding:12px 14px 10px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+.empty-recent-panel header { display:flex; align-items:center; justify-content:space-between; min-height:28px; }
+.empty-recent-panel h2 { margin:0; font-size:18px; line-height:24px; }
+.empty-table-wrap { margin-top:10px; border:1px solid var(--line); border-radius:3px; overflow:hidden; }
+.empty-table-wrap table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.empty-table-wrap th { height:32px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); background:#f8fafc; font-size:12px; text-align:center; }
+.empty-table-wrap th:last-child { border-right:0; }
+.empty-table-wrap td { height:96px; padding:0; text-align:center; }
+.empty-table-state { display:grid; justify-items:center; align-content:center; min-height:96px; color:#667385; }
+.empty-table-state svg { width:72px; height:56px; }
+.empty-table-state strong { margin-top:3px; color:#667385; font-size:13px; }
+.empty-table-state p { margin:6px 0 0; font-size:12px; }
+.view-all-empty { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:14px; color:#1677ff; font-size:13px; font-weight:700; }
+.special-empty-aside { min-width:0; position:relative; z-index:0; }
+.empty-info-panel { display:grid; gap:10px; padding:12px 10px 14px; border:1px solid var(--line); border-radius:5px; background:#fff; }
+.empty-info-panel h2 { margin:0 0 2px; font-size:18px; line-height:24px; }
+.empty-info-panel article { min-height:88px; display:grid; grid-template-columns:38px minmax(0,1fr); gap:10px; align-items:start; padding:12px 10px; border:1px solid #e4e9f1; border-radius:6px; background:#fff; }
+.empty-info-panel h3 { margin:0 0 6px; font-size:15px; line-height:20px; }
+.empty-info-panel p { margin:0; color:#526071; font-size:12px; line-height:20px; }
 .page-grid { display:grid; grid-template-columns:minmax(0,1fr) 282px; gap:12px; align-items:start; }
 .main-stack { min-width:0; display:grid; gap:9px; }
 .metric-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; margin-bottom:0; }
@@ -304,7 +475,7 @@ th:nth-child(1){width:128px} th:nth-child(2){width:116px} th:nth-child(3){width:
 .actions { display:flex; justify-content:center; gap:8px; color:#126dff; font-size:12px; }
 .table-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:5px; font-size:12px; }
 .pager { display:flex; align-items:center; gap:7px; }.pager button,.pager select,.pager input { height:25px; border:1px solid #d8dee8; border-radius:4px; background:#fff; font-size:12px; }.pager button { min-width:25px; }.pager button.active { border-color:var(--red); background:var(--red); color:#fff; }.pager select { width:86px; }.pager input { width:49px; text-align:center; }
-.side-stack { min-width:0; display:grid; gap:11px; margin-top:-44px; }
+.side-stack { min-width:0; display:grid; gap:11px; margin-top:0; }
 .info-panel { display:grid; gap:8px; padding:15px 10px 12px; }.info-panel h2 { margin:0 4px 2px; }
 .info-panel article { min-height:90px; display:grid; grid-template-columns:39px minmax(0,1fr); gap:12px; align-items:start; padding:11px 12px; border:1px solid #e5e9f0; border-radius:6px; background:#fff; }
 .material-icon { width:34px; height:34px; border-radius:8px; font-size:16px; }
@@ -313,6 +484,7 @@ th:nth-child(1){width:128px} th:nth-child(2){width:116px} th:nth-child(3){width:
 .pending-panel ul { display:grid; gap:11px; margin:0; padding:0; list-style:none; }.pending-panel li { min-height:30px; display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:9px; align-items:center; }
 .pending-icon { width:26px; height:26px; border-radius:6px; font-size:13px; }.pending-panel p { margin:0; font-size:12px; }.pending-panel strong { font-size:13px; }.pending-panel strong.red { color:var(--red); background:none; }.pending-panel strong.orange { color:#f08300; background:none; }.pending-panel strong.blue { color:var(--blue); background:none; }.pending-panel > a { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:22px; color:#126dff; font-size:12px; font-weight:600; }
 @media (max-width:1390px){.special-audit-page{max-width:none;padding-left:6px;padding-right:6px}.page-grid{grid-template-columns:minmax(0,1fr) 270px;gap:10px}.metric-card{grid-template-columns:40px minmax(0,1fr);padding:12px 9px}.icon-box{width:36px;height:36px}.metric-card strong{font-size:23px}.ability-card{padding-left:11px;padding-right:11px}.ability-card h2{font-size:16px}.flow{gap:18px;margin-left:12px;margin-right:12px}.flow i{right:-16px}.ability-card dd{font-size:13px}.donut-layout{grid-template-columns:116px minmax(0,1fr)}.donut{width:106px;height:106px}.topic-list li{gap:4px;font-size:11px}}
+@media (max-width:1280px){.empty-task-hero{grid-template-columns:220px minmax(0,1fr);gap:20px;padding-left:22px;padding-right:22px}.empty-hero-art{width:220px}.empty-info-panel article{grid-template-columns:36px minmax(0,1fr);padding-left:10px;padding-right:10px}}
 @media (max-width:1180px){.page-grid{grid-template-columns:1fr}.side-stack{grid-template-columns:1fr;margin-top:0}.info-panel{grid-template-columns:repeat(2,minmax(0,1fr))}.info-panel h2{grid-column:1/-1}}
 @media (max-width:1040px){.metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.chart-grid{grid-template-columns:1fr}.chart-grid article{border-right:0;border-bottom:1px solid var(--soft)}.chart-grid article:last-child{border-bottom:0}.trend svg{height:145px}.bar-list{max-width:560px}}
 @media (max-width:760px){.special-audit-page{padding:12px 10px 20px}.metric-grid,.ability-grid,.info-panel{grid-template-columns:1fr}.metric-card{min-height:88px}.ability-card{min-height:auto}.ability-card dl{grid-template-columns:repeat(2,minmax(0,1fr))}.ability-card dl div:nth-child(2){border-right:0}.ability-card dl div:nth-child(-n+2){border-bottom:1px solid var(--soft)}.donut-layout{grid-template-columns:1fr;justify-items:center}.topic-list{width:100%}.table-footer,.pager{flex-wrap:wrap;justify-content:flex-start}}

@@ -2,9 +2,7 @@
   <div class="supervision-page" data-supervision-result-page>
     <main class="supervision-board" aria-label="监督共享信息分析结果">
       <section class="filter-panel" data-result-region="source-filters">
-        <div class="filter-head">
-          <h1>监督共享信核</h1>
-        </div>
+        
         <div class="filter-grid">
           <label class="filter-field">
             <span>被分析单位</span>
@@ -394,9 +392,8 @@ import {
   updateResultFilter
 } from './supervisionShareResultData.js';
 
-const REFERENCE_WIDTH = 1586;
-const REFERENCE_HEIGHT = 994;
-const COMPACT_DETAIL_BREAKPOINT = 1280;
+const PAGE_WIDTH = 1351;
+const COMPACT_DETAIL_BREAKPOINT = 900;
 const COMPACT_HEIGHT_BREAKPOINT = 850;
 
 const route = useRoute();
@@ -607,18 +604,22 @@ function tagTone(tag) {
 
 function applyViewportState() {
   const root = document.documentElement;
+  const sidebar = document.querySelector('.supervision-result-shell .sidebar');
+  const sidebarWidth = sidebar && getComputedStyle(sidebar).display !== 'none'
+    ? sidebar.getBoundingClientRect().width
+    : 0;
+  const availableWidth = Math.max(1, window.innerWidth - sidebarWidth - 40);
+  const scaleNeeded = availableWidth < PAGE_WIDTH;
   const compact = window.innerWidth < COMPACT_DETAIL_BREAKPOINT;
   const compactHeight = window.innerHeight < COMPACT_HEIGHT_BREAKPOINT;
-  const viewportScale = Math.min(window.innerWidth / REFERENCE_WIDTH, window.innerHeight / REFERENCE_HEIGHT);
-  const scale = compact
-    ? Math.max(0.72, Math.min(1, viewportScale)).toFixed(4)
-    : Math.max(0.76, Math.min(1.12, viewportScale)).toFixed(4);
-  const compactScale = compact ? Math.max(0.72, Math.min(1, viewportScale)).toFixed(4) : '1';
+  const widthScale = Math.min(1, availableWidth / PAGE_WIDTH);
+  const scale = scaleNeeded ? Math.max(0.45, widthScale).toFixed(4) : '1.0000';
+  const compactScale = scaleNeeded ? scale : '1';
 
   root.style.setProperty('--supervision-result-scale', scale);
   root.style.setProperty('--supervision-result-compact-scale', compactScale);
-  root.classList.toggle('supervision-result-scaled', scale !== '1.0000' && scale !== '1');
-  root.classList.toggle('supervision-result-compact', compact);
+  root.classList.toggle('supervision-result-scaled', scaleNeeded && scale !== '1.0000' && scale !== '1');
+  root.classList.toggle('supervision-result-compact', scaleNeeded);
   root.classList.toggle('supervision-result-compact-height', compactHeight);
   isCompactDetail.value = compact;
   if (compact && !pickerOpen.value) detailOpen.value = false;
@@ -667,7 +668,7 @@ onBeforeUnmount(() => {
 
 .supervision-board {
   display: grid;
-  grid-template-rows: 96px 92px 224px 314px 139px;
+  grid-template-rows: 72px 92px 224px 314px 139px;
   gap: 8px;
   min-width: 0;
 }
@@ -687,7 +688,9 @@ onBeforeUnmount(() => {
 }
 
 .filter-panel {
-  padding: 0 14px 12px;
+  display: grid;
+  align-items: center;
+  padding: 4px 14px 8px;
 }
 
 .filter-head {
@@ -720,13 +723,13 @@ h3 {
 .filter-grid {
   display: grid;
   grid-template-columns: 110px 205px 118px 118px 156px 114px 120px;
-  align-items: end;
+  align-items: center;
   gap: 14px;
 }
 
 .filter-field {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   color: #111827;
   font-size: 12px;

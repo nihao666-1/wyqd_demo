@@ -10,7 +10,7 @@ test('任务详情使用独立应用壳和正确面包屑', () => {
   assert.match(layout, /const isTaskDetailRoute = computed\(\(\) => route\.path === '\/tasks\/detail'\)/);
   assert.match(layout, /v-else-if="isTaskDetailRoute" class="task-breadcrumb"/);
   assert.match(layout, /<span>任务中心<\/span><i>\/<\/i><strong>任务详情<\/strong>/);
-  assert.match(layout, /!isParsingPhase && !isTaskDetailRoute/);
+  assert.match(layout, /class="global-data-mode"/);
 });
 
 test('生成中任务壳尺寸规则与其他详情状态隔离', () => {
@@ -18,11 +18,11 @@ test('生成中任务壳尺寸规则与其他详情状态隔离', () => {
   assert.match(layout, /const isGeneratingTaskDetail = computed/);
   assert.match(css, /\.task-generating-shell \.sidebar\s*\{/);
   assert.match(css, /\.task-generating-shell \.topbar\s*\{/);
-  assert.match(css, /flex:\s*0 0 207px/);
+  assert.match(css, /\.task-generating-shell \.sidebar\s*\{[^}]*flex:\s*0 0 208px/s);
 });
 
 test('生成中任务壳复刻侧栏品牌、通知角标与底部导航节奏', () => {
-  assert.match(layout, /v-if="!isEmptyMode \|\| isTaskDetailRoute" class="notice-dot"/);
+  assert.match(layout, /!isEmptyMode \|\| isTaskDetailRoute" class="notice-dot"/);
   assert.match(css, /\.task-generating-shell \.brand strong\s*\{[^}]*font-size:\s*21px/s);
   assert.match(css, /\.task-generating-shell \.brand\s*\{[^}]*min-height:\s*55px[^}]*margin-bottom:\s*24px[^}]*background:\s*#cf0000/s);
   assert.match(css, /\.task-generating-shell \.bottom-nav\s*\{[^}]*min-height:\s*129px/s);

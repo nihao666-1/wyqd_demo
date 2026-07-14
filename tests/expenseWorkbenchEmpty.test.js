@@ -77,10 +77,10 @@ test('布局为费用空白页提供专用壳层面包屑和二级导航', () =>
   assert.match(content, /v-else-if="isExpenseWorkbenchRoute" class="task-breadcrumb"/);
   assert.match(content, /审计工作台<\/span><i>\/<\/i><strong>费用审计分析<\/strong>/);
   assert.match(content, /const isExpenseSection = computed/);
-  assert.match(content, /item\.children && isExpenseSection/);
+  assert.match(content, /isExpenseSection\.value && item\.path === '\/expense\/workbench'/);
   assert.match(content, /费用异常监控/);
   assert.match(content, /费用趋势分析/);
-  assert.match(content, /!isExpenseWorkbenchRoute/);
+  assert.match(content, /class="global-data-mode"/);
   compileVue(layoutUrl);
 });
 

@@ -1,16 +1,5 @@
 <template>
   <div class="file-center" :class="{ 'file-empty': isEmptyMode, 'is-data-view': !isEmptyMode }" :data-demo-mode="demoDataMode">
-    <header class="page-title-row">
-      <div>
-        <h2>文件中心</h2>
-        <p>统一管理输入资料、过程附件、生成报告和导出文件，沉淀可追溯的审计资产库。</p>
-      </div>
-      <div class="state-switch" aria-label="页面状态切换">
-        <button type="button" :class="{ active: isEmptyView }" @click="switchMode('empty')">空白状态</button>
-        <button type="button" :class="{ active: !isEmptyView }" @click="switchMode('data')">有数据状态</button>
-      </div>
-    </header>
-
     <section v-if="isEmptyView" class="empty-layout">
       <main class="main-stack">
         <section class="panel filter-panel">
@@ -381,18 +370,22 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
-const currentMode = ref('empty');
+const store = inject('store');
 const activeAssetTab = ref('制度文件');
 const activeTopTab = ref('manage');
 const notice = ref('');
 const expandedMoreFileId = ref('');
 
-const isEmptyMode = computed(() => currentMode.value === 'empty');
+const isEmptyMode = computed(() => store.demoDataMode === 'empty');
 const isEmptyView = isEmptyMode;
 const demoDataMode = computed(() => (isEmptyMode.value ? 'empty' : 'data'));
+
+watch(isEmptyMode, (empty) => {
+  activeAssetTab.value = empty ? '制度文件' : '全部文件';
+});
 
 const optionAll = ['全部'];
 const emptyFilters = [
@@ -527,12 +520,6 @@ function makeFile(id, name, ext, tone, type, unit, source, uploader, time, statu
   };
 }
 
-function switchMode(mode) {
-  currentMode.value = mode;
-  activeAssetTab.value = mode === 'empty' ? '制度文件' : '全部文件';
-  notice.value = mode === 'empty' ? '已切换至文件中心空白状态。' : '已切换至文件中心有数据状态。';
-}
-
 function selectTopTab(key) {
   activeTopTab.value = key;
   const tab = topTabs.find((item) => item.key === key);
@@ -560,35 +547,6 @@ function showNotice(message) {
   color: #111827;
 }
 
-.page-title-row {
-  min-height: 38px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.page-title-row h2 {
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.page-title-row p {
-  margin-top: 4px;
-  color: #667085;
-  font-size: 12px;
-}
-
-.state-switch {
-  display: inline-flex;
-  flex: 0 0 auto;
-  padding: 3px;
-  border: 1px solid #d9e1ec;
-  border-radius: 6px;
-  background: #fff;
-}
-
 button,
 input,
 select {
@@ -599,7 +557,6 @@ button {
   cursor: pointer;
 }
 
-.state-switch button,
 .filter-actions button,
 .empty-actions button,
 .pager button,
@@ -614,13 +571,6 @@ button {
   font-weight: 700;
 }
 
-.state-switch button {
-  min-height: 28px;
-  padding: 0 12px;
-  border: 0;
-}
-
-.state-switch button.active,
 .primary {
   border-color: #c40000 !important;
   background: #c40000 !important;
@@ -1502,7 +1452,6 @@ button {
 }
 
 @media (max-width: 760px) {
-  .page-title-row,
   .pager,
   .pager > div,
   .subpage-summary {
@@ -1522,14 +1471,6 @@ button {
     width: 100%;
     flex-wrap: wrap;
     flex-direction: row;
-  }
-
-  .state-switch {
-    width: 100%;
-  }
-
-  .state-switch button {
-    flex: 1;
   }
 }
 </style>

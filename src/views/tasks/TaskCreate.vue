@@ -72,7 +72,7 @@
     />
 
     <section v-else class="downstream-panel" :class="{ 'parsing-downstream': step === 3 && stepFourStage === 'parsing' }">
-      <h2 v-if="step === 3 && stepFourStage === 'parsing'" class="parse-page-title">资料解析与预检</h2>
+   
       <nav class="wizard-steps compact" :class="{ 'parsing-stage': step === 3 && stepFourStage === 'parsing' }" aria-label="创建审计任务步骤"><template v-for="(item, index) in steps" :key="item"><button class="wizard-step" :class="{ active: step === index, done: step > index }" type="button" :disabled="index > step" @click="goStep(index)"><span class="step-number"><FontAwesomeIcon v-if="step > index && !(step === 3 && stepFourStage === 'parsing' && index === 2)" :icon="faCheck" /><template v-else>{{ index + 1 }}</template></span><span>{{ item }}</span></button><i v-if="index < steps.length - 1" class="step-connector" aria-hidden="true"></i></template></nav>
       <header v-if="step !== 2 && !(step === 3 && stepFourStage === 'parsing')"><p>步骤 {{ step + 1 }} / 5</p><h3>{{ steps[step] }}</h3><span>{{ stepHelp }}</span></header>
       <div v-if="step === 1" class="ability-grid"><button v-for="capability in availableCapabilities" :key="capability.id" class="ability-card" :class="{ selected: selectedIds.includes(capability.id) }" type="button" @click="toggleCapability(capability.id)"><span class="ability-icon" :class="capability.colorClass">{{ capability.icon }}</span><span><b>{{ capability.name }}</b><small>{{ capability.description }}</small></span></button></div>

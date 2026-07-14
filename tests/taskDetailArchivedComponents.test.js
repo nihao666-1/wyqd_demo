@@ -119,7 +119,7 @@ test('应用壳只为归档详情启用专属类和紧凑面包屑', () => {
   assert.match(layout, /const isArchivedTaskDetail = computed/);
   assert.match(layout, /任务中心/);
   assert.match(layout, /任务详情/);
-  assert.match(layout, /!isParsingPhase && !isTaskDetailRoute/);
+  assert.match(layout, /class="global-data-mode"/);
 });
 
 test('归档壳层使用1600基准画布和0.85缩放下限', () => {
