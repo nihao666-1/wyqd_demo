@@ -61,24 +61,23 @@ test('依据来源可关闭并由查看来源动作重新打开', () => {
   assert.match(page, /function viewSource\(\)[\s\S]*sourceRailOpen\.value = true/);
 });
 
-test('窄桌面缩放参与布局占位而不是仅 transform 假缩放', () => {
+test('窄桌面通过响应式重排而不是整页缩放', () => {
   const page = source(pageUrl);
 
-  assert.match(page, /@media \(max-width:1500px\)/);
-  assert.match(page, /zoom:calc\(\(100vw - 210px\) \/ 1378\)/);
-  assert.doesNotMatch(page, /transform:scale\(calc\(\(100vw - 210px\) \/ 1378\)\)/);
+  assert.match(page, /@media \(max-width:1400px\)/);
+  assert.match(page, /\.report-generation-grid\{grid-template-columns:minmax\(180px,220px\) minmax\(0,1fr\)\}/);
+  assert.doesNotMatch(page, /\bzoom\s*:/);
+  assert.doesNotMatch(page, /transform:scale\(/);
 });
 
-test('基准画布关键区域保持参考图坐标比例', () => {
+test('报告工作区保留功能尺寸下限并利用可用视口高度', () => {
   const page = source(pageUrl);
 
-  assert.match(page, /\.report-generation-page\{[^}]*max-width:1378px/);
-  assert.match(page, /\.report-generation-grid\{[^}]*grid-template-columns:204px minmax\(640px,790px\) 326px/);
-  assert.match(page, /\.source-rail\{[^}]*right:14px;top:62px;width:326px;height:778px/);
-  assert.match(page, /\.bottom-row\{[^}]*grid-template-columns:502px 358px 126px/);
-  assert.match(page, /\.generation-config\{[^}]*height:654px/);
-  assert.match(page, /\.progress-card\{[^}]*height:334px/);
-  assert.match(page, /\.editor-card\{[^}]*height:306px/);
+  assert.match(page, /\.report-generation-page\{[^}]*min-height:calc\(var\(--shell-viewport-height/);
+  assert.match(page, /\.report-generation-grid\{[^}]*grid-template-columns:minmax\(180px,220px\) minmax\(0,1fr\) minmax\(280px,326px\)/);
+  assert.match(page, /\.report-generation-grid\{[^}]*min-height:654px[^}]*flex:1/);
+  assert.match(page, /\.source-rail\{[^}]*height:auto[^}]*min-height:654px[^}]*align-self:stretch/);
+  assert.match(page, /\.generation-center\{[^}]*grid-template-rows:minmax\(334px,1\.05fr\) minmax\(306px,\.95fr\)/);
 });
 
 test('底部输出区按参考图拆为输出、版本、导出记录三块', () => {
@@ -101,7 +100,7 @@ test('报告生成页专属 shell 接入面包屑和报告智能化激活', () =
   assert.match(layout, /<strong>报告生成<\/strong>/);
   assert.match(layout, /item\.path === '\/audit-report\/workbench'/);
   assert.match(css, /\.audit-report-generation-shell/);
-  assert.match(css, /\.audit-report-generation-shell \.sidebar\s*\{[^}]*width:\s*196px/s);
+  assert.match(css, /\.audit-report-generation-shell \.sidebar[\s\S]*width:\s*var\(--shell-sidebar-width\)/s);
   assert.match(css, /\.audit-report-generation-shell \.topbar\s*\{[^}]*height:\s*56px/s);
 });
 

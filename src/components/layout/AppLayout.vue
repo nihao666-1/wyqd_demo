@@ -75,7 +75,9 @@
       </header>
 
       <div v-if="store.notice && route.path !== '/workbench'" class="notice">{{ store.notice }}</div>
-      <RouterView />
+      <div class="route-content">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>

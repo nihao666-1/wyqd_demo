@@ -58,7 +58,7 @@
 
       <section class="metric-strip" data-result-region="task-meta" aria-label="指标汇总">
         <article v-for="metric in metrics" :key="metric.label" class="metric-card">
-          <span class="metric-icon" :class="metric.tone" aria-hidden="true">{{ metric.icon }}</span>
+          <span class="metric-icon" :class="metric.tone" aria-hidden="true"><FontAwesomeIcon :icon="metric.icon" /></span>
           <div>
             <span class="metric-label">{{ metric.label }}</span>
             <p><strong>{{ metric.value }}</strong><small>{{ metric.unit }}</small></p>
@@ -205,7 +205,7 @@
       <section class="report-framework" data-result-region="report-outline">
         <h2>汇总分析报告框架</h2>
         <article v-for="section in reportSections" :key="section.id" class="chapter-card">
-          <span class="chapter-icon" :class="section.tone" aria-hidden="true">{{ section.icon }}</span>
+          <span class="chapter-icon" :class="section.tone" aria-hidden="true"><FontAwesomeIcon :icon="section.icon" /></span>
           <div>
             <strong>{{ section.name }}</strong>
             <small>来源 {{ section.sourceCount }} 份</small>
@@ -219,7 +219,7 @@
         <h2>输出结果与导出记录</h2>
         <div>
           <article v-for="file in exportFiles" :key="file.name" class="export-card">
-            <span :class="file.tone" aria-hidden="true">{{ file.icon }}</span>
+            <span :class="file.tone" aria-hidden="true"><FontAwesomeIcon :icon="file.icon" /></span>
             <strong>{{ file.name }}</strong>
             <small>{{ file.type }}</small>
             <small>{{ file.size }}</small>
@@ -373,6 +373,21 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faChartSimple,
+  faClipboardCheck,
+  faFileExcel,
+  faFileLines,
+  faFileWord,
+  faFileZipper,
+  faFolderOpen,
+  faListCheck,
+  faPenToSquare,
+  faShieldHalved,
+  faTags,
+  faTriangleExclamation
+} from '@fortawesome/free-solid-svg-icons';
 import {
   createSupervisionExcelExport,
   createSupervisionWordExport,
@@ -392,9 +407,7 @@ import {
   updateResultFilter
 } from './supervisionShareResultData.js';
 
-const PAGE_WIDTH = 1351;
-const COMPACT_DETAIL_BREAKPOINT = 900;
-const COMPACT_HEIGHT_BREAKPOINT = 850;
+const COMPACT_DETAIL_BREAKPOINT = 1320;
 
 const route = useRoute();
 const router = useRouter();
@@ -407,11 +420,11 @@ const draftSelection = ref([]);
 let lastTrigger = null;
 
 const metrics = [
-  { label: '共享文件', value: '384', unit: '份', delta: '28', icon: '□', tone: 'blue' },
-  { label: '标签命中', value: '1,268', unit: '条', delta: '96', icon: '◇', tone: 'green' },
-  { label: '问题发现', value: '72', unit: '项', delta: '6', icon: '△', tone: 'orange' },
-  { label: '整改事项', value: '45', unit: '项', delta: '3', icon: '✓', tone: 'red' },
-  { label: '汇总报告', value: '16', unit: '份', delta: '2', icon: '▤', tone: 'purple' }
+  { label: '共享文件', value: '384', unit: '份', delta: '28', icon: faFolderOpen, tone: 'blue' },
+  { label: '标签命中', value: '1,268', unit: '条', delta: '96', icon: faTags, tone: 'green' },
+  { label: '问题发现', value: '72', unit: '项', delta: '6', icon: faTriangleExclamation, tone: 'orange' },
+  { label: '整改事项', value: '45', unit: '项', delta: '3', icon: faClipboardCheck, tone: 'red' },
+  { label: '汇总报告', value: '16', unit: '份', delta: '2', icon: faChartSimple, tone: 'purple' }
 ];
 
 const trendBars = [
@@ -445,18 +458,18 @@ const resultTabs = [
 ];
 
 const reportSections = computed(() => [
-  { id: 'summary', name: '报告摘要', icon: '摘', tone: 'blue', sourceCount: 384, progress: 100 },
-  { id: 'findings', name: '问题发现及整改', icon: '改', tone: 'red', sourceCount: 126, progress: 92 },
-  { id: 'compliance', name: '合规事项', icon: '规', tone: 'green', sourceCount: 98, progress: 88 },
-  { id: 'risk', name: '合规与风险管理情况', icon: '险', tone: 'orange', sourceCount: 74, progress: 85 },
-  { id: 'appendix', name: '附录（来源文件清单）', icon: '附', tone: 'purple', sourceCount: 384, progress: 100 }
+  { id: 'summary', name: '报告摘要', icon: faFileLines, tone: 'blue', sourceCount: 384, progress: 100 },
+  { id: 'findings', name: '问题发现及整改', icon: faPenToSquare, tone: 'red', sourceCount: 126, progress: 92 },
+  { id: 'compliance', name: '合规事项', icon: faListCheck, tone: 'green', sourceCount: 98, progress: 88 },
+  { id: 'risk', name: '合规与风险管理情况', icon: faShieldHalved, tone: 'orange', sourceCount: 74, progress: 85 },
+  { id: 'appendix', name: '附录（来源文件清单）', icon: faFolderOpen, tone: 'purple', sourceCount: 384, progress: 100 }
 ]);
 
 const exportFiles = [
-  { name: '监督共享信息汇总表', type: 'Excel', size: '256KB', time: '2025-04-28 11:05', owner: '审计员A', icon: 'X', tone: 'excel' },
-  { name: '监督共享信息分析报告', type: 'Word', size: '1.25MB', time: '2025-04-28 11:08', owner: '审计员A', icon: 'W', tone: 'word' },
-  { name: '附录明细表', type: 'Excel', size: '128KB', time: '2025-04-28 11:08', owner: '审计员A', icon: 'X', tone: 'excel' },
-  { name: '附件包（来源文件）', type: 'ZIP', size: '58.6MB', time: '2025-04-28 11:08', owner: '系统', icon: '□', tone: 'zip' }
+  { name: '监督共享信息汇总表', type: 'Excel', size: '256KB', time: '2025-04-28 11:05', owner: '审计员A', icon: faFileExcel, tone: 'excel' },
+  { name: '监督共享信息分析报告', type: 'Word', size: '1.25MB', time: '2025-04-28 11:08', owner: '审计员A', icon: faFileWord, tone: 'word' },
+  { name: '附录明细表', type: 'Excel', size: '128KB', time: '2025-04-28 11:08', owner: '审计员A', icon: faFileExcel, tone: 'excel' },
+  { name: '附件包（来源文件）', type: 'ZIP', size: '58.6MB', time: '2025-04-28 11:08', owner: '系统', icon: faFileZipper, tone: 'zip' }
 ];
 
 const historyTasks = [
@@ -602,34 +615,10 @@ function tagTone(tag) {
   return 'default';
 }
 
-function applyViewportState() {
-  const root = document.documentElement;
-  const sidebar = document.querySelector('.supervision-result-shell .sidebar');
-  const sidebarWidth = sidebar && getComputedStyle(sidebar).display !== 'none'
-    ? sidebar.getBoundingClientRect().width
-    : 0;
-  const availableWidth = Math.max(1, window.innerWidth - sidebarWidth - 40);
-  const scaleNeeded = availableWidth < PAGE_WIDTH;
-  const compact = window.innerWidth < COMPACT_DETAIL_BREAKPOINT;
-  const compactHeight = window.innerHeight < COMPACT_HEIGHT_BREAKPOINT;
-  const widthScale = Math.min(1, availableWidth / PAGE_WIDTH);
-  const scale = scaleNeeded ? Math.max(0.45, widthScale).toFixed(4) : '1.0000';
-  const compactScale = scaleNeeded ? scale : '1';
-
-  root.style.setProperty('--supervision-result-scale', scale);
-  root.style.setProperty('--supervision-result-compact-scale', compactScale);
-  root.classList.toggle('supervision-result-scaled', scaleNeeded && scale !== '1.0000' && scale !== '1');
-  root.classList.toggle('supervision-result-compact', scaleNeeded);
-  root.classList.toggle('supervision-result-compact-height', compactHeight);
+function updateCompactDetail() {
+  const compact = window.innerWidth <= COMPACT_DETAIL_BREAKPOINT;
   isCompactDetail.value = compact;
   if (compact && !pickerOpen.value) detailOpen.value = false;
-}
-
-function clearViewportState() {
-  const root = document.documentElement;
-  root.classList.remove('supervision-result-scaled', 'supervision-result-compact', 'supervision-result-compact-height');
-  root.style.removeProperty('--supervision-result-scale');
-  root.style.removeProperty('--supervision-result-compact-scale');
 }
 
 function handleGlobalKeydown(event) {
@@ -642,15 +631,14 @@ function handleGlobalKeydown(event) {
 }
 
 onMounted(() => {
-  applyViewportState();
-  window.addEventListener('resize', applyViewportState);
+  updateCompactDetail();
+  window.addEventListener('resize', updateCompactDetail);
   window.addEventListener('keydown', handleGlobalKeydown);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', applyViewportState);
+  window.removeEventListener('resize', updateCompactDetail);
   window.removeEventListener('keydown', handleGlobalKeydown);
-  clearViewportState();
 });
 </script>
 
@@ -658,19 +646,20 @@ onBeforeUnmount(() => {
 .supervision-page {
   position: relative;
   display: grid;
-  grid-template-columns: 1034px 303px;
-  gap: 14px;
-  width: 1351px;
-  height: 928px;
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 320px);
+  gap: 12px;
+  width: 100%;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  margin: 0;
   color: #1f2937;
 }
 
 .supervision-board {
   display: grid;
-  grid-template-rows: 72px 92px 224px 314px 139px;
-  gap: 8px;
+  grid-template-rows: 72px 92px minmax(224px, .9fr) minmax(314px, 1.25fr) minmax(139px, .7fr);
+  gap: 6px;
   min-width: 0;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
 }
 
 .filter-panel,
@@ -722,7 +711,7 @@ h3 {
 
 .filter-grid {
   display: grid;
-  grid-template-columns: 110px 205px 118px 118px 156px 114px 120px;
+  grid-template-columns: minmax(100px, .9fr) minmax(160px, 1.6fr) repeat(2, minmax(100px, 1fr)) minmax(130px, 1.3fr) minmax(100px, 1fr) auto;
   align-items: center;
   gap: 14px;
 }
@@ -765,7 +754,7 @@ button:focus-visible,
 select:focus-visible,
 input:focus-visible,
 tr:focus-visible {
-  outline: 2px solid #1677ff;
+  outline: 2px solid var(--color-info);
   outline-offset: 1px;
 }
 
@@ -783,8 +772,8 @@ tr:focus-visible {
 .filter-actions .primary,
 .file-picker .primary,
 .source-detail-card footer .primary {
-  border-color: #c9000b;
-  background: #c9000b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -799,6 +788,7 @@ tr:focus-visible {
   align-items: center;
   gap: 17px;
   min-width: 0;
+  min-height: 0;
   padding: 0 20px;
   border-right: 1px solid #e6ebf2;
 }
@@ -818,11 +808,11 @@ tr:focus-visible {
   font-weight: 700;
 }
 
-.metric-icon.blue { background: #eaf3ff; color: #1677ff; }
+.metric-icon.blue { background: #eaf3ff; color: var(--color-info); }
 .metric-icon.green { background: #eaf8ef; color: #16a05d; }
 .metric-icon.orange { background: #fff4e4; color: #ff9800; }
 .metric-icon.red { background: #fff0f0; color: #e3323a; }
-.metric-icon.purple { background: #f3efff; color: #7657ef; }
+.metric-icon.purple { background: #f3efff; color: #6f668f; }
 
 .metric-label {
   font-size: 13px;
@@ -837,6 +827,7 @@ tr:focus-visible {
 }
 
 .metric-card strong {
+  margin: 0;
   font-size: 23px;
   line-height: 24px;
 }
@@ -892,10 +883,10 @@ tr:focus-visible {
   border-radius: 1px;
 }
 
-.blue { background: #1677ff; }
+.blue { background: var(--color-info); }
 .green { background: #20b56b; }
 .orange { background: #ffa726; }
-.red { background: #f04438; }
+.red { background: var(--color-primary); }
 .purple { background: #7c5cff; }
 
 .bar-chart {
@@ -936,7 +927,7 @@ tr:focus-visible {
   width: 100%;
 }
 
-.seg.blue { background: #1677ff; }
+.seg.blue { background: var(--color-info); }
 .seg.green { background: #20b56b; }
 .seg.orange { background: #ffa726; }
 
@@ -969,7 +960,7 @@ tr:focus-visible {
   width: 136px;
   height: 136px;
   border-radius: 50%;
-  background: conic-gradient(#1677ff 0 28.5%, #20b56b 28.5% 53.8%, #ffa726 53.8% 72.4%, #f04438 72.4% 89.1%, #7c5cff 89.1% 100%);
+  background: conic-gradient(var(--color-info) 0 28.5%, #20b56b 28.5% 53.8%, #ffa726 53.8% 72.4%, var(--color-primary) 72.4% 89.1%, #7c5cff 89.1% 100%);
 }
 
 .donut::before {
@@ -1102,7 +1093,7 @@ tr:focus-visible {
 }
 
 .result-tabs .active {
-  color: #c9000b;
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -1112,7 +1103,7 @@ tr:focus-visible {
   bottom: -1px;
   left: 0;
   height: 2px;
-  background: #c9000b;
+  background: var(--color-primary);
   content: '';
 }
 
@@ -1189,7 +1180,7 @@ tr:focus-visible {
 .tag-pill.risk,
 .detail-tag.risk {
   background: #fff0f0;
-  color: #d92d20;
+  color: var(--color-primary);
 }
 
 .tag-pill.relation,
@@ -1201,7 +1192,7 @@ tr:focus-visible {
 .tag-pill.default,
 .detail-tag.default {
   background: #eef5ff;
-  color: #1677ff;
+  color: var(--color-info);
 }
 
 .status-used { color: #079455; }
@@ -1217,7 +1208,7 @@ tr:focus-visible {
 .text-link {
   border: 0;
   background: transparent;
-  color: #1677ff;
+  color: var(--color-info);
   padding: 0 2px;
   font-size: 9px;
 }
@@ -1251,8 +1242,8 @@ tr:focus-visible {
 }
 
 .pager button.active {
-  border-color: #c9000b;
-  color: #c9000b;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .pager select { width: 68px; }
@@ -1292,11 +1283,11 @@ tr:focus-visible {
   font-size: 12px;
 }
 
-.chapter-icon.blue { background: #1677ff; }
-.chapter-icon.red { background: #f04438; }
+.chapter-icon.blue { background: var(--color-info); }
+.chapter-icon.red { background: var(--color-primary); }
 .chapter-icon.green { background: #16a05d; }
 .chapter-icon.orange { background: #ff9800; }
-.chapter-icon.purple { background: #7657ef; }
+.chapter-icon.purple { background: #6f668f; }
 
 .chapter-card strong {
   display: block;
@@ -1361,7 +1352,7 @@ tr:focus-visible {
 }
 
 .export-card .excel { background: #16a05d; }
-.export-card .word { background: #1677ff; }
+.export-card .word { background: var(--color-info); }
 .export-card .zip { background: #ff9800; }
 
 .export-card strong,
@@ -1383,15 +1374,15 @@ tr:focus-visible {
 }
 
 .history-panel {
-  grid-column: 1 / 3;
+  grid-column: 2;
   grid-row: 5;
-  width: 490px;
-  margin-left: 544px;
+  width: auto;
+  margin-left: 0;
   min-width: 0;
 }
 
 .supervision-board {
-  grid-template-columns: 724px 302px;
+  grid-template-columns: minmax(0, 2.4fr) minmax(302px, 1fr);
 }
 
 .filter-panel,
@@ -1411,7 +1402,7 @@ tr:focus-visible {
 .exports-panel {
   grid-column: 1;
   grid-row: 5;
-  width: 532px;
+  width: auto;
 }
 
 .history-panel table {
@@ -1448,7 +1439,7 @@ tr:focus-visible {
 .history-panel a {
   display: block;
   margin: 7px 13px 0 0;
-  color: #1677ff;
+  color: var(--color-info);
   font-size: 10px;
   text-align: right;
   text-decoration: none;
@@ -1465,9 +1456,9 @@ tr:focus-visible {
   right: 0;
   height: 34px;
   padding: 0 18px;
-  border: 1px solid #c9000b;
+  border: 1px solid var(--color-primary);
   border-radius: 4px;
-  background: #c9000b;
+  background: var(--color-primary);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -1480,7 +1471,7 @@ tr:focus-visible {
   display: grid;
   grid-template-rows: 43px minmax(0, 1fr) 57px;
   width: 303px;
-  height: 741px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -1555,6 +1546,7 @@ tr:focus-visible {
 
 .detail-log {
   width: 100%;
+  min-width: 0;
   margin-top: 9px;
   border-collapse: collapse;
   table-layout: fixed;
@@ -1590,8 +1582,8 @@ tr:focus-visible {
 }
 
 .source-detail-card footer button:nth-child(2) {
-  border-color: #f04438;
-  color: #c9000b;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .detail-overlay,
@@ -1693,5 +1685,168 @@ tr:focus-visible {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.supervision-page {
+  box-sizing: border-box;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 320px);
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  margin: 0;
+  overflow: visible;
+}
+
+.supervision-board {
+  grid-template-rows: 72px 92px minmax(224px, .9fr) minmax(314px, 1.25fr) minmax(139px, .7fr);
+  gap: 6px;
+  min-width: 0;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+}
+
+.source-detail-panel {
+  position: sticky;
+  top: 70px;
+  display: grid;
+  grid-template-rows: 34px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  height: calc(var(--shell-viewport-height, 100vh) - 82px);
+}
+
+.new-analysis {
+  position: static;
+  justify-self: end;
+}
+
+.source-detail-card {
+  position: static;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.detail-content {
+  overflow-y: auto;
+}
+
+.result-table-panel {
+  display: grid;
+  grid-template-rows: 34px 34px minmax(205px, 1fr) 38px;
+}
+
+.dense-table-wrap {
+  height: auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.dense-table {
+  height: 100%;
+}
+
+.report-framework {
+  grid-template-rows: 34px repeat(5, minmax(46px, 1fr));
+  min-height: 0;
+}
+
+.chapter-card {
+  height: auto;
+  min-height: 46px;
+}
+
+.chart-card {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.bar-chart,
+.donut-layout {
+  height: auto;
+  min-height: 174px;
+  flex: 1;
+}
+
+.keyword-bars {
+  flex: 1;
+  align-content: space-between;
+}
+
+.exports-panel {
+  display: grid;
+  grid-template-rows: 34px minmax(0, 1fr);
+}
+
+.exports-panel > div {
+  min-height: 0;
+}
+
+.export-card {
+  height: 100%;
+  min-height: 92px;
+}
+
+.dense-table-wrap,
+.history-panel {
+  overflow-x: auto;
+}
+
+@media (max-width: 1679px) {
+  .supervision-board {
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .filter-panel,
+  .metric-strip,
+  .chart-grid,
+  .result-table-panel,
+  .report-framework,
+  .exports-panel,
+  .history-panel {
+    grid-column: 1;
+    grid-row: auto;
+    width: auto;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 1320px) {
+  .supervision-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .source-detail-panel.compact {
+    display: block;
+    width: min(360px, 100vw);
+    height: 100vh;
+  }
+}
+
+@media (max-width: 1100px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-actions {
+    justify-content: flex-end;
+  }
+
+  .metric-card {
+    min-height: 76px;
+  }
+}
+
+@media (max-width: 900px) {
+  .filter-grid,
+  .metric-strip,
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

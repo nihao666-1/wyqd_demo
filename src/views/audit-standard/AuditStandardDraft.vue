@@ -100,8 +100,6 @@ import AuditEvidenceTrace from './result/AuditEvidenceTrace.vue';
 import AuditResultFooter from './result/AuditResultFooter.vue';
 import AuditStandardActionDialogs from './result/AuditStandardActionDialogs.vue';
 
-const DESIGN_WIDTH = 1586;
-const DESIGN_HEIGHT = 995;
 const route = useRoute();
 const router = useRouter();
 const taskId = computed(() => String(route.query.taskId || 'TASK-20250428001'));
@@ -114,9 +112,6 @@ const dialogItem = ref(null);
 const dialogError = ref('');
 const toast = ref('');
 let toastTimer;
-let shell;
-let previousBodyOverflow = '';
-let previousHtmlOverflow = '';
 let dialogReturnFocus = null;
 
 const pagedItems = computed(() => paginateStandardItems(state.value.items, page.value, pageSize.value));
@@ -222,23 +217,7 @@ function handlePreviewFile(file) { showToast(`正在预览：${file.name}`); }
 function handlePageChange(nextPage) { page.value = Math.min(19, Math.max(1, Number(nextPage) || 1)); }
 function handlePageSizeChange(nextSize) { pageSize.value = nextSize; page.value = 1; }
 
-function applyScale() {
-  if (!shell) return;
-  const scale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
-  const physicalWidth = DESIGN_WIDTH * scale;
-  shell.style.setProperty('--audit-result-scale', String(scale));
-  shell.style.zoom = String(scale);
-  shell.style.marginLeft = `${Math.max(0, (window.innerWidth - physicalWidth) / 2) / scale}px`;
-}
-
 onMounted(() => {
-  shell = document.querySelector('.audit-standard-result-shell');
-  previousBodyOverflow = document.body.style.overflow;
-  previousHtmlOverflow = document.documentElement.style.overflow;
-  document.body.style.overflow = 'hidden';
-  document.documentElement.style.overflow = 'hidden';
-  applyScale();
-  window.addEventListener('resize', applyScale);
   window.addEventListener('keydown', handleKeydown);
 });
 
@@ -248,14 +227,13 @@ function handleKeydown(event) {
 
 onBeforeUnmount(() => {
   clearTimeout(toastTimer);
-  window.removeEventListener('resize', applyScale);
   window.removeEventListener('keydown', handleKeydown);
-  document.body.style.overflow = previousBodyOverflow;
-  document.documentElement.style.overflow = previousHtmlOverflow;
-  if (shell) { shell.style.zoom = ''; shell.style.marginLeft = ''; shell.style.removeProperty('--audit-result-scale'); }
 });
 </script>
 
 <style scoped>
-.audit-standard-result-page{position:relative;width:1384px;height:933px;padding:5px 1px 5px 15px;background:#f7f8fa;color:#252d38;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;overflow:hidden}.result-stage{display:grid;grid-template-columns:1006px 348px;gap:10px;margin-top:-69px}.result-primary{display:grid;grid-template-rows:70px 628px 149px;gap:10px}.result-meta-spacer{pointer-events:none}.result-workspace-row{display:grid;grid-template-columns:209px 788px;gap:9px}.result-side{display:grid;grid-template-rows:731px 115px;gap:10px}.reopen-trace{position:absolute;z-index:12;top:76px;right:8px;height:30px;border:1px solid #c80000;border-radius:4px;background:#fff;color:#c80000;font-size:11px}.result-toast{position:fixed;z-index:120;top:74px;left:50%;min-width:260px;padding:10px 18px;border-radius:4px;background:rgb(30 41 59 / 92%);color:#fff;font-size:12px;text-align:center;transform:translateX(-50%);box-shadow:0 8px 24px rgb(15 23 42 / 20%)}
+.audit-standard-result-page{position:relative;width:100%;height:auto;padding:5px 1px 5px 15px;background:#f7f8fa;color:#252d38;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;overflow:hidden}.result-stage{display:grid;grid-template-columns:1006px 348px;gap:10px;margin-top:-69px}.result-primary{display:grid;grid-template-rows:70px 628px 149px;gap:10px}.result-meta-spacer{pointer-events:none}.result-workspace-row{display:grid;grid-template-columns:209px 788px;gap:9px}.result-side{display:grid;grid-template-rows:731px 115px;gap:10px}.reopen-trace{position:absolute;z-index:12;top:76px;right:8px;height:30px;border:1px solid var(--color-primary);border-radius:4px;background:#fff;color:var(--color-primary);font-size:11px}.result-toast{position:fixed;z-index:120;top:74px;left:50%;min-width:260px;padding:10px 18px;border-radius:4px;background:rgb(30 41 59 / 92%);color:#fff;font-size:12px;text-align:center;transform:translateX(-50%);box-shadow:0 8px 24px rgb(15 23 42 / 20%)}
+.audit-standard-result-page{box-sizing:border-box;display:flex;width:100%;max-width:none;height:auto;min-height:calc(var(--shell-viewport-height, 100vh) - 82px);flex-direction:column;margin:0;padding:12px;background:var(--color-bg);overflow:visible}.result-stage{min-height:0;flex:1;grid-template-columns:minmax(0,1fr) minmax(300px,360px);gap:12px;margin-top:0}.result-primary{min-width:0;min-height:0;grid-template-rows:minmax(628px,1fr) auto;gap:12px}.result-meta-spacer{display:none}.result-workspace-row{min-width:0;min-height:0;grid-template-columns:minmax(190px,230px) minmax(0,1fr);gap:12px}.result-side{min-width:0;min-height:0;grid-template-rows:minmax(628px,1fr) auto;gap:12px}.reopen-trace{top:14px;right:14px;border-color:var(--color-primary);color:var(--color-primary)}.result-toast{background:rgba(31,41,55,.9);box-shadow:var(--shadow-card)}
+@media(max-width:1599px){.result-stage{grid-template-columns:1fr}.result-side{grid-template-columns:minmax(0,1fr) minmax(260px,360px);grid-template-rows:auto}}
+@media(max-width:1280px){.result-workspace-row,.result-side{grid-template-columns:1fr}}
 </style>

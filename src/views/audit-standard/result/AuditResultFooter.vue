@@ -76,7 +76,7 @@ const fallbackFiles = [
 </template>
 
 <style scoped>
-.audit-result-footer { min-width: 0; display: grid; grid-template-columns: 626px 370px; gap: 10px; color: #27303b; font-size: 11px; }.audit-result-footer.side-only{display:block}.side-only .footer-region{width:100%;height:115px}
+.audit-result-footer { min-width: 0; display: grid; grid-template-columns: minmax(0,1.7fr) minmax(300px,1fr); gap: 10px; color: #27303b; font-size: 11px; }.audit-result-footer.side-only{display:block}.side-only .footer-region{width:100%;height:115px}
 .footer-region { min-width: 0; height: 148px; padding: 12px 13px; box-sizing: border-box; border: 1px solid #dfe3ea; background: #fff; overflow: hidden; }
 .footer-region h2 { margin: 0; color: #252c36; font-size: 13px; line-height: 1.25; font-weight: 700; }
 .export-records > p { margin: 5px 0 7px; color: #657080; font-size: 10px; }
@@ -101,10 +101,10 @@ const fallbackFiles = [
 .quick-action-list button { min-width: 0; display: grid; justify-items: center; gap: 8px; padding: 7px 2px; border: 0; background: transparent; color: #343c48; cursor: pointer; }
 .quick-action-list span { font-size: 23px; line-height: 1; font-weight: 400; }
 .quick-action-list b { font-size: 10px; line-height: 1.2; font-weight: 500; white-space: nowrap; }
-.audit-result-footer button:focus-visible { outline: 2px solid #1677ff; outline-offset: 1px; }
+.audit-result-footer button:focus-visible { outline: 2px solid var(--color-info); outline-offset: 1px; }
 .file-card:hover { border-color: #aeb9c8; background: #fafbfc; }
 @media (max-width: 1199px) {
-  .audit-result-footer { grid-template-columns: 626px 370px; gap: 8px; overflow:hidden; }
+  .audit-result-footer { grid-template-columns: minmax(0, 1fr); gap: 8px; overflow:visible; }
   .footer-region { height: 140px; padding: 10px; }
   .file-cards { gap: 5px; }
   .file-card { padding-inline: 6px; }

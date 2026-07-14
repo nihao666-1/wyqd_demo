@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faArrowLeft, faBoxArchive, faCircleCheck, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { archivedTaskDetail as archive, isArchivedReadAction } from '../../domain/taskDetail/archivedTaskDetail.js';
@@ -71,24 +71,6 @@ import TaskArchiveSidebar from './TaskArchiveSidebar.vue';
 
 const feedback = ref('');
 const sidebarOpen = ref(true);
-let archiveShell;
-
-function updateArchiveScale() {
-  if (!archiveShell) return;
-  const scale = window.innerWidth < 1600 ? Math.max(0.85, window.innerWidth / 1600) : 1;
-  archiveShell.style.setProperty('--task-archived-scale', String(scale));
-}
-
-onMounted(() => {
-  archiveShell = document.querySelector('.task-archived-shell');
-  updateArchiveScale();
-  window.addEventListener('resize', updateArchiveScale);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateArchiveScale);
-  archiveShell?.style.removeProperty('--task-archived-scale');
-});
 
 function performAction(label) {
   if (!isArchivedReadAction(label)) return;
@@ -98,15 +80,17 @@ function performAction(label) {
 
 <style scoped>
 .archive-page {
-  width: 1372px;
-  min-height: 933px;
+  display: flex;
+  width: 100%;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  flex-direction: column;
   padding-top: 7px;
   color: #20242c;
   font-size: 12px;
 }
 
 .archive-titlebar {
-  width: 1222px;
+  width: calc(100% - clamp(249px, 18vw, 320px) - 22px);
   height: 53px;
   margin-left: 8px;
   padding: 0 10px 0 12px;
@@ -166,20 +150,22 @@ function performAction(label) {
 }
 
 .archive-button.primary { border-color: #b4000a; background: #b4000a; color: #fff; }
-.archive-button.danger-outline { border-color: #e34850; color: #c7000b; }
+.archive-button.danger-outline { border-color: var(--color-primary); color: var(--color-primary); }
 .archive-button:disabled { border-color: #e5e8ec; background: #f5f6f8; color: #b8bdc6; cursor: not-allowed; }
-.archive-button:focus-visible, .archive-tab:focus-visible, .archive-back:focus-visible { outline: 2px solid #1677ff; outline-offset: 2px; }
+.archive-button:focus-visible, .archive-tab:focus-visible, .archive-back:focus-visible { outline: 2px solid var(--color-info); outline-offset: 2px; }
 
 .archive-lower {
-  width: 1356px;
+  width: calc(100% - 15px);
   margin: 4px 0 0 15px;
   display: grid;
-  grid-template-columns: 1100px 249px;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) clamp(249px, 18vw, 320px);
   gap: 7px;
-  align-items: start;
+  align-items: stretch;
 }
 
-.archive-lower.sidebar-closed { grid-template-columns: 1100px; }
+.archive-lower.sidebar-closed { grid-template-columns: minmax(0, 1fr); }
 .archive-primary-column { min-width: 0; }
 
 .archive-metadata {
@@ -189,7 +175,7 @@ function performAction(label) {
   border-radius: 4px;
   background: #fff;
   display: grid;
-  grid-template-columns: 136px 82px 100px 230px 108px 130px 120px 60px 66px 68px;
+  grid-template-columns: 1.25fr .75fr .9fr 2fr 1fr 1.2fr 1.1fr .55fr .6fr .6fr;
   overflow: hidden;
 }
 
@@ -213,8 +199,8 @@ function performAction(label) {
 }
 
 .archive-tab { position: relative; padding: 0 1px; border: 0; background: transparent; color: #30343b; font-size: 12px; white-space: nowrap; }
-.archive-tab.active { color: #c7000b; font-weight: 700; }
-.archive-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: #c7000b; }
+.archive-tab.active { color: var(--color-primary); font-weight: 700; }
+.archive-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--color-primary); }
 
 .archive-notice {
   height: 40px;

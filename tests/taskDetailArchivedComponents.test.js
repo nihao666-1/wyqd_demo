@@ -122,17 +122,17 @@ test('应用壳只为归档详情启用专属类和紧凑面包屑', () => {
   assert.match(layout, /class="global-data-mode"/);
 });
 
-test('归档壳层使用1600基准画布和0.85缩放下限', () => {
+test('归档壳层使用流式网格并共享视口尺寸变量', () => {
   const detail = source('TaskDetailArchived.vue');
   const main = source('TaskArchiveMain.vue');
   const layoutCss = projectSource('styles/layout.css');
 
-  assert.match(detail, /window\.innerWidth \/ 1600/);
-  assert.match(detail, /Math\.max\(0\.85/);
-  assert.match(detail, /--task-archived-scale/);
+  assert.match(detail, /min-height: calc\(var\(--shell-viewport-height, 100vh\) - 82px\)/);
+  assert.match(detail, /grid-template-columns: minmax\(0, 1fr\) clamp\(249px, 18vw, 320px\)/);
+  assert.doesNotMatch(detail, /--task-archived-scale/);
   assert.match(main, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
-  assert.match(layoutCss, /\.task-archived-shell \.sidebar\s*\{[^}]*width:\s*208px;[^}]*flex:\s*0 0 208px;/s);
-  assert.match(layoutCss, /\.task-archived-shell \.topbar\s*\{[^}]*min-height:\s*62px;[^}]*margin:\s*0;/s);
-  assert.match(layoutCss, /zoom:\s*var\(--task-archived-scale\)/);
-  assert.match(layoutCss, /@media \(min-width: 1800px\)[\s\S]*\.task-archived-shell\s*\{[^}]*margin:\s*0 auto;/);
+  assert.match(layoutCss, /\.task-archived-shell \.sidebar[\s\S]*width:\s*var\(--shell-sidebar-width\)[^}]*flex:\s*0 0 var\(--shell-sidebar-width\)/s);
+  assert.match(layoutCss, /\.task-archived-shell \.topbar[\s\S]*height:\s*58px[^}]*margin:\s*0 calc\(-1 \* var\(--shell-page-gutter\)\) 12px/s);
+  assert.doesNotMatch(layoutCss, /\bzoom\s*:/);
+  assert.doesNotMatch(layoutCss, /transform:\s*scale\(/);
 });

@@ -245,7 +245,7 @@
 </template>
 
 <script setup>
-import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faChartSimple,
@@ -261,9 +261,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const store = inject('store');
-const DESIGN_WIDTH = 1586;
-let resizeFrame = 0;
-let shell = null;
 
 const filters = [
   { label: '被分析单位', value: '上海分公司', type: 'select' },
@@ -359,40 +356,18 @@ function notify(message) {
   store?.setNotice?.(message);
 }
 
-function applyViewportScale() {
-  if (!shell) shell = document.querySelector('.regulatory-result-shell');
-  if (!shell) return;
-  const scale = window.innerWidth < 1200 ? 1 : Math.min(1.22, window.innerWidth / DESIGN_WIDTH);
-  shell.style.setProperty('--regulatory-result-scale', String(scale));
-}
-
-function scheduleScale() {
-  if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
-  resizeFrame = window.requestAnimationFrame(applyViewportScale);
-}
-
-onMounted(() => {
-  applyViewportScale();
-  window.addEventListener('resize', scheduleScale);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', scheduleScale);
-  if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
-  if (shell) shell.style.removeProperty('--regulatory-result-scale');
-});
 </script>
 
 <style scoped>
 .reg-result-page {
-  --reg-red: #c9000b;
+  --reg-red: var(--color-primary);
   --reg-line: #dde4ef;
   --reg-soft: #f7f9fc;
   --reg-muted: #687386;
-  width: 1360px;
-  height: 927px;
+  width: 100%;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
   display: grid;
-  grid-template-columns: 1055px 305px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
   gap: 10px;
   color: #101828;
   font-size: 12px;
@@ -400,9 +375,10 @@ onBeforeUnmount(() => {
 
 .reg-result-main {
   display: grid;
-  grid-template-rows: 74px 88px 218px 244px 78px 145px;
+  grid-template-rows: 74px 88px minmax(218px, .9fr) minmax(244px, 1fr) 78px minmax(145px, .65fr);
   gap: 8px;
   min-width: 0;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
 }
 
 .filter-strip,
@@ -467,7 +443,7 @@ onBeforeUnmount(() => {
 
 .filter-actions .primary {
   border-color: var(--reg-red);
-  background: linear-gradient(180deg, #d6000b, #b70000);
+  background: var(--color-primary);
   color: #fff;
 }
 
@@ -502,11 +478,11 @@ onBeforeUnmount(() => {
   font-size: 22px;
 }
 
-.metric-icon.red { background: #ffe8e8; color: #d00000; }
+.metric-icon.red { background: #ffe8e8; color: var(--color-danger); }
 .metric-icon.orange { background: #fff0dc; color: #f07a00; }
 .metric-icon.green { background: #e5f7ed; color: #0b9b50; }
 .metric-icon.blue { background: #e8f1ff; color: #2f76e6; }
-.metric-icon.purple { background: #f1e8ff; color: #7c3aed; }
+.metric-icon.purple { background: #f1e8ff; color: #6f668f; }
 
 .metric-strip p {
   color: #263244;
@@ -699,7 +675,7 @@ svg text {
 .reason-row b {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #2f6fed);
+  background: var(--color-info);
 }
 
 .reason-axis {
@@ -821,9 +797,10 @@ td {
 
 .row-actions button,
 .history-actions button {
+  padding: 0;
   border: 0;
   background: transparent;
-  color: #1d6fe8;
+  color: var(--color-info);
   font-weight: 700;
   font-size: 10px;
 }
@@ -908,7 +885,7 @@ td {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #16a34a;
+  background: var(--color-success);
   color: #fff;
 }
 
@@ -969,7 +946,7 @@ td {
 }
 
 .focus-detail {
-  height: 927px;
+  height: 100%;
   display: grid;
   grid-template-rows: 43px minmax(0, 1fr) 64px;
   overflow: hidden;
@@ -1054,7 +1031,7 @@ td {
   border: 1px solid #bcd5fb;
   border-radius: 3px;
   background: #f5f9ff;
-  color: #1d6fe8;
+  color: var(--color-info);
   font-size: 10px;
 }
 
@@ -1063,7 +1040,7 @@ td {
   margin-top: 5px;
   border: 0;
   background: transparent;
-  color: #1d6fe8;
+  color: var(--color-info);
   font-size: 11px;
 }
 
@@ -1167,7 +1144,48 @@ td {
   }
 
   .focus-detail {
-    height: 720px;
+    height: auto;
+  }
+}
+.reg-result-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
+  margin: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  color: #1f2937;
+}
+
+.reg-result-main {
+  min-width: 0;
+}
+
+.focus-detail {
+  min-width: 0;
+}
+
+.focus-table-wrap,
+.history-card {
+  overflow-x: auto;
+}
+
+@media (max-width: 1320px) {
+  .reg-result-page {
+    grid-template-columns: 1fr;
+  }
+
+  .focus-detail {
+    height: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .filter-strip,
+  .metric-strip,
+  .chart-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
