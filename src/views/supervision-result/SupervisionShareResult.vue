@@ -179,9 +179,11 @@
                 <td><span class="ellipsis">{{ row.summary }}</span></td>
                 <td><span :class="row.referenced ? 'status-used' : 'status-empty'">{{ row.referenceStatus }}</span></td>
                 <td class="row-links">
-                  <button type="button" @click.stop="viewSource(row.id)">查看原文</button>
-                  <button type="button" @click.stop="referenceRow({ rowId: row.id, sectionId: row.defaultSectionId })">引用到报告</button>
-                  <button type="button" @click.stop="restartLabels">重新提取</button>
+                  <div class="row-link-actions">
+                    <button type="button" aria-label="查看原文" @click.stop="viewSource(row.id)">原文</button>
+                    <button type="button" aria-label="引用到报告" @click.stop="referenceRow({ rowId: row.id, sectionId: row.defaultSectionId })">引用</button>
+                    <button type="button" aria-label="重新提取" @click.stop="restartLabels">提取</button>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -231,32 +233,22 @@
 
       <section class="history-panel" data-result-region="version-timeline">
         <h2>历史分析任务</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>任务名称</th>
-              <th>被分析单位</th>
-              <th>分析期间</th>
-              <th>状态</th>
-              <th>生成数量</th>
-              <th>创建人</th>
-              <th>创建时间</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="task in historyTasks" :key="task.name">
-              <td>{{ task.name }}</td>
-              <td>{{ task.unit }}</td>
-              <td>{{ task.period }}</td>
-              <td><span>已完成</span></td>
-              <td>{{ task.count }}</td>
-              <td>{{ task.owner }}</td>
-              <td>{{ task.time }}</td>
-              <td><button type="button">查看</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="history-list" role="table" aria-label="历史分析任务">
+          <div class="history-row history-head" role="row">
+            <span role="columnheader">任务名称</span>
+            <span role="columnheader">单位</span>
+            <span role="columnheader">期间</span>
+            <span role="columnheader">状态</span>
+            <span role="columnheader">数量</span>
+          </div>
+          <div v-for="task in historyTasks" :key="task.name" class="history-row" role="row">
+            <span role="cell">{{ task.name }}</span>
+            <span role="cell">{{ task.unit }}</span>
+            <span role="cell">{{ task.period }}</span>
+            <span role="cell"><em>已完成</em></span>
+            <span role="cell">{{ task.count }}</span>
+          </div>
+        </div>
         <a href="#" @click.prevent="liveMessage = '已展开更多历史任务。'">查看更多 ›</a>
       </section>
     </main>
@@ -479,10 +471,10 @@ const historyTasks = [
 ];
 
 const detailLogs = computed(() => [
-  { time: '2025-03-10 14:22', operator: '审计员A', action: '引用到报告' },
-  { time: '2025-03-10 11:05', operator: '审计员A', action: '查看原文' },
-  { time: '2025-03-05 10:24', operator: '系统', action: '上传文件' },
-  { time: '2025-03-05 10:26', operator: '系统', action: '解析完成' }
+  { time: '2025-03-10\n14:22', operator: '审计员A', action: '引用到报告' },
+  { time: '2025-03-10\n11:05', operator: '审计员A', action: '查看原文' },
+  { time: '2025-03-05\n10:24', operator: '系统', action: '上传文件' },
+  { time: '2025-03-05\n10:26', operator: '系统', action: '解析完成' }
 ]);
 
 const filteredRows = computed(() => filterResultRows(state.value));
@@ -644,6 +636,16 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .supervision-page {
+  --supervision-font-xs: 10px;
+  --supervision-font-sm: 11px;
+  --supervision-font-md: 12px;
+  --supervision-font-lg: 13px;
+  --supervision-font-xl: 20px;
+  --ui-font-xs: var(--supervision-font-xs);
+  --ui-font-sm: var(--supervision-font-sm);
+  --ui-font-md: var(--supervision-font-md);
+  --ui-font-lg: var(--supervision-font-lg);
+  --ui-font-xl: var(--supervision-font-xl);
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 320px);
@@ -652,11 +654,12 @@ onBeforeUnmount(() => {
   min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
   margin: 0;
   color: #1f2937;
+  font-size: var(--supervision-font-sm);
 }
 
 .supervision-board {
   display: grid;
-  grid-template-rows: 72px 92px minmax(224px, .9fr) minmax(314px, 1.25fr) minmax(139px, .7fr);
+  grid-template-rows: 72px 92px 200px minmax(314px, 1.25fr) minmax(139px, .7fr);
   gap: 6px;
   min-width: 0;
   min-height: calc(var(--shell-viewport-height, 100vh) - 82px);
@@ -696,17 +699,17 @@ p {
 }
 
 h1 {
-  font-size: 22px;
+  font-size: 20px;
   line-height: 28px;
 }
 
 h2 {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 20px;
 }
 
 h3 {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .filter-grid {
@@ -721,7 +724,7 @@ h3 {
   gap: 4px;
   min-width: 0;
   color: #111827;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -761,12 +764,14 @@ tr:focus-visible {
 .filter-actions button,
 .table-tools button {
   height: 32px;
+  min-width: 48px;
   border: 1px solid #d8dee8;
   border-radius: 4px;
   background: #fff;
   padding: 0 14px;
   color: #374151;
-  font-size: 12px;
+  font-size: 10px;
+  white-space: nowrap;
 }
 
 .filter-actions .primary,
@@ -815,8 +820,9 @@ tr:focus-visible {
 .metric-icon.purple { background: #f3efff; color: #6f668f; }
 
 .metric-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .metric-card p {
@@ -828,14 +834,14 @@ tr:focus-visible {
 
 .metric-card strong {
   margin: 0;
-  font-size: 23px;
+  font-size: 21px;
   line-height: 24px;
 }
 
 .metric-card small,
 .metric-card em {
   color: #4b5563;
-  font-size: 12px;
+  font-size: 11px;
   font-style: normal;
   line-height: 14px;
 }
@@ -847,13 +853,13 @@ tr:focus-visible {
 
 .chart-grid {
   display: grid;
-  grid-template-columns: 314px 335px 1fr;
+  grid-template-columns: minmax(250px, .9fr) minmax(270px, .95fr) minmax(440px, 1.35fr);
   gap: 7px;
 }
 
 .chart-card {
   min-width: 0;
-  padding: 11px 15px;
+  padding: 9px 12px;
 }
 
 .chart-card header {
@@ -864,14 +870,14 @@ tr:focus-visible {
 
 .chart-card header small {
   color: #6b7280;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .legend {
   display: flex;
-  gap: 18px;
-  margin-top: 11px;
-  font-size: 11px;
+  gap: 14px;
+  margin-top: 7px;
+  font-size: 10px;
 }
 
 .legend i,
@@ -894,8 +900,8 @@ tr:focus-visible {
   display: grid;
   grid-template-columns: 28px repeat(6, 1fr);
   align-items: end;
-  height: 158px;
-  margin-top: 5px;
+  height: 132px;
+  margin-top: 3px;
   border-bottom: 1px solid #e6ebf2;
 }
 
@@ -919,7 +925,7 @@ tr:focus-visible {
   display: flex;
   align-items: end;
   width: 21px;
-  height: 126px;
+  height: 104px;
 }
 
 .bar-stack .seg {
@@ -934,39 +940,39 @@ tr:focus-visible {
 .chart-tooltip {
   position: absolute;
   right: 0;
-  bottom: 31px;
+  bottom: 24px;
   display: grid;
   gap: 2px;
-  width: 101px;
-  padding: 10px;
+  width: 92px;
+  padding: 7px;
   border-radius: 4px;
   background: rgb(17 24 39 / 88%);
   color: #fff;
-  font-size: 11px;
-  line-height: 16px;
+  font-size: 10px;
+  line-height: 14px;
 }
 
 .donut-layout {
   display: grid;
-  grid-template-columns: 146px minmax(0, 1fr);
+  grid-template-columns: 122px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
-  height: 174px;
+  height: 142px;
 }
 
 .donut {
   display: grid;
   place-items: center;
-  width: 136px;
-  height: 136px;
+  width: 112px;
+  height: 112px;
   border-radius: 50%;
   background: conic-gradient(var(--color-info) 0 28.5%, #20b56b 28.5% 53.8%, #ffa726 53.8% 72.4%, var(--color-primary) 72.4% 89.1%, #7c5cff 89.1% 100%);
 }
 
 .donut::before {
   position: absolute;
-  width: 78px;
-  height: 78px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: #fff;
   content: '';
@@ -976,21 +982,21 @@ tr:focus-visible {
   position: relative;
   display: grid;
   justify-items: center;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .donut strong {
   margin-top: 4px;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .donut-layout ul {
   display: grid;
-  gap: 10px;
+  gap: 7px;
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .donut-layout li {
@@ -1012,16 +1018,18 @@ tr:focus-visible {
 
 .keyword-bars {
   display: grid;
-  gap: 6px;
-  margin-top: 12px;
-  font-size: 11px;
+  gap: 1px;
+  margin-top: 3px;
+  font-size: 10px;
 }
 
 .keyword-row {
   display: grid;
-  grid-template-columns: 86px minmax(0, 1fr) 30px;
+  grid-template-columns: 90px minmax(240px, 1fr) 34px;
   align-items: center;
   gap: 8px;
+  min-height: 10px;
+  line-height: 11px;
 }
 
 .keyword-row div {
@@ -1089,7 +1097,7 @@ tr:focus-visible {
   border: 0;
   background: transparent;
   color: #5f6774;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .result-tabs .active {
@@ -1114,6 +1122,7 @@ tr:focus-visible {
 
 .dense-table {
   width: 100%;
+  min-width: 0;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 9px;
@@ -1142,15 +1151,15 @@ tr:focus-visible {
   background: #fff8f8;
 }
 
-.dense-table th:nth-child(1) { width: 86px; }
-.dense-table th:nth-child(2) { width: 115px; }
-.dense-table th:nth-child(3) { width: 61px; }
-.dense-table th:nth-child(4) { width: 72px; }
-.dense-table th:nth-child(5) { width: 92px; }
-.dense-table th:nth-child(6) { width: 81px; }
-.dense-table th:nth-child(7) { width: 114px; }
-.dense-table th:nth-child(8) { width: 58px; }
-.dense-table th:nth-child(9) { width: 93px; }
+.dense-table th:nth-child(1) { width: 12%; }
+.dense-table th:nth-child(2) { width: 15%; }
+.dense-table th:nth-child(3) { width: 8%; }
+.dense-table th:nth-child(4) { width: 10%; }
+.dense-table th:nth-child(5) { width: 12%; }
+.dense-table th:nth-child(6) { width: 11%; }
+.dense-table th:nth-child(7) { width: 11%; }
+.dense-table th:nth-child(8) { width: 8%; }
+.dense-table th:nth-child(9) { width: 13%; }
 
 .ellipsis {
   display: block;
@@ -1202,7 +1211,16 @@ tr:focus-visible {
   white-space: nowrap;
 }
 
-.row-links button,
+.row-link-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: visible;
+}
+
+.row-link-actions button,
 .history-panel button,
 .chapter-list button,
 .text-link {
@@ -1210,6 +1228,13 @@ tr:focus-visible {
   background: transparent;
   color: var(--color-info);
   padding: 0 2px;
+  font-size: 9px;
+}
+
+.row-link-actions button {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
   font-size: 9px;
 }
 
@@ -1292,19 +1317,19 @@ tr:focus-visible {
 .chapter-card strong {
   display: block;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .chapter-card small {
   color: #5f6774;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .chapter-card em {
   color: #079455;
-  font-size: 10px;
+  font-size: 9px;
   font-style: normal;
 }
 
@@ -1314,7 +1339,7 @@ tr:focus-visible {
   border-radius: 4px;
   background: #fff;
   color: #344054;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .exports-panel {
@@ -1324,6 +1349,7 @@ tr:focus-visible {
 .exports-panel > div {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  align-content: stretch;
   gap: 8px;
   padding: 10px 12px;
 }
@@ -1332,9 +1358,11 @@ tr:focus-visible {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
   grid-template-rows: 18px 16px 16px 16px;
+  align-content: start;
   gap: 1px 8px;
   min-width: 0;
-  height: 92px;
+  height: 100%;
+  min-height: 102px;
   padding: 9px;
   border: 1px solid #e1e7ef;
   border-radius: 6px;
@@ -1360,7 +1388,7 @@ tr:focus-visible {
 .export-card time,
 .export-card em {
   overflow: hidden;
-  font-size: 10px;
+  font-size: 9px;
   line-height: 16px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1405,42 +1433,50 @@ tr:focus-visible {
   width: auto;
 }
 
-.history-panel table {
+.history-list {
+  display: grid;
   width: calc(100% - 18px);
   margin: 8px 9px 0;
-  border-collapse: collapse;
-  table-layout: fixed;
   font-size: 9px;
 }
 
-.history-panel th,
-.history-panel td {
-  height: 24px;
-  overflow: hidden;
+.history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) 64px 52px 58px 34px;
+  align-items: center;
+  min-height: 25px;
   border-bottom: 1px solid #edf0f4;
-  text-align: left;
+}
+
+.history-row span {
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 6px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.history-panel th {
+.history-head {
+  min-height: 27px;
+  background: #f8fafc;
   color: #343b46;
   font-weight: 600;
 }
 
-.history-panel td span {
+.history-row em {
   display: inline-block;
   padding: 1px 5px;
   border-radius: 3px;
   background: #eaf8ef;
   color: #079455;
+  font-style: normal;
 }
 
 .history-panel a {
   display: block;
   margin: 7px 13px 0 0;
   color: var(--color-info);
-  font-size: 10px;
+  font-size: 9px;
   text-align: right;
   text-decoration: none;
 }
@@ -1460,7 +1496,7 @@ tr:focus-visible {
   border-radius: 4px;
   background: var(--color-primary);
   color: #fff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -1497,7 +1533,7 @@ tr:focus-visible {
 }
 
 .detail-content section {
-  padding: 13px 0;
+  padding: 11px 0;
   border-bottom: 1px solid #edf0f4;
 }
 
@@ -1511,7 +1547,7 @@ tr:focus-visible {
   display: grid;
   grid-template-columns: 84px minmax(0, 1fr);
   gap: 8px;
-  font-size: 11px;
+  font-size: 9px;
 }
 
 .detail-content dt {
@@ -1526,14 +1562,14 @@ tr:focus-visible {
 
 .detail-content p {
   margin-top: 10px;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 20px;
 }
 
 .text-link {
   display: block;
   margin: 9px auto 0;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .chapter-list {
@@ -1541,7 +1577,7 @@ tr:focus-visible {
   gap: 8px;
   margin: 10px 0 0;
   padding-left: 12px;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .detail-log {
@@ -1550,12 +1586,36 @@ tr:focus-visible {
   margin-top: 9px;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .detail-log td {
-  height: 22px;
+  height: 40px;
+  padding: 4px 2px 4px 0;
+  border-bottom: 1px solid #edf0f4;
   color: #344054;
+  line-height: 13px;
+  vertical-align: middle;
+}
+
+.detail-log td:nth-child(1) {
+  width: 29%;
+  white-space: pre-line;
+}
+
+.detail-log td:nth-child(2) {
+  width: 21%;
+  overflow-wrap: anywhere;
+}
+
+.detail-log td:nth-child(3) {
+  width: 34%;
+  overflow-wrap: anywhere;
+}
+
+.detail-log td:nth-child(4) {
+  width: 16%;
+  white-space: nowrap;
 }
 
 .detail-log td:last-child {
@@ -1578,7 +1638,7 @@ tr:focus-visible {
   border-radius: 4px;
   background: #fff;
   color: #344054;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .source-detail-card footer button:nth-child(2) {
@@ -1701,7 +1761,7 @@ tr:focus-visible {
 }
 
 .supervision-board {
-  grid-template-rows: 72px 92px minmax(224px, .9fr) minmax(314px, 1.25fr) minmax(139px, .7fr);
+  grid-template-rows: 72px 92px 200px minmax(314px, 1.25fr) minmax(139px, .7fr);
   gap: 6px;
   min-width: 0;
   min-height: 100%;
@@ -1742,11 +1802,13 @@ tr:focus-visible {
 .dense-table-wrap {
   height: auto;
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .dense-table {
-  height: 100%;
+  height: auto;
+  align-self: start;
 }
 
 .report-framework {
@@ -1768,13 +1830,13 @@ tr:focus-visible {
 .bar-chart,
 .donut-layout {
   height: auto;
-  min-height: 174px;
+  min-height: 142px;
   flex: 1;
 }
 
 .keyword-bars {
   flex: 1;
-  align-content: space-between;
+  align-content: center;
 }
 
 .exports-panel {
@@ -1784,16 +1846,17 @@ tr:focus-visible {
 
 .exports-panel > div {
   min-height: 0;
+  align-items: stretch;
 }
 
 .export-card {
   height: 100%;
-  min-height: 92px;
+  min-height: 102px;
 }
 
 .dense-table-wrap,
 .history-panel {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 @media (max-width: 1679px) {
@@ -1801,6 +1864,42 @@ tr:focus-visible {
     grid-template-rows: none;
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+  }
+
+  .filter-panel {
+    align-items: stretch;
+    padding: 8px 14px;
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+    gap: 8px 10px;
+  }
+
+  .filter-actions {
+    align-self: end;
+  }
+
+  .metric-card {
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .metric-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: 19px;
+  }
+
+  .metric-card strong {
+    font-size: 21px;
+    line-height: 22px;
+  }
+
+  .metric-card small,
+  .metric-card em {
+    font-size: 11px;
   }
 
   .filter-panel,
@@ -1814,6 +1913,14 @@ tr:focus-visible {
     grid-row: auto;
     width: auto;
     margin-left: 0;
+  }
+
+  .chart-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .keyword-card {
+    grid-column: 1 / -1;
   }
 }
 
@@ -1849,5 +1956,40 @@ tr:focus-visible {
   .chart-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.supervision-page :deep(.filter-panel),
+.supervision-page :deep(.source-detail-panel),
+.supervision-page :deep(.output-panel),
+.supervision-page :deep(.report-outline),
+.supervision-page :deep(.version-timeline),
+.supervision-page :deep(.tag-result-table) {
+  font-size: var(--ui-font-xs);
+}
+
+.supervision-page :deep(.status-chip),
+.supervision-page :deep(.mini-tag),
+.supervision-page :deep(.trace-tag),
+.supervision-page :deep(.metric-card small),
+.supervision-page :deep(.dense-table th),
+.supervision-page :deep(.dense-table td),
+.supervision-page :deep(.dense-table button),
+.supervision-page :deep(.output-panel small),
+.supervision-page :deep(.outline-card small),
+.supervision-page :deep(.version-timeline small),
+.supervision-page :deep(.tag-result-table th),
+.supervision-page :deep(.tag-result-table td) {
+  font-size: var(--ui-font-xs);
+}
+
+.supervision-page :deep(.dense-table td) {
+  height: 34px;
+  min-height: 0;
+  vertical-align: middle;
+}
+
+.supervision-page :deep(.dense-table button) {
+  min-height: 20px;
+  white-space: nowrap;
 }
 </style>

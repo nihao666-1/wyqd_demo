@@ -1,41 +1,50 @@
-**Findings**
-- [P1] Revised visual state could not be recaptured after fixing the first screenshot issue
-  Location: `/audit-report/draft`, 1591x896 viewport.
-  Evidence: first browser capture `docs/21-audit-report-generation-redline-rebuild/screenshots/audit-report-generation-1591x896-v2.png` showed the page mounted correctly with zero console warnings/errors, but the right source rail participated in grid height and pushed `output-version` to `y=974`, below the reference first viewport. The fix changed `.source-rail` to absolute positioning and changed the shell width from `100vw` to `100%`, but the in-app browser blocked the required reload/recapture of `http://127.0.0.1:5186/audit-report/draft` by URL policy before post-fix evidence could be captured.
-  Impact: the likely P1 has been addressed in code, but there is no post-fix browser screenshot proving the final visual state.
-  Fix: rerun browser capture when the local URL policy allows the route, then compare against the reference at the same viewport.
+# 监督共享信息分析布局验收
 
-**Open Questions**
-- Browser verification is blocked by the in-app browser URL policy. I did not use another browser surface after the policy block.
+## Findings
 
-**Implementation Checklist**
-- Completed: data contract and isolation tests for the report generation snapshot.
-- Completed: `/audit-report/draft` rebuilt as a dedicated report generation execution page with eight marked regions.
-- Completed: `/audit-report/draft` dedicated app shell, breadcrumb, hidden demo-data switch, and manual report navigation activation.
-- Completed: bottom output area now follows the reference split of output files, version timeline, and the separate export-history panel.
-- Completed: relevant Node tests and shell regression tests pass.
-- Completed: production build passes.
-- Blocked: post-fix same-viewport screenshot, multi-viewport screenshots, and final browser visual comparison.
+- [P2][已修复] “高频关键词 TOP10”卡片占据约 963x235px，宽度接近前两张图表总和，导致图表区比例失衡。
+  - 位置：`/tasks/detail/supervision-share` 数据模式，图表区第三列。
+  - 修复：三列调整为约 28% / 30% / 42%，2048px 视口下第三列收紧为 595px。
+- [P2][已修复] 图表行会参与剩余高度分配，关键词卡片内部行距偏松。
+  - 修复：桌面三列状态下图表行固定为 200px，关键词行距和顶部间距同步收紧；10 条关键词仍完整展示。
+- [P2][已修复] 第一版列最小宽度在 1680px 临界视口产生 38px 内部横向溢出。
+  - 修复：三列最小宽度调整为 250px / 270px / 440px，1680px 及以上无溢出；1679px 以下继续沿用原有两列响应式布局。
+- [P2][已修复] “共享文件与标签提取结果”表格被强制撑满可用高度，5 行数据被拉高为 46–53px；操作单元格使用 Grid 后，边框和选中背景不完整。
+  - 修复：表格改为内容高度，2048px 视口下 5 行统一为 34px；操作区 Grid 下沉到单元格内层，9 列边框和选中背景均连续。
+- [P2][已修复] 命中标签列过窄，两枚标签在宽屏下仍可能换行并撑高表格。
+  - 修复：标签列扩展至 12%，同时微调文件名和数据周期列，2048px 下标签保持单行。
+- 当前无未解决的 P0、P1 或 P2 视觉问题。
 
-**Required Fidelity Surfaces**
-- Fonts and typography: implemented with the existing Microsoft YaHei/PingFang/Arial stack and compact 11-21px hierarchy; post-fix browser proof is blocked.
-- Spacing and layout rhythm: first capture matched most target x/y geometry but exposed bottom output displacement; code fix was applied, post-fix browser proof is blocked.
-- Colors and visual tokens: implemented with the existing red primary family, neutral borders, green/blue/orange state tokens, and low-shadow enterprise styling.
-- Image quality and asset fidelity: no raster assets are required by this screen; non-standard visible icons were replaced with FontAwesome icons.
-- Copy and content: implemented reference copy for task metadata, generation configuration, progress, editor content, source cards, outputs, and versions.
+## Required Fidelity Surfaces
 
-**Comparison History**
-- Iteration 1 source visual truth path: `C:\Users\ZhuanZ（无密码）\.codex\attachments\941cde5e-ea68-4d78-89ab-fd375df2d8c0\image-1.png`
-- Iteration 1 implementation screenshot path: `docs/21-audit-report-generation-redline-rebuild/screenshots/audit-report-generation-1591x896-v2.png`
-- Iteration 1 viewport: 1591x896
-- Iteration 1 state: initial report generation execution page
-- Iteration 1 full-view comparison evidence: browser DOM regions showed `generation-config x=213 y=186 w=204 h=654`, `generation-progress x=429 y=186 w=790 h=334`, `draft-editor x=429 y=532 w=790 h=306`, `source-rail x=1231 y=186 w=326 h=778`, and `output-version x=213 y=974 w=870 h=122`.
-- Iteration 1 findings: source rail began too low and pushed bottom output/version below the first viewport; page-level horizontal overflow was visible because shell width used `100vw`.
-- Fixes made: `.source-rail` changed to absolute positioning at `top:62px`, `right:14px`, `width:326px`, `height:778px`; `.audit-report-generation-shell` changed from `width:100vw` to `width:100%`.
-- Additional static fixes made after the browser block: source rail now uses `v-if="sourceRailOpen"` so the close action truly removes the rail and `viewSource()` reopens it; the 1500px breakpoint now uses `zoom: calc((100vw - 210px) / 1378)` instead of `transform: scale(...)`, so the scaled desktop canvas participates in layout and is less likely to create horizontal overflow.
-- Additional geometry fix after static review: the source rail right offset was tightened from `26px` to `14px`, which places the 326px rail at x≈1243 in the 1591px baseline viewport and keeps it aligned with the reference right rail instead of drifting left.
-- Additional screenshot-derived fix: the reference has a separate bottom-right `导出记录（近 7 天）` panel next to the version timeline; the implementation now uses a three-column bottom row `502px 358px 126px` and removed the export-history block from the chapter action rail.
-- Additional verification after static fixes: `node --test tests/auditReportGeneration*.test.js` passed 10/10; `node --test tests/taskDetailLayout.test.js tests/supervisionShareResultIntegration.test.js` passed 12/12; `npm run build` passed with only the existing Vite chunk size warning.
-- Post-fix visual evidence: blocked by in-app browser URL policy during reload/recapture.
+- 字体与层级：标题、标签、数值字体和层级保持不变；通过。
+- 间距与布局：图表行收紧为 200px，第三列宽度明显缩小，下方结果表自然上移；通过。
+- 颜色与视觉规范：沿用现有主色、边框、图例和状态色；通过。
+- 图表与图标：三张图表、10 条关键词、数值和单位均完整可见；通过。
+- 表格密度：2048px 下数据行为 34px，操作链接垂直居中，标签不换行；通过。
+- 文案与数据：未修改关键词数据、统计数据、筛选条件或业务交互；通过。
 
-final result: blocked
+## Comparison History
+
+- 来源截图：`C:\Users\ZHUANZ~1\AppData\Local\Temp\codex-clipboard-66935000-19e8-447a-a2a6-269d140b1c5a.png`。
+- 表格来源截图：`C:\Users\ZHUANZ~1\AppData\Local\Temp\codex-clipboard-6af90faa-02a7-41d6-afd2-78ab7c9f62eb.png`。
+- 实现截图：`output/playwright/supervision-keyword-final-2048x1053.png`。
+- 表格实现截图：`output/playwright/supervision-table-compact-2048x1053.png`。
+- 表格重点区域同屏对比：`output/playwright/supervision-table-comparison-focused.png`（上：来源截图；下：当前实现）。
+- 视口与状态：2048x1053，数据模式，来源文件详情栏展开。
+- 全页同屏对比：`output/playwright/supervision-keyword-comparison-2048x1053.png`。
+- 重点区域同屏对比：`output/playwright/supervision-keyword-comparison-focused.png`。
+- 补充视口：1440x900、1680x950、2560x1260。
+- 对比结论：高频关键词卡片由大面积主导区域改为适中的第三列，图表区比例更均衡；结果表位置上移，未出现文字遮挡、图表截断或页面横向滚动。
+- 表格对比结论：数据行不再被容器撑高，行间空白明显减少；操作列的横线、选中背景与其他 8 列完整对齐。
+
+## Verification
+
+- 针对性回归：`node --test --test-name-pattern="结果页使用自适应网格|结果页统一收紧字号" tests/supervisionShareResultIntegration.test.js`，2/2 通过。
+- 浏览器验收：1440x900、1680x950、2048x1053、2560x1260 均无目标容器溢出、页面水平溢出、控制台错误或失败请求。
+- 响应式状态：1440px 下关键词卡片独占第二行并保持紧凑；1680px 以上恢复三列均衡布局。
+- 表格回归：1440x900、1680x950、2048x1053、2560x1260 均无页面或表格水平溢出；2048px 和 2560px 下 5 行均为 34px。
+- 交互回归：关键词输入与查询提示正常，重置后关键词清空，点击第二行后选中状态正确更新。
+- 运行时回归：4 个视口均无控制台 warning/error 和失败请求。
+
+final result: passed

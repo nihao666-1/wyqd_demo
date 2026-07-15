@@ -143,8 +143,29 @@ test('结果页使用自适应网格、紧凑详情抽屉和卸载清理', () =>
   assert.match(resultPage, /class="detail-overlay"/);
   assert.match(resultPage, /Escape/);
   assert.match(resultPage, /\.supervision-page\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) minmax\(300px, 320px\)/s);
-  assert.match(resultPage, /\.supervision-board\s*\{[^}]*grid-template-rows:\s*72px 92px minmax\(224px, \.9fr\) minmax\(314px, 1\.25fr\) minmax\(139px, \.7fr\)/s);
+  assert.match(resultPage, /\.supervision-board\s*\{[^}]*grid-template-rows:\s*72px 92px 200px minmax\(314px, 1\.25fr\) minmax\(139px, \.7fr\)/s);
   assert.match(resultPage, /\.source-detail-card\s*\{[^}]*width:\s*100%[^}]*height:\s*100%/s);
   assert.match(resultPage, /@media \(max-width: 1679px\)[\s\S]*\.supervision-board\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\)/s);
   assert.doesNotMatch(`${resultPage}\n${css}`, /--supervision-result-(?:scale|compact-scale)|supervision-result-scaled|html\.supervision-result-compact/);
+});
+
+test('结果页统一收紧字号、图表、操作列和详情日志', () => {
+  assert.match(resultPage, /\.supervision-page\s*\{[^}]*--supervision-font-xs:\s*10px[^}]*--supervision-font-sm:\s*11px[^}]*--supervision-font-md:\s*12px[^}]*font-size:\s*var\(--supervision-font-sm\)/s);
+  assert.match(resultPage, /\.supervision-board\s*\{[^}]*grid-template-rows:\s*72px 92px 200px minmax\(314px, 1\.25fr\) minmax\(139px, \.7fr\)/s);
+  assert.match(resultPage, /\.chart-grid\s*\{[^}]*grid-template-columns:\s*minmax\(250px, \.9fr\) minmax\(270px, \.95fr\) minmax\(440px, 1\.35fr\)/s);
+  assert.match(resultPage, /\.donut\s*\{[^}]*width:\s*112px[^}]*height:\s*112px/s);
+  assert.match(resultPage, /\.bar-chart,\s*\.donut-layout\s*\{[^}]*min-height:\s*142px/s);
+  assert.match(resultPage, /\.keyword-bars\s*\{[^}]*gap:\s*1px[^}]*margin-top:\s*3px/s);
+  assert.match(resultPage, /\.keyword-row\s*\{[^}]*min-height:\s*10px[^}]*line-height:\s*11px/s);
+  assert.match(resultPage, /\.dense-table th:nth-child\(2\)\s*\{\s*width:\s*15%;\s*}/s);
+  assert.match(resultPage, /\.dense-table th:nth-child\(4\)\s*\{\s*width:\s*10%;\s*}/s);
+  assert.match(resultPage, /\.dense-table th:nth-child\(5\)\s*\{\s*width:\s*12%;\s*}/s);
+  assert.match(resultPage, /\.dense-table th:nth-child\(9\)\s*\{\s*width:\s*13%;\s*}/s);
+  assert.match(resultPage, /<td class="row-links">\s*<div class="row-link-actions">/s);
+  assert.match(resultPage, /\.row-link-actions\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[^}]*overflow:\s*visible/s);
+  assert.match(resultPage, /\.dense-table\s*\{[^}]*height:\s*auto[^}]*align-self:\s*start/s);
+  assert.match(resultPage, /\.supervision-page\s+:deep\(\.dense-table td\)\s*\{[^}]*height:\s*34px[^}]*min-height:\s*0/s);
+  assert.match(resultPage, /\.detail-log\s*\{[^}]*font-size:\s*9px/s);
+  assert.match(resultPage, /\.detail-log td:nth-child\(1\)\s*\{[^}]*width:\s*29%/s);
+  assert.match(resultPage, /\.detail-log td:nth-child\(4\)\s*\{[^}]*width:\s*16%/s);
 });

@@ -1260,6 +1260,12 @@ function noop() {}
   font-size: var(--ui-font-sm);
 }
 
+.trace-step p {
+  overflow: visible;
+  font-size: var(--ui-font-xs);
+  white-space: normal;
+}
+
 .record-metric strong {
   font-size: var(--ui-font-xl);
 }

@@ -96,6 +96,17 @@
         </div>
         <div class="table-wrap">
           <table>
+            <colgroup>
+              <col class="col-id" />
+              <col class="col-type" />
+              <col class="col-department" />
+              <col class="col-employee" />
+              <col class="col-amount" />
+              <col class="col-voucher" />
+              <col class="col-rule" />
+              <col class="col-status" />
+              <col class="col-actions" />
+            </colgroup>
             <thead>
               <tr>
                 <th>异常编号</th>
@@ -311,5 +322,157 @@ const approvalChain = [
 
 .exception-section table {
   height: 100%;
+  table-layout: fixed;
+}
+
+.filter-panel span,
+.chart-title span,
+.trend-legend,
+.trend-scale,
+.donut span,
+.chart-list li,
+.rank-list span,
+.rank-list strong,
+.exception-section table,
+.table-actions button,
+.approval-chain time {
+  font-size: var(--ui-font-xs);
+}
+
+.metric-card strong {
+  overflow: visible;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.risk-tag {
+  font-size: var(--ui-font-xs);
+}
+
+@media (min-width: 1381px) {
+  .chart-grid {
+    grid-template-columns: minmax(330px, 1.16fr) minmax(250px, .9fr) minmax(330px, 1.18fr) minmax(300px, 1.06fr);
+    gap: 8px;
+  }
+
+  .chart-card {
+    height: 254px;
+    padding: 10px 12px;
+  }
+
+  .trend-plot {
+    height: 184px;
+  }
+
+  .trend-bars {
+    padding-bottom: 16px;
+  }
+
+  .bar-pair {
+    height: 132px;
+  }
+
+  .donut-layout {
+    height: 190px;
+    gap: 8px;
+  }
+
+  .donut {
+    width: min(124px, 100%);
+  }
+
+  .chart-list {
+    gap: 6px;
+  }
+
+  .rank-card {
+    padding-left: 16px;
+    padding-right: 14px;
+  }
+
+  .rank-list {
+    gap: 6px;
+  }
+
+  .rank-list li {
+    grid-template-columns: 44px minmax(112px, 1fr) 72px;
+    gap: 8px;
+  }
+}
+
+.exception-section table {
+  min-width: 1040px;
+}
+
+.exception-section th,
+.exception-section td {
+  height: 40px;
+  padding: 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exception-section tbody {
+  height: 1px;
+}
+
+.exception-section .table-wrap table {
+  height: auto;
+}
+
+.col-id {
+  width: 136px;
+}
+
+.col-type {
+  width: 112px;
+}
+
+.col-department {
+  width: 92px;
+}
+
+.col-employee {
+  width: 64px;
+}
+
+.col-amount {
+  width: 94px;
+}
+
+.col-voucher {
+  width: 132px;
+}
+
+.col-rule {
+  width: 178px;
+}
+
+.col-status {
+  width: 82px;
+}
+
+.col-actions {
+  width: 188px;
+}
+
+.table-actions {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.table-actions button {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.exception-section .table-wrap {
+  padding-top: 8px;
 }
 </style>

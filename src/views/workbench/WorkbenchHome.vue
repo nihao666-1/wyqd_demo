@@ -123,14 +123,16 @@
           </div>
           <div class="todo-list">
             <article v-for="item in todoItems" :key="item.id" class="todo-item">
-              <div>
+              <div class="todo-heading">
                 <strong>{{ item.title }}</strong>
-                <p>{{ item.meta }}</p>
+                <span class="status-tag" :class="item.statusClass">{{ item.status }}</span>
               </div>
-              <span class="status-tag" :class="item.statusClass">{{ item.status }}</span>
-              <div class="row-actions">
-                <RouterLink class="btn primary" :to="item.primaryTo">去处理</RouterLink>
-                <RouterLink class="btn" :to="item.detailTo">查看详情</RouterLink>
+              <div class="todo-support">
+                <p>{{ item.meta }}</p>
+                <div class="row-actions">
+                  <RouterLink class="btn primary" :to="item.primaryTo">去处理</RouterLink>
+                  <RouterLink class="btn todo-detail-link" :to="item.detailTo">查看详情</RouterLink>
+                </div>
               </div>
             </article>
           </div>
@@ -521,8 +523,8 @@ const operationRows = computed(() => store.db.operationLogs);
   grid-template-rows:
     auto
     minmax(clamp(260px, 26vh, 320px), 0.28fr)
-    minmax(clamp(220px, 25vh, 340px), 1.25fr)
-    minmax(clamp(132px, 15vh, 190px), 0.42fr);
+    minmax(clamp(300px, 25vh, 320px), 0.12fr)
+    minmax(clamp(260px, 22vh, 286px), 1fr);
 }
 
 .workbench-page :deep(.panel),
@@ -967,7 +969,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .secondary-row {
   grid-template-columns: minmax(260px, 0.95fr) minmax(270px, 1fr) minmax(260px, 1fr) minmax(220px, 0.85fr);
-  min-height: clamp(220px, 25vh, 340px);
+  min-height: clamp(300px, 25vh, 320px);
 }
 
 .primary-row > .panel,
@@ -1045,14 +1047,18 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .todo-item {
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 4px;
-  min-height: 32px;
-  padding: 3px 6px;
+  grid-template-rows: auto auto;
+  gap: 2px;
+  min-height: 44px;
+  padding: 2px 6px;
 }
 
-.todo-item > div:first-child {
-  grid-column: auto;
+.todo-heading,
+.todo-support {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
   min-width: 0;
 }
 
@@ -1074,29 +1080,32 @@ const operationRows = computed(() => store.db.operationLogs);
   line-height: 1.2;
 }
 
-.todo-item .status-tag,
-.todo-item .row-actions {
-  grid-row: auto;
-}
-
 .todo-item .status-tag {
-  grid-column: auto;
-  justify-self: start;
-}
-
-.todo-item .row-actions {
-  grid-column: auto;
   justify-self: end;
 }
 
-.todo-item .btn {
-  min-height: 22px;
-  padding: 2px 7px;
+.todo-item .row-actions {
+  justify-self: end;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+.workbench-page .todo-item .btn {
+  min-height: 18px;
+  padding: 1px 6px;
+  line-height: 14px;
 }
 
 .todo-item .status-tag {
-  min-height: 20px;
-  padding: 1px 6px;
+  min-height: 18px;
+  padding: 0 5px;
+  line-height: 16px;
+}
+
+.todo-item .todo-detail-link {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-muted);
 }
 
 .row-actions {
@@ -1399,8 +1408,25 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .operation-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   margin-bottom: 0;
-  min-height: clamp(132px, 15vh, 190px);
+  min-height: clamp(260px, 22vh, 286px);
+}
+
+.operation-panel .compact-table {
+  min-height: 0;
+}
+
+.operation-panel .compact-table table {
+  width: 100%;
+}
+
+.operation-panel .compact-table th,
+.operation-panel .compact-table td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  line-height: 1.35;
 }
 
 @media (max-width: 1200px) {

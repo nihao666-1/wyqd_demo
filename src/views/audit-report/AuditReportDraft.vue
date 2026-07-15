@@ -184,13 +184,13 @@
           </article>
         </div>
         <div class="pager">
-          <button type="button" disabled><FontAwesomeIcon :icon="faChevronLeft" /></button>
+          <button type="button" aria-label="上一页" disabled><FontAwesomeIcon :icon="faChevronLeft" /></button>
           <button type="button" class="active">1</button>
           <button type="button">2</button>
           <button type="button">3</button>
           <span>...</span>
           <button type="button">16</button>
-          <button type="button"><FontAwesomeIcon :icon="faChevronRight" /></button>
+          <button type="button" aria-label="下一页"><FontAwesomeIcon :icon="faChevronRight" /></button>
           <strong>共 156 条</strong>
         </div>
       </aside>
@@ -347,4 +347,139 @@ function sourceIcon(tone) {
 .source-rail{height:auto;min-height:654px;align-self:stretch}
 @media (max-width:1400px){.source-rail{min-height:480px}}
 .report-generation-page{height:0;min-height:0;overflow:auto}
+.progress-card {
+  overflow: hidden;
+}
+
+.progress-body {
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 320px);
+  gap: 16px;
+}
+
+.progress-metrics {
+  padding-top: var(--ui-space-4);
+}
+
+.progress-metrics button {
+  width: auto;
+  min-width: 72px;
+}
+
+.output-panel,
+.version-panel,
+.export-history-panel {
+  height: auto;
+  min-height: 122px;
+  overflow: visible;
+}
+
+.task-meta-strip span,
+.hint-text,
+.step-flow li em,
+.readiness-grid em,
+.chapter-list button,
+.ai-paragraph span,
+.ai-paragraph button,
+.issue-tag,
+.source-tools select,
+.source-card footer button,
+.output-files span,
+.output-files strong,
+.output-files small,
+.version-panel em,
+.version-panel time {
+  font-size: var(--ui-font-xs);
+}
+
+/* Keep the generation workspace readable when the evidence rail reduces the center column. */
+.generation-logs,
+.generation-logs p {
+  min-width: 0;
+}
+
+.generation-logs li {
+  grid-template-columns: 58px minmax(0, 1fr);
+}
+
+.editor-card {
+  overflow: hidden;
+}
+
+.editor-card > * {
+  min-width: 0;
+  min-height: 0;
+}
+
+.chapter-list,
+.chapter-actions {
+  height: auto;
+  overflow: auto;
+}
+
+.chapter-list button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-surface {
+  height: 100%;
+  overflow: hidden;
+}
+
+.doc-paper {
+  box-sizing: border-box;
+}
+
+@media (min-width:1401px) and (max-width:1600px) {
+  .report-generation-grid {
+    min-height: 734px;
+    flex: 0 0 auto;
+    grid-template-rows: auto;
+  }
+
+  .generation-center {
+    min-height: 734px;
+    grid-template-rows: 416px 306px;
+  }
+
+  .generation-config,
+  .source-rail {
+    min-height: 734px;
+  }
+
+}
+
+@media (max-width:1400px) {
+  .report-generation-grid {
+    min-height: 0;
+    flex: 0 0 auto;
+    grid-template-rows: auto auto;
+  }
+
+  .generation-center {
+    min-height: 698px;
+    grid-template-rows: 380px 306px;
+  }
+
+  .generation-config {
+    min-height: 698px;
+  }
+
+  .source-rail {
+    min-height: 480px;
+  }
+
+  .source-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+}
+
+@media (max-width:900px) {
+  .source-list {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

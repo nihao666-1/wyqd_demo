@@ -103,6 +103,15 @@ const fallbackFiles = [
 .quick-action-list b { font-size: 10px; line-height: 1.2; font-weight: 500; white-space: nowrap; }
 .audit-result-footer button:focus-visible { outline: 2px solid var(--color-info); outline-offset: 1px; }
 .file-card:hover { border-color: #aeb9c8; background: #fafbfc; }
+.file-card small,
+.export-records > p,
+.version-node strong,
+.version-node time,
+.version-node small,
+.quick-action-list b {
+  font-size: var(--ui-font-xs);
+  line-height: 1.3;
+}
 @media (max-width: 1199px) {
   .audit-result-footer { grid-template-columns: minmax(0, 1fr); gap: 8px; overflow:visible; }
   .footer-region { height: 140px; padding: 10px; }

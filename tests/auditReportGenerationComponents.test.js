@@ -49,6 +49,8 @@ test('报告生成页覆盖关键动作和真实图标组件', () => {
     assert.match(page, new RegExp(action));
   }
   assert.match(page, /FontAwesomeIcon/);
+  assert.match(page, /aria-label="上一页"/);
+  assert.match(page, /aria-label="下一页"/);
   assert.doesNotMatch(page, /[✓⌄▣▤▧⇩×]/);
 });
 
@@ -66,6 +68,11 @@ test('窄桌面通过响应式重排而不是整页缩放', () => {
 
   assert.match(page, /@media \(max-width:1400px\)/);
   assert.match(page, /\.report-generation-grid\{grid-template-columns:minmax\(180px,220px\) minmax\(0,1fr\)\}/);
+  assert.match(page, /@media \(min-width:1401px\) and \(max-width:1600px\)/);
+  assert.match(page, /\.progress-body\s*\{[^}]*grid-template-columns:\s*minmax\(220px,\s*1fr\)\s+minmax\(260px,\s*320px\)/s);
+  assert.match(page, /\.editor-card\s*>\s*\*\s*\{[^}]*min-height:\s*0/s);
+  assert.match(page, /\.chapter-list button\s*\{[^}]*text-overflow:\s*ellipsis/s);
+  assert.match(page, /@media \(max-width:1400px\)[\s\S]*\.source-list\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
   assert.doesNotMatch(page, /\bzoom\s*:/);
   assert.doesNotMatch(page, /transform:scale\(/);
 });

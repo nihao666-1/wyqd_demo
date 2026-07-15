@@ -106,6 +106,19 @@ test('费用趋势页锁定截图式紧凑布局和响应式降级', () => {
   assert.match(content, /@media\(max-width:760px\)\{[\s\S]*\.trend-filter-row,\.chart-row,\.metric-row\{grid-template-columns:1fr/);
 });
 
+test('费用趋势四图使用受控高度和图表局部密度', () => {
+  const content = read(dashboardUrl);
+  assert.match(content, /item\.month\.slice\(0, 4\)/);
+  assert.match(content, /item\.month\.slice\(5\)/);
+  assert.match(content, /item\.actual \/ monthlyMax \* 72/);
+  assert.match(content, /item\.business \/ categoryMax \* 84/);
+  assert.match(content, /clamp\(8px, \$\{item\.amount \/ 5 \* 100\}%, calc\(100% - 8px\)\)/);
+  assert.match(content, /\.chart-panel\s*\{[\s\S]*height:\s*clamp\(246px,\s*27vh,\s*286px\);[\s\S]*min-height:\s*0;[\s\S]*overflow:\s*hidden/);
+  assert.match(content, /\.month-group small,\s*\.stack small\s*\{[\s\S]*font-size:\s*10px;[\s\S]*line-height:\s*12px/);
+  assert.match(content, /\.rank-list\s*\{[\s\S]*gap:\s*clamp\(5px,\s*\.65vh,\s*7px\)/);
+  assert.match(content, /\.rank-list div\s*\{[\s\S]*font-size:\s*12px;[\s\S]*line-height:\s*1\.25/);
+});
+
 test('费用趋势页核心按钮会产生反馈、跳转或导出', () => {
   const content = read(dashboardUrl);
   assert.match(content, /function queryTrend\(\)/);

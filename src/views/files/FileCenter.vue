@@ -546,6 +546,7 @@ function showNotice(message) {
   height: 0;
   min-width: 0;
   min-height: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   color: #111827;
@@ -591,10 +592,12 @@ button {
 
 .empty-layout,
 .data-layout {
+  flex: 1 1 auto;
+  min-height: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--ui-panel-rail-lg);
   gap: var(--ui-space-3);
-  align-items: start;
+  align-items: stretch;
 }
 
 .data-layout {
@@ -607,6 +610,11 @@ button {
   min-width: 0;
   display: grid;
   gap: 10px;
+}
+
+.empty-layout .main-stack {
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .data-layout .main-stack {
@@ -727,6 +735,12 @@ button {
   overflow: hidden;
 }
 
+.empty-layout .list-panel {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
 .data-layout .list-panel,
 .reference-rail {
   height: 100%;
@@ -819,6 +833,10 @@ button {
   overflow-x: auto;
 }
 
+.empty-layout .table-shell {
+  min-height: 0;
+}
+
 .data-layout .table-shell {
   flex: 1;
   min-height: 0;
@@ -858,10 +876,11 @@ button {
 
 .empty-table tbody td {
   padding: 0;
+  height: 100%;
 }
 
 .empty-state-card {
-  min-height: clamp(260px, 36vh, 360px);
+  min-height: 100%;
   display: grid;
   justify-items: center;
   align-content: center;
@@ -1529,6 +1548,9 @@ button {
 .file-table th,
 .file-table td,
 .pager,
+.flow-card p,
+.format-grid p,
+.note-list,
 .ref-block article p,
 .ref-block > p,
 .history-block th,

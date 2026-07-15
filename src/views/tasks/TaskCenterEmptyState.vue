@@ -256,7 +256,7 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
   }
 
   .empty-list-content {
-    min-height: 0;
+    min-height: 180px;
     padding: var(--ui-space-3);
   }
 

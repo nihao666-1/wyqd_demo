@@ -61,4 +61,11 @@ const fields = [
 <style scoped>
 .generation-conditions{box-sizing:border-box;height:100%;min-height:626px;padding:0 12px 12px;background:#fff;border:1px solid #dfe4eb;color:#252a34}.generation-conditions h2{height:43px;margin:0;display:flex;align-items:center;font-size:14px;line-height:20px;font-weight:600}.condition-field{display:block;margin-bottom:15px}.condition-field>span{display:block;margin-bottom:5px;color:#303642;font-size:11px;line-height:16px;font-weight:500}.condition-field>span.required::before{content:"*";margin-right:3px;color:var(--color-primary)}.condition-field select{box-sizing:border-box;width:100%;height:31px;padding:0 25px 0 8px;border:1px solid #d8dee8;border-radius:3px;background:#fff;color:#323844;font:400 10px/29px inherit;white-space:nowrap;text-overflow:ellipsis}.condition-field select:focus-visible{outline:2px solid #e5484d;outline-offset:1px}.condition-field select:disabled{background:#f5f6f8;color:#949ba6}.generate-button{width:100%;height:31px;margin-top:7px;border:1px solid var(--color-primary);border-radius:3px;background:var(--color-primary);color:#fff;font:500 12px/29px inherit;cursor:pointer}.generate-button:hover:not(:disabled){background:#a90000}.generate-button:focus-visible{outline:2px solid #e5484d;outline-offset:2px}.generate-button:disabled{cursor:not-allowed;opacity:.62}.condition-hint{margin-top:24px;padding:10px 8px;background:#fafbfc}.condition-hint h3{margin:0 0 7px;font-size:10px;line-height:16px;font-weight:600}.condition-hint ul{margin:0;padding:0;list-style:none}.condition-hint li{position:relative;margin:4px 0;padding-left:8px;color:#5f6774;font-size:9px;line-height:14px}.condition-hint li::before{content:"";position:absolute;top:6px;left:0;width:3px;height:3px;border-radius:50%;background:#5f6774}
 .condition-field{margin-bottom:17px}.condition-hint{padding:8px}.condition-hint h3{margin-bottom:5px;line-height:14px}.condition-hint li{margin:2px 0;line-height:12px}.condition-hint li::before{top:5px}
+.condition-field > span,
+.condition-field select,
+.condition-hint h3,
+.condition-hint li {
+  font-size: var(--ui-font-xs);
+  line-height: 1.45;
+}
 </style>

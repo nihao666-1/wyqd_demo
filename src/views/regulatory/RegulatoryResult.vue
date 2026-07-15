@@ -42,7 +42,7 @@
               <circle v-for="point in trendPoints" :key="point" :cx="point[0]" :cy="point[1]" r="3" />
             </g>
             <g class="axis-labels">
-              <text v-for="month in trendMonths" :key="month.label" :x="month.x" y="148">{{ month.label }}</text>
+              <text v-for="month in trendMonths" :key="month.label" :x="month.x" y="148" text-anchor="middle">{{ month.label }}</text>
             </g>
             <g class="legend">
               <circle cx="74" cy="12" r="3" />
@@ -71,14 +71,16 @@
 
         <article class="chart-card source-card">
           <h3>案例来源分布 <small>（条）</small></h3>
-          <svg viewBox="0 0 240 152" role="img" aria-label="案例来源分布柱状图">
+          <svg viewBox="0 0 240 168" role="img" aria-label="案例来源分布柱状图">
             <g class="grid-lines">
               <path v-for="y in [26, 54, 82, 110, 138]" :key="y" :d="`M24 ${y} H226`" />
             </g>
             <g v-for="bar in sourceBars" :key="bar.name">
               <rect :x="bar.x" :y="bar.y" width="20" :height="138 - bar.y" rx="2" />
               <text :x="bar.x + 10" :y="bar.y - 6" text-anchor="middle">{{ bar.value }}</text>
-              <text :x="bar.x + 10" y="150" text-anchor="middle">{{ bar.name }}</text>
+              <text :x="bar.x + 10" y="150" text-anchor="middle">
+                <tspan v-for="(line, lineIndex) in bar.labelLines" :key="line" :x="bar.x + 10" :dy="lineIndex === 0 ? 0 : 10">{{ line }}</tspan>
+              </text>
             </g>
           </svg>
         </article>
@@ -281,12 +283,12 @@ const metrics = [
 
 const trendPoints = [[34, 112], [78, 96], [122, 78], [166, 64], [210, 50], [248, 44]];
 const trendMonths = [
-  { label: '2024-10', x: 20 },
-  { label: '2024-11', x: 62 },
-  { label: '2024-12', x: 105 },
-  { label: '2025-01', x: 148 },
-  { label: '2025-02', x: 191 },
-  { label: '2025-03', x: 234 }
+  { label: '2024-10', x: 34 },
+  { label: '2024-11', x: 78 },
+  { label: '2024-12', x: 122 },
+  { label: '2025-01', x: 166 },
+  { label: '2025-02', x: 210 },
+  { label: '2025-03', x: 248 }
 ];
 const donutSegments = [
   { className: 'donut-blue', dash: '98 328', offset: '0' },
@@ -305,11 +307,11 @@ const riskThemes = [
   { name: '其他', percent: '9.52%', tone: 'yellow' }
 ];
 const sourceBars = [
-  { name: '证监会', value: 21, x: 36, y: 48 },
-  { name: '交易所', value: 15, x: 78, y: 72 },
-  { name: '银保监会', value: 10, x: 120, y: 94 },
-  { name: '地方监管局', value: 8, x: 162, y: 104 },
-  { name: '其他', value: 4, x: 204, y: 120 }
+  { name: '证监会', labelLines: ['证监会'], value: 21, x: 36, y: 48 },
+  { name: '交易所', labelLines: ['交易所'], value: 15, x: 78, y: 72 },
+  { name: '银保监会', labelLines: ['银保', '监会'], value: 10, x: 120, y: 94 },
+  { name: '地方监管局', labelLines: ['地方', '监管局'], value: 8, x: 162, y: 104 },
+  { name: '其他', labelLines: ['其他'], value: 4, x: 204, y: 120 }
 ];
 const reasonBars = [
   { name: '客户适当性不足', value: 18, width: '90%' },
@@ -338,7 +340,14 @@ const processSteps = [
 const historyTasks = [
   { id: 'AN-20250428-001', name: '上海分公司Q1适当性管理舆情分析', scope: '适当性管理', period: '2025Q1', count: 126, createdAt: '2025-04-28 09:00', outputs: '监管关注点清单.xlsx　审计建议清单.xlsx' },
   { id: 'AN-20250415-002', name: '上海分公司Q1反洗钱案例分析', scope: '反洗钱管理', period: '2025Q1', count: 98, createdAt: '2025-04-15 10:23', outputs: '监管关注点清单.xlsx　舆情风险清单.xlsx' },
-  { id: 'AN-20250330-001', name: '证券行业舆情月度监测（3月）', scope: '全行业', period: '2025-03', count: 156, createdAt: '2025-03-30 08:40', outputs: '舆情监测报告.pdf' }
+  { id: 'AN-20250330-001', name: '证券行业舆情月度监测（3月）', scope: '全行业', period: '2025-03', count: 156, createdAt: '2025-03-30 08:40', outputs: '舆情监测报告.pdf' },
+  { id: 'AN-20250318-004', name: '经纪业务投诉处理专项复核', scope: '经纪业务', period: '2025-03', count: 73, createdAt: '2025-03-18 14:20', outputs: '投诉处理关注点.xlsx' },
+  { id: 'AN-20250305-005', name: '费用报销真实性监管案例比对', scope: '管理支持', period: '2025-02', count: 64, createdAt: '2025-03-05 11:12', outputs: '费用风险建议清单.xlsx' },
+  { id: 'AN-20250221-006', name: '信息披露舆情风险回溯分析', scope: '经纪业务', period: '2025-02', count: 82, createdAt: '2025-02-21 16:35', outputs: '信息披露风险报告.pdf' },
+  { id: 'AN-20250208-007', name: '客户身份识别案例交叉分析', scope: '反洗钱管理', period: '2025-02', count: 91, createdAt: '2025-02-08 10:06', outputs: '反洗钱关注点清单.xlsx' },
+  { id: 'AN-20250123-008', name: '产品匹配性不足监管处罚复盘', scope: '适当性管理', period: '2025-01', count: 68, createdAt: '2025-01-23 09:44', outputs: '产品匹配复核建议.xlsx' },
+  { id: 'AN-20250110-009', name: '营业部现场检查案例扫描', scope: '营业部管理', period: '2025-01', count: 54, createdAt: '2025-01-10 15:18', outputs: '现场检查问题清单.xlsx' },
+  { id: 'AN-20241228-010', name: '年度监管案例重点主题沉淀', scope: '全行业', period: '2024Q4', count: 188, createdAt: '2024-12-28 17:02', outputs: '年度监管主题沉淀.pdf' }
 ];
 const detailCases = [
   { title: '《证券公司客户适当性管理办法（2023年修订）》', source: '证监会', date: '2023-08-18' },
@@ -375,12 +384,16 @@ function notify(message) {
 }
 
 .reg-result-main {
-  display: grid;
-  grid-template-rows: 74px 88px minmax(218px, .9fr) minmax(244px, 1fr) 78px minmax(145px, .65fr);
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   min-width: 0;
   min-height: 0;
   overflow: auto;
+}
+
+.reg-result-main > * {
+  flex: 0 0 auto;
 }
 
 .filter-strip,
@@ -400,6 +413,7 @@ function notify(message) {
   grid-template-columns: 112px 176px 196px 78px 82px 82px 1fr;
   gap: 10px;
   align-items: end;
+  min-height: 74px;
   padding: 10px 10px 12px;
 }
 
@@ -456,6 +470,7 @@ function notify(message) {
 .metric-strip {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  min-height: 88px;
 }
 
 .metric-strip article {
@@ -517,7 +532,7 @@ function notify(message) {
 
 .chart-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.96fr 0.88fr 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -548,7 +563,7 @@ function notify(message) {
 
 svg text {
   fill: #344054;
-  font-size: 9px;
+  font-size: 8.5px;
 }
 
 .line-red,
@@ -647,17 +662,17 @@ svg text {
 }
 
 .source-card text {
-  font-size: 9px;
+  font-size: 8.5px;
 }
 
 .reason-card {
   display: grid;
-  grid-template-rows: 22px repeat(5, 25px) 18px;
+  grid-template-rows: 22px repeat(5, minmax(24px, 1fr)) 18px;
 }
 
 .reason-row {
   display: grid;
-  grid-template-columns: 86px 1fr 20px;
+  grid-template-columns: 128px 1fr 24px;
   gap: 8px;
   align-items: center;
 }
@@ -665,8 +680,14 @@ svg text {
 .reason-row span,
 .reason-row em {
   color: #263244;
-  font-size: 10px;
+  font-size: 11px;
   font-style: normal;
+}
+
+.reason-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .reason-row i {
@@ -683,7 +704,7 @@ svg text {
 .reason-axis {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  padding-left: 94px;
+  padding-left: 136px;
   color: #64748b;
   font-size: 9px;
 }
@@ -763,14 +784,15 @@ td {
   color: #1f2937;
 }
 
-.focus-table-wrap th:nth-child(1) { width: 91px; }
-.focus-table-wrap th:nth-child(2) { width: 103px; }
-.focus-table-wrap th:nth-child(3) { width: 124px; }
-.focus-table-wrap th:nth-child(4) { width: 67px; }
-.focus-table-wrap th:nth-child(5) { width: 67px; }
-.focus-table-wrap th:nth-child(6) { width: 58px; }
-.focus-table-wrap th:nth-child(8) { width: 72px; }
-.focus-table-wrap th:nth-child(9) { width: 205px; }
+.focus-table-wrap th:nth-child(1) { width: 7%; }
+.focus-table-wrap th:nth-child(2) { width: 8%; }
+.focus-table-wrap th:nth-child(3) { width: 10%; }
+.focus-table-wrap th:nth-child(4) { width: 7%; }
+.focus-table-wrap th:nth-child(5) { width: 6%; }
+.focus-table-wrap th:nth-child(6) { width: 6%; }
+.focus-table-wrap th:nth-child(7) { width: 28%; }
+.focus-table-wrap th:nth-child(8) { width: 8%; }
+.focus-table-wrap th:nth-child(9) { width: 20%; }
 
 .focus-table-wrap tr.selected td {
   background: #fff7f7;
@@ -794,7 +816,9 @@ td {
 .row-actions,
 .history-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .row-actions button,
@@ -929,8 +953,10 @@ td {
 }
 
 .history-card {
+  align-self: start;
   padding: 10px 12px;
   overflow: hidden;
+  min-height: 0;
 }
 
 .history-card h3 {
@@ -1163,6 +1189,7 @@ td {
 
 .reg-result-main {
   min-width: 0;
+  overflow: auto;
 }
 
 .focus-detail {
@@ -1193,4 +1220,276 @@ td {
     grid-template-columns: 1fr;
   }
 }
+
+.filter-strip label,
+.filter-strip select,
+.filter-strip input,
+.chart-title span,
+.donut-layout li,
+.axis text,
+.result-table th,
+.result-table td,
+.status,
+.history-card th,
+.history-card td,
+.focus-detail dt,
+.focus-detail dd {
+  font-size: var(--ui-font-xs);
+}
+
+.chart-grid {
+  min-height: 0;
+  overflow: visible;
+}
+
+.chart-card {
+  height: auto;
+  min-height: 214px;
+  overflow: visible;
+}
+
+.donut-layout {
+  height: auto;
+  min-height: 176px;
+}
+
+.source-card text,
+.chart-card svg text {
+  font-size: 8.5px;
+}
+
+.reason-row span,
+.reason-row em {
+  font-size: 11px;
+}
+
+.metric-strip {
+  min-height: 88px;
+  overflow: hidden;
+  border: 1px solid #e6ebf2;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035);
+}
+
+.metric-strip article {
+  position: relative;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 18px;
+  border-right: 1px solid #edf1f6;
+}
+
+.metric-strip article::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.metric-strip article:nth-child(1)::after { background: #c85858; }
+.metric-strip article:nth-child(2)::after { background: #f59e0b; }
+.metric-strip article:nth-child(3)::after { background: #22a06b; }
+.metric-strip article:nth-child(4)::after { background: #3b82f6; }
+.metric-strip article:nth-child(5)::after { background: #8b5cf6; }
+
+.metric-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.metric-strip p {
+  margin: 0 0 4px;
+  color: #344054;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.metric-strip strong {
+  margin: 0 0 3px;
+  color: #172033;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+.metric-strip small {
+  margin-left: 3px;
+  color: #344054;
+  font-size: 11px;
+}
+
+.metric-strip em {
+  font-size: 10px;
+}
+
+.chart-grid {
+  display: grid;
+  gap: 8px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.chart-card {
+  display: grid;
+  grid-template-rows: 24px minmax(0, 1fr);
+  min-height: 214px;
+  padding: 10px 12px 9px;
+  overflow: hidden;
+  border: 1px solid #e6ebf2;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 253, 0.96) 100%),
+    radial-gradient(circle at 18% 8%, rgba(164, 28, 45, 0.045), transparent 28%);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035);
+}
+
+.chart-card h3 {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 0;
+  padding-bottom: 7px;
+  border-bottom: 1px solid #eef2f7;
+  color: #172033;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.chart-card small {
+  margin-left: 4px;
+  color: #7a8798;
+  font-size: 11px;
+}
+
+.chart-card svg {
+  align-self: center;
+  width: 100%;
+  height: 174px;
+  min-height: 0;
+}
+
+.trend-card svg,
+.source-card svg {
+  max-height: 174px;
+}
+
+.donut-layout {
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  align-self: center;
+}
+
+.donut-wrap {
+  display: grid;
+  place-items: center;
+}
+
+.donut-wrap svg {
+  width: 126px;
+  height: 126px;
+}
+
+.donut-layout ul {
+  align-content: center;
+  gap: 6px;
+}
+
+.donut-layout li {
+  grid-template-columns: 8px minmax(0, 1fr) 50px;
+  min-width: 0;
+  color: #344054;
+}
+
+.donut-layout li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donut-layout li b {
+  justify-self: end;
+  color: #172033;
+  font-variant-numeric: tabular-nums;
+}
+
+.source-card svg {
+  width: 92%;
+  justify-self: center;
+}
+
+.reason-card {
+  grid-template-rows: 24px repeat(5, 24px) 18px;
+  align-content: start;
+  row-gap: 7px;
+}
+
+.reason-row {
+  grid-template-columns: minmax(96px, 128px) minmax(0, 1fr) 24px;
+  gap: 10px;
+}
+
+.reason-row i {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf2f8;
+}
+
+.reason-row b {
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f6ea8 0%, #4d7fab 100%);
+}
+
+.reason-axis {
+  margin-top: 0;
+  color: #7a8798;
+}
+
+@media (max-width: 1440px) and (min-width: 1321px) {
+  .metric-strip article {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .metric-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .metric-strip p {
+    font-size: 10px;
+  }
+
+  .metric-strip strong {
+    font-size: 23px;
+  }
+
+  .metric-strip small,
+  .metric-strip em {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .donut-layout {
+    grid-template-columns: 128px minmax(0, 1fr);
+  }
+}
+
 </style>

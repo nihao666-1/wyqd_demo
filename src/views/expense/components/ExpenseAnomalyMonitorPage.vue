@@ -99,7 +99,7 @@ function exportExcel() {
 
 @media (min-width: 901px) {
   .expense-monitor-page {
-    overflow: hidden;
+    overflow: auto;
   }
 
   .expense-monitor-body {

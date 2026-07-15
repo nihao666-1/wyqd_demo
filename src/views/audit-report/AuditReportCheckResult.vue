@@ -1504,4 +1504,31 @@ dd {
     overflow: auto;
   }
 }
+
+.task-info-item strong,
+.file-chip strong {
+  overflow: visible;
+  white-space: normal;
+}
+
+.export-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.export-grid article {
+  height: auto;
+  min-height: 96px;
+  align-content: start;
+}
+
+.export-grid strong,
+.export-grid p,
+.export-grid small,
+.version-line strong,
+.version-line b,
+.version-line small,
+.version-line em {
+  font-size: var(--ui-font-xs);
+  line-height: 1.35;
+}
 </style>
