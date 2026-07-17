@@ -76,18 +76,20 @@ const fallbackFiles = [
 </template>
 
 <style scoped>
-.audit-result-footer { min-width: 0; display: grid; grid-template-columns: minmax(0,1.7fr) minmax(300px,1fr); gap: 10px; color: #27303b; font-size: 11px; }.audit-result-footer.side-only{display:block}.side-only .footer-region{width:100%;height:115px}
-.footer-region { min-width: 0; height: 148px; padding: 12px 13px; box-sizing: border-box; border: 1px solid #dfe3ea; background: #fff; overflow: hidden; }
-.footer-region h2 { margin: 0; color: #252c36; font-size: 13px; line-height: 1.25; font-weight: 700; }
-.export-records > p { margin: 5px 0 7px; color: #657080; font-size: 10px; }
-.file-cards { display: grid; grid-template-columns: repeat(6, minmax(64px, 1fr)); gap: 8px; }
-.file-card { min-width: 0; height: 74px; display: grid; grid-template-columns: 22px minmax(0, 1fr); grid-template-rows: 1fr auto; align-items: start; gap: 4px 6px; padding: 9px 8px 7px; border: 1px solid #dde3eb; border-radius: 3px; background: #fff; color: #2e3743; text-align: left; cursor: pointer; }
-.file-card__icon { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 2px; background: #139b57; color: #fff; font-size: 11px; font-weight: 800; }
+.audit-result-footer { min-width: 0; display: grid; grid-template-columns: minmax(0,1.7fr) minmax(300px,1fr); gap: 6px; color: #27303b; font-size: 10px; }
+.audit-result-footer.side-only{display:block}
+.side-only .footer-region{width:100%;height:98px}
+.footer-region { min-width: 0; height: 112px; padding: 8px 10px; box-sizing: border-box; border: 1px solid #dfe3ea; background: #fff; overflow: hidden; }
+.footer-region h2 { margin: 0; color: #252c36; font-size: 12px; line-height: 1.2; font-weight: 700; }
+.export-records > p { margin: 3px 0 5px; color: #657080; font-size: 10px; }
+.file-cards { display: grid; grid-template-columns: repeat(6, minmax(52px, 1fr)); gap: 6px; }
+.file-card { min-width: 0; height: 56px; display: grid; grid-template-columns: 18px minmax(0, 1fr); grid-template-rows: 1fr auto; align-items: start; gap: 2px 4px; padding: 6px 6px 5px; border: 1px solid #dde3eb; border-radius: 3px; background: #fff; color: #2e3743; text-align: left; cursor: pointer; }
+.file-card__icon { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 2px; background: #139b57; color: #fff; font-size: 10px; font-weight: 800; }
 .file-card__icon.is-word { background: #286bd5; }
 .file-card__name { min-width: 0; align-self: center; line-height: 1.25; overflow-wrap: anywhere; }
 .file-card small { grid-column: 1 / -1; align-self: end; color: #697382; font-size: 9px; }
 .version-timeline { padding-inline: 14px; }
-.version-line { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 23px; }
+.version-line { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
 .version-line::before { content: ''; position: absolute; top: -9px; left: 4px; right: 4px; height: 1px; background: #bdc6d2; }
 .version-node { position: relative; display: grid; gap: 4px; min-width: 0; }
 .version-node__dot { position: absolute; top: -13px; left: 0; width: 8px; height: 8px; border: 2px solid #98a5b7; border-radius: 50%; background: #fff; box-sizing: border-box; }
@@ -98,8 +100,8 @@ const fallbackFiles = [
 .version-node.is-current .version-node__dot { border-color: #d20b0b; box-shadow: 0 0 0 2px #ffdddd; background: #d20b0b; }
 .quick-actions { display: flex; flex-direction: column; }
 .quick-action-list { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; gap: 3px; }
-.quick-action-list button { min-width: 0; display: grid; justify-items: center; gap: 8px; padding: 7px 2px; border: 0; background: transparent; color: #343c48; cursor: pointer; }
-.quick-action-list span { font-size: 23px; line-height: 1; font-weight: 400; }
+.quick-action-list button { min-width: 0; display: grid; justify-items: center; gap: 4px; padding: 4px 2px; border: 0; background: transparent; color: #343c48; cursor: pointer; }
+.quick-action-list span { font-size: 18px; line-height: 1; font-weight: 400; }
 .quick-action-list b { font-size: 10px; line-height: 1.2; font-weight: 500; white-space: nowrap; }
 .audit-result-footer button:focus-visible { outline: 2px solid var(--color-info); outline-offset: 1px; }
 .file-card:hover { border-color: #aeb9c8; background: #fafbfc; }
@@ -114,7 +116,7 @@ const fallbackFiles = [
 }
 @media (max-width: 1199px) {
   .audit-result-footer { grid-template-columns: minmax(0, 1fr); gap: 8px; overflow:visible; }
-  .footer-region { height: 140px; padding: 10px; }
+  .footer-region { height: 112px; padding: 8px; }
   .file-cards { gap: 5px; }
   .file-card { padding-inline: 6px; }
 }

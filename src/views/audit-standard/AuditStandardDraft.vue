@@ -10,9 +10,8 @@
       @export-excel="handleExportExcel"
     />
 
-    <div class="result-stage">
-      <div class="result-primary">
-        <div class="result-meta-spacer" aria-hidden="true"></div>
+    <div class="result-body">
+      <main class="result-primary">
         <div class="result-workspace-row">
         <AuditGenerationConditions @start-generation="handleRegenerate" />
           <AuditGenerationWorkspace
@@ -33,17 +32,9 @@
             @more-suggestions="showToast('已加载全部审计重点建议')"
           />
         </div>
-        <AuditResultFooter
-          :export-files="state.exportFiles"
-          :saved="state.version.saved"
-          @view-task="handleBack"
-          @view-version="showToast('已打开 V0.9 与 V1.0 版本对比')"
-          @view-trail="handleViewTrail"
-          @download-file="handlePreviewFile"
-        />
-      </div>
+      </main>
 
-      <div class="result-side">
+      <aside class="result-side">
         <AuditEvidenceTrace v-if="traceVisible"
           :item="selectedItem"
           :operation-trail="state.operationTrail"
@@ -53,15 +44,26 @@
           @confirm-citation="showToast('已确认引庇关系')"
           @view-original="showToast('已定位制度原文第 35 页')"
         />
-        <AuditResultFooter
-          side-only
-          :export-files="state.exportFiles"
-          :saved="state.version.saved"
-          @view-task="handleBack"
-          @view-version="showToast('已打开 V0.9 与 V1.0 版本对比')"
-          @view-trail="handleViewTrail"
-        />
-      </div>
+      </aside>
+    </div>
+
+    <div class="result-footer-row">
+      <AuditResultFooter
+        :export-files="state.exportFiles"
+        :saved="state.version.saved"
+        @view-task="handleBack"
+        @view-version="showToast('已打开 V0.9 与 V1.0 版本对比')"
+        @view-trail="handleViewTrail"
+        @download-file="handlePreviewFile"
+      />
+      <AuditResultFooter
+        side-only
+        :export-files="state.exportFiles"
+        :saved="state.version.saved"
+        @view-task="handleBack"
+        @view-version="showToast('已打开 V0.9 与 V1.0 版本对比')"
+        @view-trail="handleViewTrail"
+      />
     </div>
 
     <button v-if="!traceVisible" class="reopen-trace" type="button" @click="traceVisible = true">展开来源追溯</button>
@@ -232,8 +234,136 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.audit-standard-result-page{position:relative;width:100%;height:auto;padding:5px 1px 5px 15px;background:#f7f8fa;color:#252d38;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;overflow:hidden}.result-stage{display:grid;grid-template-columns:1006px 348px;gap:10px;margin-top:-69px}.result-primary{display:grid;grid-template-rows:70px 628px 149px;gap:10px}.result-meta-spacer{pointer-events:none}.result-workspace-row{display:grid;grid-template-columns:209px 788px;gap:9px}.result-side{display:grid;grid-template-rows:731px 115px;gap:10px}.reopen-trace{position:absolute;z-index:12;top:76px;right:8px;height:30px;border:1px solid var(--color-primary);border-radius:4px;background:#fff;color:var(--color-primary);font-size:11px}.result-toast{position:fixed;z-index:120;top:74px;left:50%;min-width:260px;padding:10px 18px;border-radius:4px;background:rgb(30 41 59 / 92%);color:#fff;font-size:12px;text-align:center;transform:translateX(-50%);box-shadow:0 8px 24px rgb(15 23 42 / 20%)}
-.audit-standard-result-page{box-sizing:border-box;display:flex;width:100%;max-width:none;height:0;min-height:0;flex-direction:column;margin:0;padding:var(--ui-space-4);background:var(--color-bg);overflow:auto}.result-stage{min-height:0;flex:1;grid-template-columns:minmax(0,1fr) minmax(300px,360px);gap:var(--ui-space-4);margin-top:0}.result-primary{min-width:0;min-height:0;grid-template-rows:minmax(628px,1fr) auto;gap:var(--ui-space-4)}.result-meta-spacer{display:none}.result-workspace-row{min-width:0;min-height:0;grid-template-columns:minmax(190px,230px) minmax(0,1fr);gap:var(--ui-space-4)}.result-side{min-width:0;min-height:0;grid-template-rows:minmax(628px,1fr) auto;gap:var(--ui-space-4)}.reopen-trace{top:14px;right:14px;border-color:var(--color-primary);color:var(--color-primary)}.result-toast{background:rgba(31,41,55,.9);box-shadow:var(--shadow-card)}
-@media(max-width:1599px){.result-stage{grid-template-columns:1fr}.result-side{grid-template-columns:minmax(0,1fr) minmax(260px,360px);grid-template-rows:auto}}
-@media(max-width:1500px){.result-workspace-row,.result-side{grid-template-columns:1fr}.result-primary,.result-side{grid-template-rows:auto}}
+.audit-standard-result-page {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  max-width: none;
+  height: 0;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 10px 10px;
+  background: var(--color-bg);
+  color: #252d38;
+  font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  overflow: auto;
+}
+
+.result-body {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 6px;
+  align-items: stretch;
+  margin-top: -64px;
+}
+
+.result-stage {
+  flex: 1;
+  grid-template-columns: minmax(0,1fr) minmax(300px,360px);
+}
+
+.result-primary,
+.result-side {
+  min-width: 0;
+  min-height: 0;
+}
+
+.result-primary {
+  padding-top: 64px;
+}
+
+.result-workspace-row {
+  display: grid;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.result-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-footer-row {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 6px;
+}
+
+.reopen-trace {
+  position: absolute;
+  z-index: 12;
+  top: 112px;
+  right: 16px;
+  height: 30px;
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+.result-toast {
+  position: fixed;
+  z-index: 120;
+  top: 74px;
+  left: 50%;
+  min-width: 260px;
+  padding: 10px 18px;
+  border-radius: 4px;
+  background: rgba(31, 41, 55, .9);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  transform: translateX(-50%);
+  box-shadow: var(--shadow-card);
+}
+
+@media (max-width: 1500px) {
+  .audit-standard-result-page {
+    overflow: auto;
+  }
+
+  .result-body,
+  .result-footer-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .result-body {
+    flex: 0 0 auto;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .result-primary {
+    padding-top: 0;
+  }
+
+  .result-workspace-row {
+    grid-template-columns: minmax(190px, 210px) minmax(0, 1fr);
+    min-height: 520px;
+  }
+
+  .result-side {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .result-workspace-row {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+}
 </style>
