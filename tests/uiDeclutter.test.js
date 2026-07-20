@@ -4,11 +4,15 @@ import test from 'node:test';
 
 const read = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 
-test('workbench uses a compact summary instead of repeating module status cards', () => {
+test('workbench keeps the original capability metric cards at the top', () => {
   const source = read('src/views/workbench/WorkbenchHome.vue');
 
-  assert.match(source, /class="overview-strip"/);
-  assert.match(source, /v-for="item in overviewStats"/);
+  assert.match(source, /data-workbench-section="能力指标概览"/);
+  assert.match(source, /v-for="item in capabilityMetrics"/);
+  assert.match(source, /class="metric-card workbench-metric capability-card"/);
+  assert.match(source, /class="capability-status-grid"/);
+  assert.match(source, />查看明细/);
+  assert.doesNotMatch(source, /class="overview-strip"/);
   assert.match(source, />最近访问</);
 });
 

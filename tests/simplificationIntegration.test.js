@@ -173,9 +173,14 @@ test('dashboard stays a personal overview while task center owns complete task m
   const workbench = read(workbenchUrl);
   const taskList = read(taskListUrl);
 
-  for (const section of ['关键指标摘要', '我的待办', '风险提醒', '最近访问', '快捷入口']) {
+  for (const section of ['能力指标概览', '我的待办', '风险提醒', '最近访问', '快捷入口']) {
     assert.match(workbench, new RegExp(`data-workbench-section="${section}"`));
   }
+  assert.match(workbench, /v-for="item in capabilityMetrics"/);
+  assert.match(workbench, /class="metric-card workbench-metric capability-card"/);
+  assert.match(workbench, /class="capability-status-grid"/);
+  assert.match(workbench, />查看明细/);
+  assert.doesNotMatch(workbench, /class="overview-strip"/);
   assert.match(workbench, /const recentVisitTasks = recentAuditTasks\.slice\(0, 4\)/);
   assert.doesNotMatch(workbench, /<h3>最近生成结果<\/h3>/);
   assert.doesNotMatch(workbench, /<h3>系统通知<\/h3>/);

@@ -103,18 +103,30 @@
     </template>
 
     <template v-else>
-      <section class="workbench-top" data-workbench-section="关键指标摘要">
-        <div class="overview-title">
-          <div>
-            <h3>关键指标摘要</h3>
-            <p>只保留需要立即关注的数字。</p>
-          </div>
-        </div>
-        <div class="overview-strip">
-          <RouterLink v-for="item in overviewStats" :key="item.label" :to="item.to">
-            <span>{{ item.label }}</span>
-            <strong>{{ item.value }}</strong>
-            <small>{{ item.hint }}</small>
+      <section class="workbench-top" data-workbench-section="能力指标概览">
+        <div class="capability-grid workbench-metrics">
+          <RouterLink
+            v-for="item in capabilityMetrics"
+            :key="item.title"
+            class="metric-card workbench-metric capability-card"
+            :to="item.to"
+          >
+            <div class="capability-card-head">
+              <div class="metric-icon" aria-hidden="true"><AuditIcon :name="item.icon" /></div>
+              <div class="capability-title-block">
+                <span class="capability-title">{{ item.title }}</span>
+              </div>
+              <span class="range-pill">{{ item.range }} <i>⌄</i></span>
+            </div>
+            <dl class="capability-status-grid">
+              <div v-for="status in item.statuses" :key="status.key" :class="['capability-status', status.key]">
+                <dt>{{ status.label }}</dt>
+                <dd>{{ status.value }}</dd>
+              </div>
+            </dl>
+            <div class="capability-card-foot">
+              <strong>查看明细 <b aria-hidden="true">›</b></strong>
+            </div>
           </RouterLink>
         </div>
       </section>
@@ -299,13 +311,6 @@ const buildCapabilityMetrics = (empty = false) =>
   });
 
 const capabilityMetrics = computed(() => buildCapabilityMetrics(false));
-
-const overviewStats = [
-  { label: '我的待办', value: '12', hint: '5 项需今日处理', to: '/tasks' },
-  { label: '高风险异常', value: '4', hint: '较昨日新增 1 项', to: '/expense/anomaly/dashboard' },
-  { label: '待复核报告', value: '3', hint: '最早已等待 2 天', to: '/audit-report/workbench?mode=review' },
-  { label: '本月已完成', value: '148', hint: '覆盖 5 类审计能力', to: '/tasks' }
-];
 
 const startCards = [
   {
@@ -516,76 +521,45 @@ const operationRows = computed(() => store.db.operationLogs);
   min-width: 0;
 }
 
-.overview-title {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  padding: 0 2px;
-}
-
-.overview-title h3 {
-  margin: 0;
-  color: var(--color-text);
-  font-size: var(--ui-font-md);
-}
-
-.overview-title p,
 .section-note {
   margin: 3px 0 0;
   color: var(--color-muted);
   font-size: var(--ui-font-xs);
 }
 
-.overview-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  overflow: hidden;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
-  background: #fff;
-}
-
-.overview-strip a {
-  display: grid;
-  min-width: 0;
-  gap: 3px;
-  padding: 12px 16px;
-  border-right: 1px solid var(--color-line);
-  color: var(--color-text);
-}
-
-.overview-strip a:last-child {
-  border-right: 0;
-}
-
-.overview-strip span,
-.overview-strip small {
-  color: var(--color-muted);
-  font-size: var(--ui-font-xs);
-}
-
-.overview-strip strong {
-  font-size: 22px;
-  line-height: 1.25;
-}
-
 .workbench-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 0;
 }
 
 .workbench-metric {
+  position: relative;
   display: flex;
   min-width: 0;
-  min-height: 158px;
-  padding: 14px 16px 10px;
+  min-height: 168px;
+  padding: 14px 18px 12px;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #fff;
   color: var(--color-text);
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(22, 32, 51, 0.06);
+}
+
+.workbench-metric::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--color-primary);
 }
 
 .workbench-metric > div {
@@ -595,8 +569,8 @@ const operationRows = computed(() => store.db.operationLogs);
 .capability-card-head {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: start;
+  gap: 12px;
+  align-items: center;
 }
 
 .capability-title-block {
@@ -611,7 +585,7 @@ const operationRows = computed(() => store.db.operationLogs);
   color: var(--color-text);
   font-size: 16px;
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.25;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
@@ -629,14 +603,14 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .range-pill {
   display: inline-flex;
-  min-width: 74px;
-  height: 30px;
+  min-width: 80px;
+  height: 34px;
   padding: 0 10px;
   border: 1px solid #d9e0ea;
   border-radius: 6px;
   background: #fbfcff;
   color: #5a6678;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   align-items: center;
   justify-content: center;
@@ -670,7 +644,7 @@ const operationRows = computed(() => store.db.operationLogs);
   min-height: 18px;
   overflow: visible;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.25;
   white-space: normal;
 }
@@ -678,7 +652,7 @@ const operationRows = computed(() => store.db.operationLogs);
 .capability-status dd {
   margin: 8px 0 0;
   color: #34465d;
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1;
 }
@@ -703,7 +677,7 @@ const operationRows = computed(() => store.db.operationLogs);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-top: 10px;
+  padding-top: 11px;
   border-top: 1px solid #e9edf3;
   color: var(--color-muted);
   line-height: 1;
@@ -713,8 +687,8 @@ const operationRows = computed(() => store.db.operationLogs);
   display: inline-flex;
   margin: 0;
   color: var(--color-primary);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   align-items: center;
   gap: 2px;
   white-space: nowrap;
@@ -722,7 +696,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .capability-card-foot b {
   color: inherit;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 400;
 }
 
@@ -739,9 +713,9 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .metric-icon {
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
 }
 
 .start-icon,
@@ -1555,7 +1529,7 @@ const operationRows = computed(() => store.db.operationLogs);
   line-height: 1.35;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1080px) {
   .workbench-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1564,10 +1538,6 @@ const operationRows = computed(() => store.db.operationLogs);
 @media (max-width: 1200px) {
   .workbench-top {
     grid-template-columns: 1fr;
-  }
-
-  .workbench-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workbench-actions {
@@ -1618,18 +1588,6 @@ const operationRows = computed(() => store.db.operationLogs);
     grid-template-columns: 1fr;
   }
 
-  .overview-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .overview-strip a:nth-child(2) {
-    border-right: 0;
-  }
-
-  .overview-strip a:nth-child(-n + 2) {
-    border-bottom: 1px solid var(--color-line);
-  }
-
   .welcome-preview {
     display: none;
   }
@@ -1669,5 +1627,28 @@ const operationRows = computed(() => store.db.operationLogs);
 .workbench-page .start-icon {
   width: var(--ui-icon-lg);
   height: var(--ui-icon-lg);
+}
+
+.workbench-page .capability-title {
+  font-size: 16px;
+}
+
+.workbench-page .range-pill,
+.workbench-page .capability-status dt {
+  font-size: 14px;
+}
+
+.workbench-page .capability-status dd {
+  font-size: 26px;
+}
+
+.workbench-page .capability-card-foot strong,
+.workbench-page .capability-card-foot b {
+  font-size: 16px;
+}
+
+.workbench-page .metric-icon {
+  width: 30px;
+  height: 30px;
 }
 </style>
