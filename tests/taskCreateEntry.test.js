@@ -37,10 +37,10 @@ test('资料入口解析三种来源并保持旧 parse 和 confirm 兼容', () =
 });
 
 test('未知入口回到基础信息且无效资料来源回退本地上传', () => {
-  assert.deepEqual(resolveTaskCreateEntry(), { step: 0, stage: 'basic', source: 'local' });
+  assert.deepEqual(resolveTaskCreateEntry(), { step: 0, stage: 'ability', source: 'local' });
   assert.deepEqual(resolveTaskCreateEntry({ phase: 'unknown', source: 'fileCenter' }), {
     step: 0,
-    stage: 'basic',
+    stage: 'ability',
     source: 'fileCenter'
   });
   assert.deepEqual(resolveTaskCreateEntry({ phase: 'materials', source: 'invalid' }), {

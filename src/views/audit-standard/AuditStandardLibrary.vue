@@ -3,6 +3,10 @@
   <PageHeader eyebrow="规范库" title="审计规范库版本管理" description="查看当前有效版本、历史版本和引用锁定状态。">
     <RouterLink class="btn" to="/audit-standard/workbench">返回工作台</RouterLink>
   </PageHeader>
+  <section v-if="route.query.action || route.query.panel" class="panel merge-hint">
+    <strong>{{ route.query.action === 'upload' ? '规范上传已并入规范库' : '版本差异已并入规范库' }}</strong>
+    <p>{{ route.query.action === 'upload' ? '可在规范库内上传制度或规范文件，并完成适用范围确认。' : '可在版本列表中打开差异抽屉，查看新旧版本变化和引用影响。' }}</p>
+  </section>
   <FilterPanel :items="filters" @query="store.setNotice('已按规范名称、版本、部门和有效状态查询。')" />
   <section class="panel">
     <div class="panel-title"><h3>版本列表</h3></div>
@@ -17,11 +21,13 @@
 
 <script setup>
 import { inject } from 'vue';
+import { useRoute } from 'vue-router';
 import PageHeader from '../../components/common/PageHeader.vue';
 import FilterPanel from '../../components/common/FilterPanel.vue';
 import DataTable from '../../components/common/DataTable.vue';
 
 const store = inject('store');
+const route = useRoute();
 const filters = [
   { label: '规范名称', value: '费用报销审计规范' },
   { label: '覆盖部门', value: '上海分公司' },

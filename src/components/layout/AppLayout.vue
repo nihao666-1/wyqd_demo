@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell" :class="{ 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }">
+  <div class="app-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }">
     <aside class="sidebar">
       <div class="brand">
         <strong>审计大模型系统</strong>
@@ -22,7 +22,8 @@
       </nav>
 
       <nav class="bottom-nav">
-        <RouterLink to="/demo-guide"><span class="nav-icon"><AuditIcon name="collapse" /></span>收起导航</RouterLink>
+        <button type="button" @click="toggleSidebar"><span class="nav-icon"><AuditIcon name="collapse" /></span><span class="nav-label">{{ sidebarCollapsed ? '展开导航' : '收起导航' }}</span></button>
+        <RouterLink v-if="showDemoControls" to="/demo-guide"><span class="nav-icon"><AuditIcon name="qa" /></span>演示指南</RouterLink>
       </nav>
     </aside>
 
@@ -42,7 +43,7 @@
           <div v-else-if="isAuditReportGeneration" class="task-breadcrumb"><span>任务中心</span><i>/</i><span>上海分公司Q1常规审计任务</span><i>/</i><strong>报告生成</strong></div>
           <div v-else-if="isRegulatoryResultRoute" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>专项审计分析</strong></div>
           <div v-else-if="isSpecialAuditWorkbench" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>专项审计分析</strong></div>
-          <div v-else-if="isTaskRoute" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong v-if="!isParsingPhase">创建审计任务</strong><template v-else><span>创建审计任务</span><i>/</i><strong>资料解析</strong></template></div>
+          <div v-else-if="isTaskCreateRoute" class="task-breadcrumb"><span>审计工作台</span><i>/</i><span>当前任务：创建审计任务</span><i>/</i><strong>{{ taskCreateStepLabel }}</strong></div>
           <template v-else>
             <span class="crumb">当前位置</span>
             <h1>{{ route.meta.title || '审计任务工作台' }}</h1>
@@ -50,21 +51,10 @@
         </div>
 
         <div class="topbar-right">
-          <div class="global-data-mode" aria-label="统一演示数据切换">
+          <div v-if="showDemoControls" class="global-data-mode" aria-label="统一演示数据切换">
             <span>演示数据</span>
             <button type="button" :class="{ active: !isEmptyMode }" @click="setDemoDataMode('data')">有</button>
             <button type="button" :class="{ active: isEmptyMode }" @click="setDemoDataMode('empty')">无</button>
-          </div>
-          <div class="top-icons" aria-label="全局操作">
-            <button class="icon-btn" type="button" aria-label="通知">
-              <FontAwesomeIcon :icon="faBell" />
-              <span v-if="isExpenseWorkbenchRoute" class="notice-dot">0</span>
-              <span v-else-if="isExpenseTrendResult" class="notice-dot">12</span>
-              <span v-else-if="!isEmptyMode || isTaskDetailRoute" class="notice-dot">12</span>
-              <span v-else-if="isSupervisionShareResultRoute" class="notice-dot">12</span>
-              <span v-else-if="isAuditStandardResult" class="notice-dot">12</span>
-            </button>
-            <button class="icon-btn" type="button" aria-label="帮助"><FontAwesomeIcon :icon="faCircleQuestion" /></button>
           </div>
           <div class="user-scope" aria-label="当前用户">
             <span class="user-avatar"><FontAwesomeIcon :icon="faCircleUser" /></span>
@@ -83,16 +73,17 @@
 </template>
 
 <script setup>
-import { computed, inject, watch } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBell, faChevronDown, faCircleQuestion, faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faCircleUser } from '@fortawesome/free-solid-svg-icons';
 import AuditIcon from '../common/AuditIcon.vue';
 import { resolveTaskDetailView } from '../../domain/taskDetail/taskDetailViewState.js';
 import { taskRows } from '../../views/tasks/taskCenterData.js';
 
 const store = inject('store');
 const route = useRoute();
+const sidebarCollapsed = ref(false);
 
 watch(
   () => route.fullPath,
@@ -105,8 +96,17 @@ watch(
 const businessNavItems = [
   { icon: 'workbench', label: '审计工作台', path: '/workbench' },
   { icon: 'tasks', label: '任务中心', path: '/tasks' },
-  { icon: 'knowledge', label: '审计知识库', path: '/audit-standard/policy' },
-  { icon: 'compare', label: '制度比对', path: '/audit-standard/workbench' },
+  {
+    icon: 'knowledge',
+    label: '制度与规范',
+    path: '/audit-standard/policy',
+    children: [
+      { label: '制度查询', path: '/audit-standard/policy' },
+      { label: '制度比对', path: '/audit-standard/workbench' },
+      { label: '规范生成', path: '/audit-standard/generate' },
+      { label: '规范库', path: '/audit-standard/library' }
+    ]
+  },
   {
     icon: 'analysis',
     label: '专项审计分析',
@@ -135,7 +135,7 @@ const businessNavItems = [
     label: '配置中心',
     path: '/config',
     children: [
-      { label: '配置与记录中心', path: '/config?mode=records', mode: 'records' },
+      { label: '模板规则标签权限', path: '/config' },
       { label: '系统参数配置', path: '/config?mode=params', mode: 'params' }
     ]
   },
@@ -155,25 +155,41 @@ const isAuditReportGeneration = computed(() => route.path === '/audit-report/dra
 const isReportReviewRoute = computed(() => route.path === '/audit-report/check-result');
 const isRegulatoryResultRoute = computed(() => route.path === '/regulatory/result');
 const isSpecialAuditWorkbench = computed(() => route.path === '/regulatory/workbench');
+const isAuditStandardSection = computed(() => route.path.startsWith('/audit-standard'));
 const isSpecialAuditSection = computed(() => route.path.startsWith('/regulatory') || route.path.startsWith('/supervision') || isSupervisionShareResultRoute.value);
 const isExpenseSection = computed(() => route.path.startsWith('/expense'));
+const showDemoControls = computed(() => import.meta.env.DEV || route.query.demo === '1');
 const selectedTask = computed(() => taskRows.find((task) => task.id === route.query.taskId));
 const detailView = computed(() => resolveTaskDetailView(route.query, selectedTask.value));
 const isGeneratingTaskDetail = computed(() => isTaskDetailRoute.value && detailView.value === 'generating');
 const isArchivedTaskDetail = computed(() => isTaskDetailRoute.value && detailView.value === 'archived');
 const isTaskRoute = computed(() => route.path === '/tasks' || route.path === '/tasks/create');
+const isTaskCreateRoute = computed(() => route.path === '/tasks/create');
 const isParsingPhase = computed(() => route.path === '/tasks/create' && route.query.phase === 'parse');
 const isTemplatePhase = computed(() => route.path === '/tasks/create' && (route.query.phase === 'confirm' || route.query.phase === 'template'));
+const taskCreateStepLabel = computed(() => {
+  const phase = String(route.query.phase || 'ability');
+  if (phase === 'basic') return '填写基础信息';
+  if (phase === 'materials') return '资料选择';
+  if (phase === 'parse') return '资料解析';
+  if (phase === 'confirm' || phase === 'template') return '模板与输出设置';
+  return '选择能力';
+});
 
 function setDemoDataMode(mode) {
   store.setDemoDataMode(mode);
   store.notice = '';
 }
 
+function toggleSidebar() {
+  sidebarCollapsed.value = !sidebarCollapsed.value;
+}
+
 function shouldShowChildren(item) {
   return Boolean(
     item.children &&
-    ((isSpecialAuditSection.value && item.path === '/regulatory/workbench') ||
+    ((isAuditStandardSection.value && item.path === '/audit-standard/policy') ||
+      (isSpecialAuditSection.value && item.path === '/regulatory/workbench') ||
       (isExpenseSection.value && item.path === '/expense/workbench') ||
       (route.path === '/config' && item.path === '/config'))
   );

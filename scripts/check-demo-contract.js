@@ -27,7 +27,6 @@ const requiredFiles = [
   'src/views/files/FileDetail.vue',
   'src/views/demo-guide/DemoGuide.vue',
   'src/views/audit-report/AuditReportWorkbench.vue',
-  'src/views/audit-report/AuditReportCheckUpload.vue',
   'src/views/audit-report/AuditReportCheckResult.vue',
   'src/domain/lifecycle/reportActionGuard.js',
   'src/domain/lifecycle/assetReferenceGuard.js'
@@ -65,7 +64,9 @@ for (const route of requiredRoutes) {
 }
 
 const layoutText = read('src/components/layout/AppLayout.vue');
-assert(layoutText.includes('/demo-guide'), '左侧菜单缺少演示指南入口 /demo-guide');
+assert(layoutText.includes('制度与规范'), '左侧菜单缺少合并后的制度与规范分组');
+assert(layoutText.includes('showDemoControls') && layoutText.includes('import.meta.env.DEV'), '演示入口和演示数据开关应仅在开发或显式演示模式显示');
+assert(!layoutText.includes('faBell') && !layoutText.includes('faCircleQuestion'), '顶部通知/帮助按钮应从全局导航移除');
 const storeText = read('src/store/index.js');
 for (const marker of ['demoDataMode', 'setDemoDataMode', 'resetDemoState']) {
   assert(storeText.includes(marker), `演示状态能力缺少：${marker}`);
@@ -80,30 +81,36 @@ for (const marker of [
   '待复核报告',
   '失败任务',
   '推荐开始方式',
-  '任务流程预览',
   '创建常规审计任务',
   '从文件中心导入资料',
   '体验知识库智能体',
   '查看系统配置',
-  '新手引导',
+  '快速引导',
   '系统初始化状态',
-  '最近操作空态',
   'demoDataMode',
   'setDemoDataMode',
   '我的待办',
   '最近审计任务',
-  '快捷入口',
-  '任务进度概览',
   '风险提醒',
   '最近生成结果',
-  '系统通知',
-  '最近操作日志',
   '知识库问答',
   '制度比对',
   '费用异常监控',
   '报告生成'
 ]) {
   assert(workbenchText.includes(marker), `工作台红框复刻缺少：${marker}`);
+}
+
+for (const marker of [
+  '<h3>任务流程预览</h3>',
+  '<h3>新手引导</h3>',
+  '<h3>最近操作空态</h3>',
+  '<h3>快捷入口</h3>',
+  '<h3>任务进度概览</h3>',
+  '<h3>系统通知</h3>',
+  '<h3>最近操作日志</h3>'
+]) {
+  assert(!workbenchText.includes(marker), `工作台页面内部应减负移除：${marker}`);
 }
 
 for (const route of [
@@ -146,7 +153,9 @@ for (const marker of [
   'ability-card',
   'ability-grid',
   'selectedIds',
-  'toggleCapability',
+  'selectCapability',
+  'role="radiogroup"',
+  'role="radio"',
   '制度查询',
   '制度变更',
   '制度比对',
@@ -173,16 +182,16 @@ for (const marker of [
   '待确认',
   '已归档',
   '失败/异常',
-  '今日待办与提醒',
-  '失败任务',
-  '最近操作日志',
-  '快捷入口',
   '导入模拟任务',
   'paginateTaskRows',
   '全部任务',
   '创建审计任务'
 ]) {
   assert(taskListText.includes(marker), `任务中心红框复刻缺少：${marker}`);
+}
+
+for (const marker of ['今日待办与提醒', '失败任务', '最近操作日志', '快捷入口', 'task-rail']) {
+  assert(!taskListText.includes(marker), `任务中心重复右栏应移除：${marker}`);
 }
 
 const taskEmptyText = read('src/views/tasks/TaskCenterEmptyState.vue');
@@ -253,7 +262,7 @@ for (const forbidden of ['门禁', '办理门禁', '资料门禁', '能力门禁
 }
 
 const auditReportWorkbenchText = read('src/views/audit-report/AuditReportWorkbench.vue');
-assert(auditReportWorkbenchText.includes('/audit-report/material/import'), '审计报告资料导入入口必须指向审计报告专属资料导入链路');
+assert(auditReportWorkbenchText.includes('/materials/import?scene=audit-report'), '审计报告资料导入入口必须指向合并后的资料导入工作区并带审计报告场景');
 assert(!auditReportWorkbenchText.includes('/supervision/import/upload'), '审计报告资料导入入口不得跳转监督共享文件导入');
 
 const reportCheckFiles = [];

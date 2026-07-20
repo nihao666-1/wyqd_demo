@@ -10,7 +10,13 @@
             <label><span>任务类型</span><select v-model="filters.type"><option>全部</option><option>常规审计</option><option>专项审计</option><option>费用审计</option></select></label>
             <label><span>任务状态</span><select v-model="filters.status"><option>全部</option><option>草稿</option><option>待解析</option><option>生成中</option><option>待确认</option><option>已完成</option></select></label>
             <label><span>负责人</span><select v-model="filters.owner"><option value="">请选择负责人</option><option v-for="person in personnel" :key="person.userId" :value="person.name">{{ person.name }}</option></select></label>
-            <div class="empty-filter-actions"><button class="empty-btn primary" type="submit">查询</button><button class="empty-btn" type="button" @click="resetFilters">重置</button></div>
+            <div class="empty-filter-actions">
+              <RouterLink class="empty-create-inline" to="/tasks/create">
+                <FontAwesomeIcon :icon="faFileCirclePlus" />
+                <span>创建审计任务</span>
+              </RouterLink>
+              <div class="empty-query-actions"><button class="empty-btn primary" type="submit">查询</button><button class="empty-btn" type="button" @click="resetFilters">重置</button></div>
+            </div>
           </form>
         </section>
 
@@ -46,7 +52,6 @@
       </main>
 
       <aside class="empty-side-column">
-        <RouterLink class="empty-create-button" to="/tasks/create">创建审计任务</RouterLink>
         <section class="status-guide-card">
           <h3>任务状态说明</h3>
           <div class="status-guide-list">
@@ -116,7 +121,7 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
 }
 
 .empty-center-grid {
-  grid-template-columns: minmax(0, 1fr) var(--ui-panel-rail-lg);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, var(--ui-panel-rail-lg));
   gap: var(--ui-space-5);
 }
 
@@ -147,6 +152,62 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
 .empty-filter-grid input,
 .empty-filter-grid select {
   height: var(--ui-control-md);
+}
+
+.empty-filter-grid {
+  grid-template-columns:
+    minmax(112px, 1.05fr)
+    minmax(112px, 1fr)
+    minmax(164px, 1.28fr)
+    minmax(96px, .86fr)
+    minmax(96px, .86fr)
+    minmax(112px, 1fr)
+    minmax(148px, 156px);
+}
+
+.empty-filter-actions {
+  display: grid;
+  min-width: 0;
+  grid-template-rows: var(--ui-control-md) var(--ui-control-md);
+  align-items: stretch;
+}
+
+.empty-create-inline {
+  display: inline-flex;
+  min-width: 0;
+  min-height: var(--ui-control-md);
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  border: 1px solid var(--empty-red);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--empty-red);
+  font-size: var(--ui-font-xs);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.empty-create-inline span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty-create-inline:hover {
+  background: #fff6f6;
+}
+
+.empty-query-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ui-space-3);
+}
+
+.empty-query-actions .empty-btn {
+  width: 100%;
+  min-width: 0;
 }
 
 .empty-metric-card b,
@@ -187,12 +248,15 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
     height: 100%;
     min-height: 0;
     align-items: stretch;
+    overflow: hidden;
   }
 
   .empty-main-column {
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto;
+    min-width: 0;
     min-height: 0;
+    overflow: hidden;
   }
 
   .empty-list-card {
@@ -209,7 +273,7 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
   .empty-side-column {
     height: 100%;
     min-height: 0;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: var(--ui-space-4);
     padding-top: 0;
   }
@@ -274,6 +338,38 @@ function importDemoTasks() { store.setDemoDataMode('data'); store.notice = ''; }
 
   .empty-list-content p {
     margin-bottom: var(--ui-space-3);
+  }
+}
+
+@media (max-width: 1439px) {
+  .empty-filter-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .empty-filter-actions {
+    grid-column: span 3;
+    grid-template-columns: minmax(180px, 1fr) auto;
+    grid-template-rows: var(--ui-control-md);
+  }
+
+  .empty-query-actions {
+    min-width: 156px;
+  }
+}
+
+@media (max-width: 760px) {
+  .empty-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-filter-actions {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--ui-control-md) var(--ui-control-md);
+  }
+
+  .empty-query-actions {
+    min-width: 0;
   }
 }
 </style>

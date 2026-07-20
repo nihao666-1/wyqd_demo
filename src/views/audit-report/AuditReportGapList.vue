@@ -2,7 +2,7 @@
   <div class="audit-report-gap-list-page route-fill-page">
   <PageHeader eyebrow="资料完整性预检" title="资料缺口清单" description="关键资料缺失时，不能锁定正式报告；可选资料缺失可生成带提示草稿。">
     <RouterLink class="btn" to="/audit-report/source-select">返回来源选择</RouterLink>
-    <RouterLink class="btn" to="/audit-report/material/supplement-preview">补充上传</RouterLink>
+    <RouterLink class="btn" to="/materials/import?scene=audit-report&step=supplement-preview">补充上传</RouterLink>
     <button class="btn primary" @click="generateDraft">生成草稿</button>
   </PageHeader>
   <section class="report-table-panel">

@@ -1,11 +1,11 @@
 <template>
   <section class="task-create-page" :class="{ 'parsing-page': step === 3 && stepFourStage === 'parsing', 'template-output-page': step === 4 && stepFourStage === 'template' }" data-page="task-create">
-    <header v-if="step === 0" class="create-title-row">
+    <header v-if="step <= 1" class="create-title-row">
       <RouterLink class="create-back" to="/tasks" aria-label="返回任务中心"><AuditIcon name="collapse" /></RouterLink>
       <h2>创建审计任务</h2>
     </header>
 
-    <div v-if="step === 0" class="create-workspace" data-step="basic-info">
+    <div v-if="step === 1" class="create-workspace" data-step="basic-info">
       <main class="create-primary-column">
         <form id="task-create-form" class="task-create-card" novalidate @submit.prevent="goNext">
           <nav class="wizard-steps" aria-label="创建审计任务步骤">
@@ -18,7 +18,7 @@
           </nav>
 
           <section class="basic-info-section" aria-labelledby="basic-info-title">
-            <h3 id="basic-info-title">基础信息</h3>
+            <h3 id="basic-info-title">填写基础信息</h3>
             <div class="basic-form-grid">
               <label class="form-field"><span>任务名称 <b>*</b></span><div><input :ref="(element) => setFieldRef('taskName', element)" v-model="form.taskName" type="text" placeholder="请输入任务名称" :aria-invalid="Boolean(errors.taskName)" /><small>任务名称将作为报告标题默认前缀</small><p v-if="errors.taskName" class="field-error" role="alert">{{ errors.taskName }}</p></div></label>
               <label class="form-field"><span>被审计单位 <b>*</b></span><div><select :ref="(element) => setFieldRef('auditedUnit', element)" v-model="form.auditedUnit" :aria-invalid="Boolean(errors.auditedUnit)"><option value="">请选择被审计单位</option><option v-for="item in auditedUnits" :key="item" :value="item">{{ item }}</option></select><p v-if="errors.auditedUnit" class="field-error" role="alert">{{ errors.auditedUnit }}</p></div></label>
@@ -41,8 +41,8 @@
         </section>
 
         <footer class="create-footer">
-          <p>当前步骤 <strong>1</strong> / 5 <span aria-live="polite">{{ draftSaved ? '基础信息已暂存' : '' }}</span></p>
-          <div><button class="btn" type="button" @click="saveDraft">保存草稿</button><RouterLink class="btn" to="/tasks">取消</RouterLink><button class="btn primary" type="submit" form="task-create-form">下一步：选择审计能力</button></div>
+          <p>当前步骤 <strong>2</strong> / 5 <span aria-live="polite">{{ draftSaved ? '基础信息已暂存' : '' }}</span></p>
+          <div><button class="btn" type="button" @click="saveDraft">保存草稿</button><button class="btn" type="button" @click="goBack">上一步</button><button class="btn primary" type="submit" form="task-create-form">下一步：资料选择</button></div>
         </footer>
       </main>
 
@@ -75,7 +75,7 @@
    
       <nav class="wizard-steps compact" :class="{ 'parsing-stage': step === 3 && stepFourStage === 'parsing' }" aria-label="创建审计任务步骤"><template v-for="(item, index) in steps" :key="item"><button class="wizard-step" :class="{ active: step === index, done: step > index }" type="button" :disabled="index > step" @click="goStep(index)"><span class="step-number"><FontAwesomeIcon v-if="step > index && !(step === 3 && stepFourStage === 'parsing' && index === 2)" :icon="faCheck" /><template v-else>{{ index + 1 }}</template></span><span>{{ item }}</span></button><i v-if="index < steps.length - 1" class="step-connector" aria-hidden="true"></i></template></nav>
       <header v-if="step !== 2 && !(step === 3 && stepFourStage === 'parsing')"><p>步骤 {{ step + 1 }} / 5</p><h3>{{ steps[step] }}</h3><span>{{ stepHelp }}</span></header>
-      <div v-if="step === 1" class="ability-grid"><button v-for="capability in availableCapabilities" :key="capability.id" class="ability-card" :class="{ selected: selectedIds.includes(capability.id) }" type="button" @click="toggleCapability(capability.id)"><span class="ability-icon" :class="capability.colorClass">{{ capability.icon }}</span><span><b>{{ capability.name }}</b><small>{{ capability.description }}</small></span></button></div>
+      <div v-if="step === 0" class="ability-grid" role="radiogroup" aria-label="选择审计能力"><button v-for="capability in availableCapabilities" :key="capability.id" class="ability-card" :class="{ selected: selectedIds.includes(capability.id) }" type="button" role="radio" :aria-checked="selectedIds.includes(capability.id)" @click="selectCapability(capability.id)"><span class="ability-icon" :class="capability.colorClass">{{ capability.icon }}</span><span><b>{{ capability.name }}</b><small>{{ capability.description }}</small></span></button></div>
       <div v-else-if="step === 2" class="materials-selection-page" data-step="material-selection">
         <div class="materials-workspace">
           <main class="materials-primary">
@@ -109,7 +109,7 @@
         @continue="continueToConfirmation"
       />
       <div v-else class="submit-summary"><h3>任务配置已完成</h3><p>提交后进入资料准备和文件导入流程，所有操作写入任务记录。</p></div>
-      <footer v-if="!(step === 3 && stepFourStage === 'parsing')" class="create-footer" :class="{ 'materials-footer': step === 2 }"><p>当前步骤 <strong>{{ step + 1 }}</strong> / 5</p><div><button class="btn" type="button" @click="saveDraft">保存草稿</button><button class="btn" type="button" @click="goBack">上一步</button><button v-if="step < steps.length - 1" class="btn primary" type="button" :disabled="step === 2 && !materialProgress.canProceed" @click="goNext">{{ step === 2 ? '下一步：解析资料' : '下一步' }}</button><RouterLink v-else class="btn primary" to="/supervision/import/upload">提交并准备资料</RouterLink></div></footer>
+      <footer v-if="!(step === 3 && stepFourStage === 'parsing')" class="create-footer" :class="{ 'materials-footer': step === 2 }"><p>当前步骤 <strong>{{ step + 1 }}</strong> / 5</p><div><button class="btn" type="button" @click="saveDraft">保存草稿</button><RouterLink v-if="step === 0" class="btn" to="/tasks">取消</RouterLink><button v-else class="btn" type="button" @click="goBack">上一步</button><button v-if="step < steps.length - 1" class="btn primary" type="button" :disabled="(step === 0 && !selectedIds.length) || (step === 2 && !materialProgress.canProceed)" @click="goNext">{{ nextStepButtonText }}</button><button v-else class="btn primary" type="button" @click="submitTaskAndReturn">提交任务</button></div></footer>
     </section>
   </section>
 </template>
@@ -132,7 +132,7 @@ const router = useRouter();
 const taskCreateEntry = resolveTaskCreateEntry(route.query);
 const step = ref(taskCreateEntry.step);
 const stepFourStage = ref(taskCreateEntry.stage);
-const steps = ['基础信息', '选择能力', '资料选择', '模板与输出设置', '确认提交'];
+const steps = ['选择能力', '填写基础信息', '资料选择', '模板与输出设置', '确认提交'];
 const form = reactive({ ...initialTaskCreateForm, participants: [...initialTaskCreateForm.participants], dataScope: [...initialTaskCreateForm.dataScope] });
 const templateOutputSettings = ref(createTemplateOutputSettings());
 const errors = ref({});
@@ -167,10 +167,10 @@ const requiredChecks = computed(() => [
   { label: '审计期间', complete: Boolean(form.auditStart && form.auditEnd) },
   { label: '任务类型', complete: Boolean(form.taskType) },
   { label: '负责人', complete: Boolean(form.owner) },
-  { label: '选择审计能力', complete: false }
+  { label: '选择审计能力', complete: Boolean(selectedIds.value.length) }
 ]);
-const availableCapabilities = computed(() => capabilities.filter((item) => taskTypeProfile.value.abilities.includes(item.name)));
-const selectedIds = ref(availableCapabilities.value.map((item) => item.id));
+const availableCapabilities = computed(() => capabilities);
+const selectedIds = ref([capabilities[0].id]);
 const selectedCapabilities = computed(() => availableCapabilities.value.filter((item) => selectedIds.value.includes(item.id)));
 const selectedAbilityNames = computed(() => selectedCapabilities.value.map((item) => item.name));
 const templateTaskSummary = computed(() => ({
@@ -183,18 +183,26 @@ const templateTaskSummary = computed(() => ({
 }));
 const materialProgress = computed(() => getMaterialSelectionProgress(materialRows.value));
 const materialCards = computed(() => taskTypeProfile.value.materials.map((title) => ({ title, description: '下一步将以该资料作为建议资料，可在资料选择阶段调整。' })));
-const stepHelp = computed(() => ['确认任务对象、期间、负责人和权限范围。', '按任务目标选择能力。', '确认资料和数据源范围。', '选择模板、输出格式和版本归档方式。', '确认配置并进入资料准备流程。'][step.value]);
+const stepHelp = computed(() => ['按任务目标选择一个审计能力。', '确认任务对象、期间、负责人和权限范围。', '确认资料和数据源范围。', '选择模板、输出格式和版本归档方式。', '确认配置并进入资料准备流程。'][step.value]);
+const nextStepButtonText = computed(() => {
+  if (step.value === 0) return '下一步：填写基础信息';
+  if (step.value === 2) return '下一步：解析资料';
+  return '下一步';
+});
 
 function setFieldRef(name, element) { if (element) fieldRefs[name] = element; }
 function goStep(index) {
   if (index > step.value) return;
   step.value = index;
+  if (index === 0) { syncStepFourQuery('ability'); return; }
+  if (index === 1) { syncStepFourQuery('basic'); return; }
+  if (index === 2) { syncStepFourQuery('materials'); return; }
   if (index === 3) { stepFourStage.value = 'parsing'; syncStepFourQuery('parse'); return; }
   if (index === 4) { stepFourStage.value = 'template'; syncStepFourQuery('confirm'); return; }
   syncStepFourQuery('');
 }
 function removeParticipant(person) { form.participants = form.participants.filter((item) => item !== person); }
-function toggleCapability(id) { selectedIds.value = selectedIds.value.includes(id) ? selectedIds.value.filter((item) => item !== id) : [...selectedIds.value, id]; }
+function selectCapability(id) { selectedIds.value = [id]; }
 function resetMaterialRows() {
   materialRows.value = createMaterialSelectionRows(form.taskType, selectedAbilityNames.value);
   materialNotice.value = '';
@@ -222,32 +230,46 @@ function syncStepFourQuery(stage) {
   else delete query.phase;
   router.replace({ query });
 }
-function backFromParsing() { step.value = 2; syncStepFourQuery(''); }
+function backFromParsing() { step.value = 2; syncStepFourQuery('materials'); }
 function continueToConfirmation() { step.value = 4; stepFourStage.value = 'template'; syncStepFourQuery('confirm'); }
 function backToParsing() { step.value = 3; stepFourStage.value = 'parsing'; syncStepFourQuery('parse'); }
-function handleTemplateSummaryDetail(section) { goStep(section === 'task' ? 0 : 1); }
+function handleTemplateSummaryDetail(section) { goStep(section === 'task' ? 1 : 0); }
 function exitTaskCreate() { router.push('/tasks'); }
 function submitTemplateTask() {
   saveDraft();
   store.setNotice('任务已提交，模板、输出规则和合规设置已写入任务记录。');
-  router.push('/supervision/import/upload');
+  router.push('/tasks');
+}
+function submitTaskAndReturn() {
+  saveDraft();
+  store.setNotice('任务已提交，可在任务中心继续查看执行进度。');
+  router.push('/tasks');
 }
 function goBack() {
   if (step.value === 4 && stepFourStage.value === 'template') { backToParsing(); return; }
+  if (step.value <= 0) return;
   step.value -= 1;
-  syncStepFourQuery('');
+  if (step.value === 0) syncStepFourQuery('ability');
+  else if (step.value === 1) syncStepFourQuery('basic');
+  else if (step.value === 2) syncStepFourQuery('materials');
+  else syncStepFourQuery('');
 }
-watch(() => form.taskType, () => { selectedIds.value = availableCapabilities.value.map((item) => item.id); });
+watch(() => form.taskType, () => { if (!selectedIds.value.length) selectedIds.value = [capabilities[0].id]; });
 watch(() => form.owner, () => { form.participants = form.participants.filter((person) => person !== form.owner); });
 watch([() => form.taskType, selectedAbilityNames], resetMaterialRows, { immediate: true });
 async function goNext() {
+  if (step.value === 0) { step.value = 1; syncStepFourQuery('basic'); return; }
+  if (step.value === 1) {
+    errors.value = validateTaskCreateForm(form);
+    const firstInvalid = ['taskName', 'auditedUnit', 'auditPeriod', 'taskType', 'owner'].find((key) => errors.value[key]);
+    if (firstInvalid) { await nextTick(); fieldRefs[firstInvalid]?.focus(); return; }
+    draftSaved.value = false;
+    step.value = 2;
+    syncStepFourQuery('materials');
+    return;
+  }
   if (step.value === 2) { if (!materialProgress.value.canProceed) { materialNotice.value = '请先补齐阻断资料后再进入下一步。'; return; } step.value = 3; stepFourStage.value = 'parsing'; syncStepFourQuery('parse'); return; }
-  if (step.value !== 0) { step.value += 1; return; }
-  errors.value = validateTaskCreateForm(form);
-  const firstInvalid = ['taskName', 'auditedUnit', 'auditPeriod', 'taskType', 'owner'].find((key) => errors.value[key]);
-  if (firstInvalid) { await nextTick(); fieldRefs[firstInvalid]?.focus(); return; }
-  draftSaved.value = false;
-  step.value = 1;
+  if (step.value < steps.length - 1) { step.value += 1; return; }
 }
 </script>
 

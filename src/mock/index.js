@@ -417,11 +417,6 @@ export const regulatoryFindings = [
   { findingId: 'REG-003', type: '检查建议候选', title: '抽查高风险产品销售录音录像', riskLevel: '中', source: '历史检查建议库', adoptStatus: '已纳入' }
 ];
 
-export const regulatoryHistory = [
-  { historyId: 'RH-001', taskName: '上海分公司适当性监管线索分析', period: '2026Q2', status: '已锁定', exportedAt: '2026-07-06 16:20', referenceCount: 2 },
-  { historyId: 'RH-002', taskName: '营业部投诉舆情风险分析', period: '2026Q1', status: '待确认', exportedAt: '-', referenceCount: 0 }
-];
-
 export const standardSources = [
   { sourceId: 'STD-S-001', sourceType: '内部规章制度', title: '费用报销管理办法', scope: '上海分公司', period: '2025-2026', version: 'V2.1', status: '可引用' },
   { sourceId: 'STD-S-002', sourceType: '外部法规', title: '证券公司内部控制指引', scope: '全公司', period: '现行有效', version: '2026版', status: '可引用' },
@@ -749,7 +744,6 @@ export const mockDb = {
   checkIssues,
   recheckRecords,
   regulatoryFindings,
-  regulatoryHistory,
   standardSources,
   standardDraft,
   standardVersions,

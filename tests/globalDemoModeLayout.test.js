@@ -27,10 +27,10 @@ function compileVue(url) {
   assert.deepEqual(template.errors, []);
 }
 
-test('global demo data switch is always rendered from the shared layout', () => {
+test('global demo data switch is hidden outside development or explicit demo mode', () => {
   const layout = read(layoutUrl);
-  assert.match(layout, /<div class="global-data-mode" aria-label=/);
-  assert.doesNotMatch(layout, /v-if="[^"]*global-data-mode/);
+  assert.match(layout, /<div v-if="showDemoControls" class="global-data-mode" aria-label=/);
+  assert.match(layout, /const showDemoControls = computed\(\(\) => import\.meta\.env\.DEV \|\| route\.query\.demo === '1'\)/);
   assert.match(layout, /store\.setDemoDataMode\(mode\)/);
   compileVue(layoutUrl);
 });
@@ -41,9 +41,9 @@ test('expense workbench switches empty and data entry states from the global dem
   assert.match(content, /const isEmptyMode = computed\(\(\) => store\.demoDataMode === 'empty'\)/);
   assert.match(content, /<template v-if="isEmptyMode">/);
   assert.match(content, /<template v-else>/);
-  assert.match(content, /to="\/expense\/audit\/overview"/);
-  assert.match(content, /to="\/expense\/anomaly\/dashboard"/);
-  assert.match(content, /to="\/expense\/usage\/dashboard"/);
+  assert.match(content, /to:\s*'\/expense\/audit\/overview'/);
+  assert.match(content, /to:\s*'\/expense\/anomaly\/dashboard'/);
+  assert.match(content, /to:\s*'\/expense\/usage\/dashboard'/);
   compileVue(expenseWorkbenchUrl);
 });
 

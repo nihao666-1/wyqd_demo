@@ -1,16 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 
 const naturalPages = [
+  '../src/views/supervision/SupervisionReportSourceSelect.vue'
+];
+
+const deletedImportPages = [
   '../src/views/supervision/SupervisionUpload.vue',
   '../src/views/supervision/SupervisionFolderPreview.vue',
   '../src/views/supervision/SupervisionFieldEdit.vue',
   '../src/views/supervision/SupervisionMetadata.vue',
-  '../src/views/supervision/SupervisionPrecheck.vue',
-  '../src/views/supervision/SupervisionReportSourceSelect.vue'
+  '../src/views/supervision/SupervisionPrecheck.vue'
 ];
 
 test('batch C opts the three supervision workspaces into the shared fill contract', () => {
@@ -35,6 +38,10 @@ test('batch C leaves short import forms content driven and forbids whole-page sc
     assert.doesNotMatch(source, /\bzoom\s*:/, path);
     assert.doesNotMatch(source, /transform:\s*scale\(/, path);
   }
+
+  for (const path of deletedImportPages) {
+    assert.equal(existsSync(new URL(path, import.meta.url)), false, `${path} should be removed after import consolidation`);
+  }
 });
 
 test('supervision result stretches at the two priority baselines and keeps detail scrolling internal', () => {
@@ -44,8 +51,8 @@ test('supervision result stretches at the two priority baselines and keeps detai
   assert.match(layout, /\.supervision-result-shell\s*\{[^}]*height:\s*var\(--shell-viewport-height\)[^}]*min-height:\s*var\(--shell-viewport-height\)/s);
   assert.match(layout, /\.supervision-result-shell \.main\s*\{[^}]*height:\s*var\(--shell-viewport-height\)[^}]*min-height:\s*0[^}]*overflow:\s*hidden/s);
   assert.match(result, /\.supervision-board\s*\{[^}]*min-height:\s*100%/s);
-  assert.match(result, /\.source-detail-panel\s*\{[^}]*height:\s*100%[^}]*min-height:\s*0/s);
-  assert.match(result, /\.detail-content\s*\{[^}]*overflow-y:\s*auto/s);
+  assert.match(result, /\.source-detail-panel\s*\{[^}]*height:\s*auto[^}]*min-height:\s*0/s);
+  assert.match(result, /\.source-detail-panel\.compact \.detail-content\s*\{[^}]*overflow-y:\s*auto/s);
   assert.doesNotMatch(`${layout}\n${result}`, /\bzoom\s*:/);
   assert.doesNotMatch(`${layout}\n${result}`, /transform:\s*scale\(/);
 });

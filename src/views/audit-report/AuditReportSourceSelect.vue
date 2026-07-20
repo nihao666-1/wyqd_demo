@@ -8,7 +8,7 @@
     primary-text="处理资料缺口"
     primary-to="/audit-report/gap-list"
     secondary-text="补充上传资料"
-    secondary-to="/audit-report/material/supplement-preview"
+    secondary-to="/materials/import?scene=audit-report&step=supplement-preview"
   />
   <FilterPanel :items="filters" @query="store.setNotice('已按对象、报告类型、部门和资料权限刷新来源。')" />
   <section class="section-grid">

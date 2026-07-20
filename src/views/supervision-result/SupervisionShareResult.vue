@@ -1749,8 +1749,8 @@ tr:focus-visible {
 
 .supervision-page {
   box-sizing: border-box;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 320px);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(292px, 300px);
+  gap: 8px;
   align-items: start;
   width: 100%;
   max-width: none;
@@ -1761,42 +1761,217 @@ tr:focus-visible {
 }
 
 .supervision-board {
-  grid-template-rows: 72px 92px 200px minmax(314px, 1.25fr) minmax(139px, .7fr);
-  gap: 6px;
+  grid-template-columns: minmax(0, 2.45fr) minmax(286px, .92fr);
+  grid-template-rows: 64px 78px 176px minmax(286px, 1.12fr) minmax(120px, .62fr);
+  gap: 5px;
   min-width: 0;
   min-height: 100%;
 }
 
 .source-detail-panel {
-  position: sticky;
-  top: 70px;
+  position: relative;
+  top: auto;
   display: grid;
-  grid-template-rows: 34px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-rows: 64px minmax(0, 1fr);
+  gap: 5px;
   min-width: 0;
-  height: 100%;
+  height: auto;
   min-height: 0;
+  align-self: start;
 }
 
 .new-analysis {
   position: static;
-  justify-self: end;
+  justify-self: center;
+  align-self: center;
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .source-detail-card {
   position: static;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
+  grid-template-rows: 43px auto 57px;
+  align-self: start;
+  overflow: visible;
 }
 
 .detail-content {
+  overflow: visible;
+}
+
+.filter-panel {
+  padding: 4px 12px 6px;
+}
+
+.filter-grid {
+  grid-template-columns: minmax(92px, .82fr) minmax(148px, 1.45fr) repeat(2, minmax(92px, .95fr)) minmax(118px, 1.18fr) minmax(92px, .95fr) auto;
+  gap: 10px;
+}
+
+.filter-field {
+  gap: 3px;
+}
+
+.filter-field select,
+.filter-field input,
+.filter-actions button {
+  height: 30px;
+}
+
+.metric-card {
+  gap: 12px;
+  padding: 0 14px;
+}
+
+.metric-icon {
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
+  border-radius: 9px;
+  font-size: 20px;
+}
+
+.metric-card strong {
+  font-size: 19px;
+  line-height: 22px;
+}
+
+.chart-grid {
+  grid-template-columns: minmax(218px, .95fr) minmax(232px, .95fr) minmax(340px, 1.28fr);
+  gap: 6px;
+}
+
+.chart-card {
+  padding: 8px 10px;
+}
+
+.legend {
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.bar-chart {
+  grid-template-columns: 26px repeat(6, 1fr);
+  height: 116px;
+  margin-top: 2px;
+}
+
+.bar-stack {
+  width: 18px;
+  height: 90px;
+}
+
+.chart-tooltip {
+  bottom: 18px;
+  width: 86px;
+  padding: 6px;
+  line-height: 13px;
+}
+
+.donut-layout {
+  grid-template-columns: 106px minmax(0, 1fr);
+  gap: 8px;
+  height: 124px;
+}
+
+.donut {
+  width: 102px;
+  height: 102px;
+}
+
+.donut::before {
+  width: 58px;
+  height: 58px;
+}
+
+.donut-layout ul {
+  gap: 5px;
+}
+
+.donut-layout li {
+  grid-template-columns: 11px minmax(0, 1fr) 36px 44px;
+}
+
+.keyword-row {
+  grid-template-columns: 82px minmax(190px, 1fr) 32px;
+  gap: 6px;
+}
+
+.source-detail-card header,
+.result-table-panel header,
+.report-framework h2,
+.exports-panel h2,
+.history-panel h2 {
+  height: 32px;
+}
+
+.detail-content {
+  padding: 0 12px;
+}
+
+.detail-content section {
+  padding: 9px 0;
+}
+
+.detail-content dl {
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.detail-content dl div {
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.detail-content p {
+  margin-top: 8px;
+  line-height: 18px;
+}
+
+.chapter-list {
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.detail-log {
+  margin-top: 7px;
+}
+
+.detail-log td {
+  height: 34px;
+  line-height: 12px;
+}
+
+.source-detail-card footer {
+  gap: 6px;
+  padding: 8px;
+}
+
+.source-detail-card footer button {
+  height: 30px;
+}
+
+.source-detail-panel.compact .source-detail-card {
+  grid-template-rows: 43px minmax(0, 1fr) 57px;
+  overflow: hidden;
+}
+
+.source-detail-panel.compact .detail-content {
   overflow-y: auto;
 }
 
 .result-table-panel {
   display: grid;
-  grid-template-rows: 34px 34px minmax(205px, 1fr) 38px;
+  grid-template-rows: 32px 30px minmax(184px, 1fr) 34px;
 }
 
 .dense-table-wrap {
@@ -1812,13 +1987,14 @@ tr:focus-visible {
 }
 
 .report-framework {
-  grid-template-rows: 34px repeat(5, minmax(46px, 1fr));
+  grid-template-rows: 32px repeat(5, minmax(42px, 1fr));
   min-height: 0;
 }
 
 .chapter-card {
   height: auto;
-  min-height: 46px;
+  min-height: 42px;
+  margin: 0 8px;
 }
 
 .chart-card {
@@ -1830,7 +2006,7 @@ tr:focus-visible {
 .bar-chart,
 .donut-layout {
   height: auto;
-  min-height: 142px;
+  min-height: 118px;
   flex: 1;
 }
 
@@ -1851,7 +2027,7 @@ tr:focus-visible {
 
 .export-card {
   height: 100%;
-  min-height: 102px;
+  min-height: 92px;
 }
 
 .dense-table-wrap,
@@ -1859,11 +2035,20 @@ tr:focus-visible {
   overflow-x: hidden;
 }
 
-@media (max-width: 1679px) {
+@media (max-width: 1499px) {
   .supervision-board {
     grid-template-rows: none;
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+  }
+
+  .source-detail-panel {
+    grid-template-rows: 64px auto;
+  }
+
+  .new-analysis {
+    justify-self: center;
+    align-self: center;
   }
 
   .filter-panel {

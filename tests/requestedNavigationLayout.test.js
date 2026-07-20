@@ -49,11 +49,12 @@ test('files config and records pages remove the redundant local title bands', ()
   compileVue(configUrl);
 });
 
-test('config center exposes one fill workspace and three independent table scrollers', () => {
+test('config center exposes configuration and parameter workspaces while records stay separate', () => {
   const config = read(configUrl);
   assert.match(config, /class="config-page route-fill-page"/);
-  assert.equal((config.match(/class="table-scroll"/g) || []).length, 3);
-  assert.equal((config.match(/<\/div>\s*<footer class="pager">/g) || []).length, 3);
+  assert.equal((config.match(/class="table-scroll"/g) || []).length, 2);
+  assert.equal((config.match(/<\/div>\s*<footer class="pager">/g) || []).length, 2);
+  assert.doesNotMatch(config, /currentMode === 'records'/);
   assert.match(config, /\.config-page\s*\{[^}]*(?:^|\n)\s*height:\s*0;[^}]*overflow:\s*hidden/ms);
   assert.match(config, /\.config-page\.mode-initial[\s\S]*grid-template-rows:\s*auto auto minmax\(0,\s*1fr\)/);
   assert.match(config, /\.config-page\.mode-params[\s\S]*grid-template-rows:\s*auto minmax\(0,\s*1fr\)/);
@@ -112,8 +113,8 @@ test('supervision result keeps its content grid without whole-page scaling', () 
   assert.doesNotMatch(result, /\bPAGE_WIDTH\b/);
   assert.doesNotMatch(result, /\bscaleNeeded\b/);
   assert.doesNotMatch(result, /transform:\s*scale\(/);
-  assert.match(result, /grid-template-rows:\s*72px 92px minmax\(224px, \.9fr\) minmax\(314px, 1\.25fr\) minmax\(139px, \.7fr\)/);
-  assert.match(result, /\.filter-panel\s*\{[^}]*display:\s*grid;[^}]*align-items:\s*center;[^}]*padding:\s*4px 14px 8px/s);
+  assert.match(result, /grid-template-rows:\s*64px 78px 176px minmax\(286px, 1\.12fr\) minmax\(120px, \.62fr\)/);
+  assert.match(result, /\.filter-panel\s*\{[^}]*padding:\s*4px 12px 6px/s);
 });
 
 test('task special audit and expense shells inherit the same viewport-scaled shell tokens', () => {

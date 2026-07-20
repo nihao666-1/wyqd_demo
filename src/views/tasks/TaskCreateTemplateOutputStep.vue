@@ -57,7 +57,7 @@ import { capabilityDefinitions, cloneTemplateOutputSettings, createPreSubmitSumm
 
 const props = defineProps({
   modelValue: { type: Object, required: true },
-  steps: { type: Array, default: () => ['基础信息', '选择能力', '资料选择', '模板与输出设置', '确认提交'] },
+  steps: { type: Array, default: () => ['选择能力', '填写基础信息', '资料选择', '模板与输出设置', '确认提交'] },
   currentStep: { type: Number, default: 4 },
   taskSummary: { type: Object, default: () => ({ ...referenceTaskSummary }) },
   selectedCapabilities: { type: Array, default: () => capabilityDefinitions.map((item) => ({ ...item })) },

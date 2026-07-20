@@ -1,25 +1,36 @@
 <template>
   <div class="workbench-page route-fill-page" :class="isEmptyMode ? 'is-empty' : 'has-data'">
-    <section class="workbench-top">
-      <div class="metric-grid workbench-metrics">
-        <RouterLink v-for="item in topMetrics" :key="item.label" class="metric-card workbench-metric" :to="item.to">
-          <div class="metric-icon" aria-hidden="true"><AuditIcon :name="item.icon" /></div>
-          <div>
-            <span>{{ item.label }}</span>
-            <strong>{{ item.value }}<small>{{ item.unit }}</small></strong>
-            <p>{{ item.change }}</p>
-          </div>
-          <b aria-hidden="true">›</b>
-        </RouterLink>
-      </div>
-      <div class="workbench-actions">
-        <RouterLink class="btn primary create-task-btn" to="/tasks/create">创建审计任务</RouterLink>
-      </div>
-    </section>
-
     <template v-if="isEmptyMode">
       <section class="empty-layout">
         <div class="empty-main">
+          <section class="workbench-top">
+            <div class="capability-grid workbench-metrics">
+              <RouterLink
+                v-for="item in capabilityMetrics"
+                :key="item.title"
+                class="metric-card workbench-metric capability-card"
+                :to="item.to"
+              >
+                <div class="capability-card-head">
+                  <div class="metric-icon" aria-hidden="true"><AuditIcon :name="item.icon" /></div>
+                  <div class="capability-title-block">
+                    <span class="capability-title">{{ item.title }}</span>
+                  </div>
+                  <span class="range-pill">{{ item.range }} <i>⌄</i></span>
+                </div>
+                <dl class="capability-status-grid">
+                  <div v-for="status in item.statuses" :key="status.key" :class="['capability-status', status.key]">
+                    <dt>{{ status.label }}</dt>
+                    <dd>{{ status.value }}</dd>
+                  </div>
+                </dl>
+                <div class="capability-card-foot">
+                  <strong>查看明细 <b aria-hidden="true">›</b></strong>
+                </div>
+              </RouterLink>
+            </div>
+          </section>
+
           <section class="panel welcome-panel">
             <div class="welcome-copy">
               <span class="eyebrow">首次使用</span>
@@ -31,7 +42,7 @@
               <div class="head-actions">
                 <RouterLink class="btn primary" to="/tasks/create">创建审计任务</RouterLink>
                 <button class="btn" type="button" @click="store.setDemoDataMode('data')">导入模拟数据</button>
-                <RouterLink class="btn" to="/demo-guide">查看演示流程</RouterLink>
+                <RouterLink v-if="showDemoControls" class="btn" to="/demo-guide">查看演示流程</RouterLink>
               </div>
             </div>
             <div class="welcome-preview" aria-hidden="true">
@@ -65,10 +76,10 @@
             </div>
           </section>
 
-          <section class="panel">
-            <div class="panel-title"><h3>任务流程预览</h3></div>
-            <div class="flow-strip">
-              <div v-for="(step, index) in lifecycleSteps" :key="step" class="flow-node">
+          <section class="panel compact-guide-panel">
+            <div class="panel-title"><h3>快速引导</h3></div>
+            <div class="flow-strip compact-flow">
+              <div v-for="(step, index) in lifecycleSteps.slice(0, 5)" :key="step" class="flow-node">
                 <span>{{ index + 1 }}</span>
                 <p>{{ step }}</p>
               </div>
@@ -77,16 +88,6 @@
         </div>
 
         <aside class="summary-rail empty-rail">
-          <section class="panel guide-panel">
-            <div class="panel-title"><h3>新手引导</h3></div>
-            <ol class="guide-list">
-              <li v-for="item in beginnerGuide" :key="item.title">
-                <strong>{{ item.title }}</strong>
-                <p>{{ item.description }}</p>
-              </li>
-            </ol>
-          </section>
-
           <section class="panel">
             <div class="panel-title"><h3>系统初始化状态</h3></div>
             <div class="status-stack">
@@ -97,19 +98,39 @@
             </div>
           </section>
 
-          <section class="panel empty-log-panel">
-            <div class="panel-title"><h3>最近操作空态</h3></div>
-            <div class="empty-log">
-              <span aria-hidden="true"><AuditIcon name="records" /></span>
-              <strong>暂无操作记录</strong>
-              <p>创建任务、上传资料或导入模拟数据后，将在此展示最近操作。</p>
-            </div>
-          </section>
         </aside>
       </section>
     </template>
 
     <template v-else>
+      <section class="workbench-top">
+        <div class="capability-grid workbench-metrics">
+          <RouterLink
+            v-for="item in capabilityMetrics"
+            :key="item.title"
+            class="metric-card workbench-metric capability-card"
+            :to="item.to"
+          >
+            <div class="capability-card-head">
+              <div class="metric-icon" aria-hidden="true"><AuditIcon :name="item.icon" /></div>
+              <div class="capability-title-block">
+                <span class="capability-title">{{ item.title }}</span>
+              </div>
+              <span class="range-pill">{{ item.range }} <i>⌄</i></span>
+            </div>
+            <dl class="capability-status-grid">
+              <div v-for="status in item.statuses" :key="status.key" :class="['capability-status', status.key]">
+                <dt>{{ status.label }}</dt>
+                <dd>{{ status.value }}</dd>
+              </div>
+            </dl>
+            <div class="capability-card-foot">
+              <strong>查看明细 <b aria-hidden="true">›</b></strong>
+            </div>
+          </RouterLink>
+        </div>
+      </section>
+
       <section class="dashboard-row primary-row">
         <section class="panel todo-panel">
           <div class="panel-title">
@@ -185,57 +206,9 @@
           </div>
         </section>
 
-        <aside class="panel quick-panel">
-          <div class="panel-title"><h3>快捷入口</h3></div>
-          <div class="quick-grid">
-            <RouterLink v-for="item in quickEntries" :key="item.title" :to="item.to" class="quick-entry">
-              <span aria-hidden="true"><AuditIcon :name="item.icon" /></span>
-              <strong>{{ item.title }}</strong>
-            </RouterLink>
-          </div>
-        </aside>
       </section>
 
       <section class="dashboard-row secondary-row">
-        <section class="panel progress-panel">
-          <div class="panel-title">
-            <h3>任务进度概览</h3>
-            <span class="chart-filter">近30日</span>
-          </div>
-          <div class="progress-combo" aria-label="任务状态数量和完成率概览">
-            <svg viewBox="0 0 320 240" role="img" aria-label="任务进度柱线组合图">
-              <g class="svg-legend">
-                <path d="M190 15h14" class="legend-bar-line" />
-                <text x="209" y="18">任务数量</text>
-                <path d="M254 15h14" class="legend-rate-line" />
-                <text x="273" y="18">完成率</text>
-              </g>
-              <g class="grid-lines">
-                <line x1="34" y1="42" x2="286" y2="42" />
-                <line x1="34" y1="112" x2="286" y2="112" />
-                <line x1="34" y1="182" x2="286" y2="182" />
-              </g>
-              <g class="axis-text">
-                <text x="18" y="45">60</text>
-                <text x="18" y="115">30</text>
-                <text x="22" y="185">0</text>
-                <text x="292" y="45">100%</text>
-                <text x="292" y="115">50%</text>
-                <text x="292" y="185">0%</text>
-              </g>
-              <g v-for="item in progressChartItems" :key="item.label">
-                <rect class="bar-bg" :x="item.x - 8" y="42" width="16" height="140" rx="4" />
-                <rect class="bar-value" :x="item.x - 8" :y="item.barY" width="16" :height="item.barHeight" rx="4" />
-                <circle class="line-dot" :cx="item.x" :cy="item.lineY" r="3.5" />
-                <text class="rate-text" :x="item.x + item.rateDx" :y="item.rateY">{{ item.rate }}%</text>
-                <text class="bar-label" :x="item.x" y="216">{{ item.label }}</text>
-                <text class="bar-value-text" :class="{ inside: item.valueInside }" :x="item.x" :y="item.valueY">{{ item.value }}</text>
-              </g>
-              <polyline class="rate-line" :points="progressLinePoints" />
-            </svg>
-          </div>
-        </section>
-
         <section class="panel risk-panel">
           <div class="panel-title">
             <h3>风险提醒</h3>
@@ -268,46 +241,6 @@
             </article>
           </div>
         </section>
-
-        <section class="panel notice-panel">
-          <div class="panel-title"><h3>系统通知</h3></div>
-          <div class="notice-list">
-            <article v-for="notice in notices" :key="notice.title" class="notice-item">
-              <span :class="notice.className" aria-hidden="true"></span>
-              <div>
-                <strong>{{ notice.title }}</strong>
-                <p>{{ notice.time }}</p>
-              </div>
-            </article>
-          </div>
-        </section>
-      </section>
-
-      <section class="panel operation-panel">
-        <div class="panel-title">
-          <h3>最近操作日志</h3>
-          <RouterLink class="btn" to="/records">记录中心</RouterLink>
-        </div>
-        <div class="compact-table">
-          <table>
-            <thead>
-              <tr>
-                <th>时间</th>
-                <th>操作内容</th>
-                <th>对象</th>
-                <th>操作人</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="log in operationRows" :key="log.logId">
-                <td>{{ log.createdAt }}</td>
-                <td>{{ log.action }}</td>
-                <td>{{ log.targetType }} {{ log.targetId }}</td>
-                <td>{{ log.operator }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </section>
     </template>
   </div>
@@ -315,34 +248,88 @@
 
 <script setup>
 import { computed, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const store = inject('store');
+const route = useRoute();
 
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
+const showDemoControls = computed(() => import.meta.env.DEV || route.query.demo === '1');
 
-const emptyMetrics = [
-  { icon: 'in-progress', label: '进行中任务', value: 0, unit: '个', change: '暂无进行中任务', to: '/tasks' },
-  { icon: 'anomaly', label: '待确认异常', value: 0, unit: '条', change: '暂无待确认异常', to: '/expense/anomaly/candidates' },
-  { icon: 'review', label: '待复核报告', value: 0, unit: '份', change: '暂无待复核报告', to: '/audit-report/draft' },
-  { icon: 'failed', label: '失败任务', value: 0, unit: '个', change: '暂无失败任务', to: '/tasks' }
+const legacyWorkbenchMetricLabels = ['进行中任务', '待确认异常', '待复核报告', '失败任务'];
+
+const capabilityDefinitions = [
+  {
+    icon: 'analysis',
+    title: '监管案例舆情分析',
+    description: '监管案例检索、舆情风险识别',
+    range: '近7天',
+    update: '最近更新 10:42',
+    to: '/regulatory/workbench',
+    data: { success: 36, failed: 3, pending: 8, running: 12 }
+  },
+  {
+    icon: 'expense',
+    title: '费用分析',
+    description: '费用结构、异常波动和明细穿透',
+    range: '本月',
+    update: '最近更新 10:38',
+    to: '/expense/workbench',
+    data: { success: 28, failed: 2, pending: 14, running: 7 }
+  },
+  {
+    icon: 'report-generate',
+    title: '报告生成',
+    description: '审计发现整理、报告初稿输出',
+    range: '近30天',
+    update: '最近更新 09:56',
+    to: '/audit-report/workbench',
+    data: { success: 19, failed: 1, pending: 5, running: 9 }
+  },
+  {
+    icon: 'files',
+    title: '监督共享信息分析',
+    description: '多源监督数据关联和线索筛查',
+    range: '自定义',
+    update: '最近更新 09:41',
+    to: '/supervision/workbench',
+    data: { success: 43, failed: 4, pending: 17, running: 6 }
+  },
+  {
+    icon: 'knowledge',
+    title: '审计规范生成',
+    description: '规范、清单和工作指引生成',
+    range: '本季度',
+    update: '最近更新 09:20',
+    to: '/audit-standard/workbench',
+    data: { success: 22, failed: 0, pending: 4, running: 3 }
+  }
 ];
 
-const dataMetrics = [
-  { icon: 'in-progress', label: '进行中任务', value: 18, unit: '个', change: '较昨日 +2', to: '/tasks' },
-  { icon: 'anomaly', label: '待确认异常', value: 36, unit: '条', change: '较昨日 +5', to: '/expense/anomaly/candidates' },
-  { icon: 'review', label: '待复核报告', value: 9, unit: '份', change: '较昨日 +1', to: '/audit-report/draft' },
-  { icon: 'failed', label: '失败任务', value: 3, unit: '个', change: '较昨日 -1', to: '/tasks' }
-];
+const buildCapabilityMetrics = (empty = false) =>
+  capabilityDefinitions.map((item) => {
+    const values = empty ? { success: 0, failed: 0, pending: 0, running: 0 } : item.data;
+    return {
+      ...item,
+      update: empty ? '暂无任务数据' : item.update,
+      statuses: [
+        { key: 'success', label: '成功', value: values.success },
+        { key: 'failed', label: '失败', value: values.failed },
+        { key: 'pending', label: '待确认', value: values.pending },
+        { key: 'running', label: '进行中', value: values.running }
+      ]
+    };
+  });
 
-const topMetrics = computed(() => (isEmptyMode.value ? emptyMetrics : dataMetrics));
+const capabilityMetrics = computed(() => buildCapabilityMetrics(false));
 
 const startCards = [
   {
     icon: 'create',
     title: '创建常规审计任务',
     description: '填写审计对象、期间和能力范围，生成首个任务。',
-    steps: ['基础信息', '选择能力', '提交任务'],
+    steps: ['选择能力', '填写基础信息', '提交任务'],
     to: '/tasks/create'
   },
   {
@@ -416,7 +403,7 @@ const todoItems = [
     meta: '风险事项台账.xlsx / 三字段待确认',
     status: '待预检',
     statusClass: 'warning',
-    primaryTo: '/supervision/import/precheck',
+    primaryTo: '/materials/import?scene=supervision&step=precheck',
     detailTo: '/files/detail'
   },
   {
@@ -425,7 +412,7 @@ const todoItems = [
     meta: '费用报销管理办法 V2.1 / 3 项差异',
     status: '待处理',
     statusClass: 'success',
-    primaryTo: '/audit-standard/diff',
+    primaryTo: '/audit-standard/library?panel=diff',
     detailTo: '/audit-standard/library'
   },
   {
@@ -441,7 +428,7 @@ const todoItems = [
 
 const recentAuditTasks = [
   { id: 'TASK-2026-001', name: '上海分公司二季度费用异常审计', unit: '上海分公司', period: '2026Q2', stage: '候选异常确认', progress: 72, status: '处理中', statusClass: 'warning', to: '/tasks/detail' },
-  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', period: '2026Q1', stage: '入库预检', progress: 48, status: '待预检', statusClass: 'warning', to: '/supervision/import/precheck' },
+  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', period: '2026Q1', stage: '入库预检', progress: 48, status: '待预检', statusClass: 'warning', to: '/materials/import?scene=supervision&step=precheck' },
   { id: 'TASK-2026-003', name: '营业部常规审计报告', unit: '审计部', period: '2026H1', stage: '报告复核', progress: 86, status: '待复核', statusClass: 'success', to: '/audit-report/draft' },
   { id: 'TASK-2026-004', name: '监管案例舆情分析', unit: '经纪业务部', period: '2026Q2', stage: '数据获取', progress: 35, status: '进行中', statusClass: 'warning', to: '/regulatory/workbench' }
 ];
@@ -491,8 +478,8 @@ const riskAlerts = [
 ];
 
 const generatedResults = [
-  { name: '制度差异清单', type: '制度比对', time: '10:20', viewTo: '/audit-standard/diff', downloadTo: '/audit-standard/library' },
-  { name: '费用异常汇总', type: '费用审计', time: '10:12', viewTo: '/expense/anomaly/dashboard', downloadTo: '/expense/usage/report' },
+  { name: '制度差异清单', type: '制度比对', time: '10:20', viewTo: '/audit-standard/library?panel=diff', downloadTo: '/audit-standard/library' },
+  { name: '费用异常汇总', type: '费用审计', time: '10:12', viewTo: '/expense/anomaly/dashboard', downloadTo: '/expense/usage/dashboard?panel=report' },
   { name: '审计报告草稿', type: '报告生成', time: '09:48', viewTo: '/audit-report/draft', downloadTo: '/audit-report/draft' }
 ];
 
@@ -516,15 +503,14 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .workbench-page.is-empty {
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .workbench-page.has-data {
   grid-template-rows:
     auto
-    minmax(clamp(260px, 26vh, 320px), 0.28fr)
-    minmax(clamp(300px, 25vh, 320px), 0.12fr)
-    minmax(clamp(260px, 22vh, 286px), 1fr);
+    minmax(clamp(260px, 32vh, 360px), 0.7fr)
+    minmax(clamp(260px, 30vh, 340px), 0.6fr);
 }
 
 .workbench-page :deep(.panel),
@@ -559,42 +545,163 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .workbench-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: stretch;
+  min-width: 0;
 }
 
 .workbench-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin-bottom: 0;
 }
 
 .workbench-metric {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 14px;
-  gap: 10px;
-  align-items: center;
-  min-height: clamp(82px, 10.5vh, 102px);
-  padding: clamp(10px, 1.25vh, 14px) clamp(12px, 1vw, 16px);
-  color: var(--color-text);
-}
-
-.workbench-metric b {
-  color: var(--color-muted);
-  font-size: 18px;
-  font-weight: 400;
-}
-
-.workbench-metric strong {
   display: flex;
-  gap: 4px;
-  align-items: baseline;
+  min-width: 0;
+  min-height: 158px;
+  padding: 14px 16px 10px;
+  color: var(--color-text);
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-.workbench-metric small {
-  font-size: 12px;
+.workbench-metric > div {
+  min-width: 0;
+}
+
+.capability-card-head {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.capability-title-block {
+  display: grid;
+  gap: 3px;
+}
+
+.capability-title {
+  display: -webkit-box;
+  min-height: 22px;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.capability-title-block p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
   color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.range-pill {
+  display: inline-flex;
+  min-width: 74px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #d9e0ea;
+  border-radius: 6px;
+  background: #fbfcff;
+  color: #5a6678;
+  font-size: 13px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.range-pill i {
+  color: #7b8493;
+  font-style: normal;
+}
+
+.capability-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+}
+
+.capability-status {
+  min-width: 0;
+  padding: 0 10px;
+  border-right: 1px solid #dde3ec;
+  text-align: center;
+}
+
+.capability-status:last-child {
+  border-right: 0;
+}
+
+.capability-status dt {
+  min-height: 18px;
+  overflow: visible;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.capability-status dd {
+  margin: 8px 0 0;
+  color: #34465d;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.capability-status.success dd {
+  color: #2f6c5d;
+}
+
+.capability-status.failed dd {
+  color: #9a2a3a;
+}
+
+.capability-status.pending dd {
+  color: #8a6124;
+}
+
+.capability-status.running dd {
+  color: #3d5f8c;
+}
+
+.capability-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid #e9edf3;
+  color: var(--color-muted);
+  line-height: 1;
+}
+
+.capability-card-foot strong {
+  display: inline-flex;
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 13px;
   font-weight: 700;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.capability-card-foot b {
+  color: inherit;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .metric-icon,
@@ -610,9 +717,9 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .metric-icon {
-  width: 34px;
-  height: 34px;
-  font-size: 19px;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
 }
 
 .start-icon,
@@ -631,12 +738,14 @@ const operationRows = computed(() => store.db.operationLogs);
 .workbench-actions {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
 }
 
 .create-task-btn {
-  align-self: start;
-  min-height: 44px;
+  align-self: center;
+  min-height: 38px;
   white-space: nowrap;
 }
 
@@ -909,7 +1018,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
   .is-empty .empty-rail {
     min-height: 0;
-    grid-template-rows: minmax(252px, 1.02fr) minmax(158px, 0.68fr) minmax(148px, 0.6fr);
+    grid-template-rows: minmax(158px, 0.68fr);
   }
 
   .is-empty .empty-main > .panel,
@@ -963,13 +1072,13 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .primary-row {
-  grid-template-columns: minmax(330px, 0.9fr) minmax(500px, 1.45fr) minmax(220px, 0.72fr);
-  min-height: clamp(260px, 26vh, 320px);
+  grid-template-columns: minmax(330px, 0.9fr) minmax(500px, 1.45fr);
+  min-height: clamp(260px, 32vh, 360px);
 }
 
 .secondary-row {
-  grid-template-columns: minmax(260px, 0.95fr) minmax(270px, 1fr) minmax(260px, 1fr) minmax(220px, 0.85fr);
-  min-height: clamp(300px, 25vh, 320px);
+  grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
+  min-height: clamp(260px, 30vh, 340px);
 }
 
 .primary-row > .panel,
@@ -1429,9 +1538,19 @@ const operationRows = computed(() => store.db.operationLogs);
   line-height: 1.35;
 }
 
+@media (max-width: 1500px) {
+  .workbench-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1200px) {
   .workbench-top {
     grid-template-columns: 1fr;
+  }
+
+  .workbench-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workbench-actions {
@@ -1475,6 +1594,10 @@ const operationRows = computed(() => store.db.operationLogs);
   .start-card-grid,
   .todo-item,
   .result-item {
+    grid-template-columns: 1fr;
+  }
+
+  .workbench-metrics {
     grid-template-columns: 1fr;
   }
 

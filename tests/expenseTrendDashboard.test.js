@@ -125,7 +125,7 @@ test('费用趋势页核心按钮会产生反馈、跳转或导出', () => {
   assert.match(content, /function resetFilters\(\)/);
   assert.match(content, /function drilldown\(row\)/);
   assert.match(content, /function exportExcel\(\)/);
-  assert.match(content, /router\.push\('\/expense\/usage\/report'\)/);
+  assert.match(content, /router\.push\(\{ path: '\/expense\/usage\/dashboard', query: \{ panel: 'report' \} \}\)/);
   assert.match(content, /store\.setNotice\('趋势分析结论已加入本次审计重点清单。'\)/);
   assert.match(content, /anchor\.click\(\)/);
   compileVue(dashboardUrl);

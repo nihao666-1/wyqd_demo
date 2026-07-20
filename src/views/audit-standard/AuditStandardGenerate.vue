@@ -1,8 +1,12 @@
 <template>
   <PageHeader :eyebrow="mode" :title="`${mode} 审计规范配置`" description="选择公司、部门、时间范围和来源类型，完成生成前预检后进入三栏草稿。">
     <RouterLink class="btn" to="/audit-standard/workbench">返回工作台</RouterLink>
-    <RouterLink class="btn primary" to="/audit-standard/precheck">生成前预检</RouterLink>
+    <button class="btn primary" type="button" @click="store.setNotice('生成前预检确认区已展开。')">生成前预检</button>
   </PageHeader>
+  <section v-if="route.query.step === 'precheck'" class="panel merge-hint">
+    <strong>生成前预检已并入配置页</strong>
+    <p>请在生成条件下方确认来源完整性、权限范围和引用约束，确认后进入审计规范草稿。</p>
+  </section>
   <section class="panel">
     <div class="panel-title"><h3>生成条件</h3></div>
     <div class="filter-grid">

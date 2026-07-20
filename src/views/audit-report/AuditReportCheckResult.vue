@@ -4,7 +4,7 @@
       <h2 id="report-review-title">报告审核</h2>
       <div class="review-actions" aria-label="报告审核操作">
         <RouterLink class="review-btn" to="/tasks/detail?taskId=TASK-20250428001&tab=reports">返回任务</RouterLink>
-        <RouterLink class="review-btn" to="/audit-report/check-upload">上传新版本</RouterLink>
+        <RouterLink class="review-btn" to="/audit-report/workbench?mode=review">上传新版本</RouterLink>
         <button class="review-btn" type="button" @click="recheck"><FontAwesomeIcon :icon="faArrowsRotate" />重新检查</button>
         <button class="review-btn primary" type="button" @click="writeReviewRecord">生成复核记录</button>
         <button class="review-btn" type="button" @click="exportIssues"><FontAwesomeIcon :icon="faDownload" />导出问题清单</button>

@@ -1,6 +1,10 @@
 <template>
   <div class="expense-trend-page route-fill-page">
     <main class="trend-main">
+      <section v-if="route.query.panel" class="trend-merge-hint" aria-label="兼容路由提示">
+        <strong>{{ route.query.panel === 'report' ? '报告预览与导出已并入趋势看板' : '费用明细下钻已并入趋势看板' }}</strong>
+        <p>{{ route.query.panel === 'report' ? '可在明细表中选择费用项加入报告，并在当前页完成预览与导出。' : '可在明细表中查看部门、类别、员工和供应商维度的穿透明细。' }}</p>
+      </section>
       <section class="trend-filter" aria-label="费用趋势分析筛选">
         <form class="trend-filter-row" @submit.prevent="queryTrend" @reset.prevent="resetFilters">
           <label v-for="field in filterFields" :key="field.key">
@@ -95,7 +99,7 @@
       <section><h3>预测结果（未来 3 个月）</h3><table><thead><tr><th scope="col">期间</th><th scope="col">预测金额（元）</th><th scope="col">环比趋势</th><th scope="col">预算使用率预测</th></tr></thead><tbody><tr v-for="row in trend.forecast" :key="row.period"><td>{{ row.period }}</td><td>{{ row.expected }}</td><td class="up">↑</td><td>{{ row.usage }}</td></tr></tbody></table></section>
       <section><h3>建议关注点</h3><ul><li v-for="item in trend.insights.recommendations" :key="item">{{ item }}</li></ul></section>
       <footer class="insight-actions">
-        <button class="primary action-half" type="button" @click="router.push('/expense/usage/report')">生成趋势报告</button>
+        <button class="primary action-half" type="button" @click="router.push({ path: '/expense/usage/dashboard', query: { panel: 'report' } })">生成趋势报告</button>
         <button class="outline action-half" type="button" @click="store.setNotice('趋势分析结论已加入本次审计重点清单。')">加入审计重点</button>
         <button class="export action-full" type="button" @click="exportExcel"><span aria-hidden="true">↓</span> 导出 Excel</button>
       </footer>
@@ -105,9 +109,10 @@
 
 <script setup>
 import { computed, inject, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const store = inject('store');
+const route = useRoute();
 const router = useRouter();
 const trend = computed(() => store.db.expenseTrendAnalysis);
 const filters = reactive({ organization: '上海分公司', period: '本年累计（2025-01 ~ 2025-04）', category: '全部', department: '全部', budgetScope: '年度预算', source: '全部' });
@@ -129,7 +134,7 @@ function signedClass(value) { return String(value).trim().startsWith('-') ? 'dow
 function judgementClass(value) { return value === '下降' ? 'down' : value === '平稳' ? 'stable' : 'up'; }
 function queryTrend() { store.setNotice(`已按 ${filters.organization} / ${filters.period} 刷新趋势分析。`); }
 function resetFilters() { Object.assign(filters, { organization: '上海分公司', period: '本年累计（2025-01 ~ 2025-04）', category: '全部', department: '全部', budgetScope: '年度预算', source: '全部' }); store.setNotice('费用趋势筛选条件已重置。'); }
-function drilldown(row) { router.push(`/expense/usage/drilldown?dimension=${encodeURIComponent(row.category)}&name=${encodeURIComponent(row.department)}`); }
+function drilldown(row) { router.push({ path: '/expense/usage/dashboard', query: { panel: 'drilldown', dimension: row.category, name: row.department } }); }
 function exportExcel() {
   const lines = [['期间', '费用类别', '部门', '金额', '环比', '同比', '预算偏差', '预算偏差率', '趋势判断'].join(','), ...trend.value.detailRows.map((row) => [row.period, row.category, row.department, row.amount, row.mom, row.yoy, row.budgetDiff, row.budgetRate, row.judgement].join(','))];
   const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8' });
@@ -145,7 +150,7 @@ function exportExcel() {
 
 <style scoped>
 .expense-trend-page{display:grid;grid-template-columns:minmax(0,1fr) 345px;gap:8px;align-items:start;min-height:calc(100vh - 58px);padding-top:4px;color:#222831}
-.trend-main{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:8px}.trend-filter,.metric-card,.chart-row,.summary-panel,.trend-detail,.insight-rail{border:1px solid #e2e6ec;background:#fff}
+.trend-main{display:grid;grid-template-columns:minmax(0,1fr);min-width:0;gap:8px}.trend-merge-hint,.trend-filter,.metric-card,.chart-row,.summary-panel,.trend-detail,.insight-rail{border:1px solid #e2e6ec;background:#fff}.trend-merge-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;padding:8px 12px}.trend-merge-hint strong{color:var(--color-primary)}.trend-merge-hint p{margin:0;color:#667085}
 .trend-filter{min-height:54px;padding:8px 10px 7px}
 .trend-filter-row{display:grid;grid-template-columns:132px minmax(174px,1.35fr) repeat(4,minmax(110px,1fr)) auto;gap:12px 16px;align-items:end}
 .trend-filter-row label{display:grid;gap:4px;min-width:0;color:#333c4d;font-size:12px;font-weight:700}.trend-filter-row select{width:100%;height:29px;border:1px solid #cfd6df;border-radius:4px;padding:0 26px 0 9px;background:#fff;color:#202936;font-size:12px}.filter-actions{display:flex;gap:9px;white-space:nowrap}

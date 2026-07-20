@@ -1,13 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 
 const reportTablePages = [
   '../src/views/audit-report/AuditReportGapList.vue',
+  '../src/views/audit-report/AuditReportTemplate.vue'
+];
+
+const deletedReportStepPages = [
   '../src/views/audit-report/AuditReportDiff.vue',
-  '../src/views/audit-report/AuditReportTemplate.vue',
   '../src/views/audit-report/AuditReportTemplateDiff.vue'
 ];
 
@@ -29,16 +32,23 @@ test('report table pages stretch their data region instead of a blank card', () 
     assert.match(source, /:deep\(\.table-wrap\)\s*\{[^}]*display:\s*flex[^}]*flex:\s*1/s, path);
     assert.match(source, /:deep\(\.table-wrap > table\)\s*\{[^}]*height:\s*100%/s, path);
   }
+
+  for (const path of deletedReportStepPages) {
+    assert.equal(existsSync(new URL(path, import.meta.url)), false, `${path} should be removed after report route consolidation`);
+  }
 });
 
-test('report workbench empty state and review workspace use remaining height', () => {
+test('report workbench keeps generate and review modes without legacy empty template rail', () => {
   const workbench = read('../src/views/audit-report/AuditReportWorkbench.vue');
   const review = read('../src/views/audit-report/AuditReportCheckResult.vue');
 
   assert.match(workbench, /report-ai-page route-fill-page/);
   assert.match(workbench, /\.report-ai-page\s*\{[^}]*display:\s*flex[^}]*height:\s*0[^}]*min-height:\s*0/s);
-  assert.match(workbench, /\.mode-empty \.empty-main\s*\{[^}]*grid-template-rows:[^;}]*minmax\(0,\s*1fr\)[^}]*\}/s);
-  assert.match(workbench, /\.mode-empty \.report-list\s*\{[^}]*display:\s*grid[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\)/s);
+  assert.match(workbench, /activeMode === 'generate'/);
+  assert.match(workbench, /activeMode === 'review'|<template v-else>/);
+  assert.match(workbench, /to="\/audit-report\/template"/);
+  assert.match(workbench, /to="\/materials\/import\?scene=audit-report"/);
+  assert.doesNotMatch(workbench, /activeMode === 'empty'|template-rail|reportTypes|formatTemplates|mode-empty/);
 
   assert.match(review, /report-review-page route-fill-page/);
   assert.match(review, /\.report-review-page\s*\{[^}]*display:\s*flex[^}]*height:\s*0[^}]*min-height:\s*0[^}]*overflow:\s*auto/s);

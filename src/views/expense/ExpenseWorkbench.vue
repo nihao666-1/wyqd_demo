@@ -36,6 +36,16 @@
         </section>
 
         <section class="expense-entry-grid" aria-label="新建费用审计分析入口">
+          <article v-if="route.query.action === 'create-usage'" class="expense-entry-card merged-entry">
+            <header>
+              <span class="entry-icon red"><FontAwesomeIcon :icon="faChartColumn" /></span>
+              <div>
+                <h2>新建费用综合分析</h2>
+                <p>该能力已并入费用审计入口，可在当前页完成数据快照选择、预算分析和汇总统计。</p>
+              </div>
+            </header>
+            <button class="entry-action" type="button" @click="store.setNotice('已打开新建费用综合分析弹窗。')">打开新建任务</button>
+          </article>
           <article v-for="entry in entries" :key="entry.title" class="expense-entry-card">
             <header>
               <span class="entry-icon" :class="entry.tone"><FontAwesomeIcon :icon="entry.icon" /></span>
@@ -102,7 +112,7 @@
             <span class="source-badge" :class="{ optional: source.optional }">{{ source.badge }}</span>
           </div>
         </article>
-        <RouterLink class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
+        <RouterLink v-if="showDemoControls" class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
       </aside>
     </div>
   </div>
@@ -141,6 +151,16 @@
           </section>
 
           <section class="expense-entry-grid" aria-label="费用审计分析入口">
+            <article v-if="route.query.action === 'create-usage'" class="expense-entry-card merged-entry">
+              <header>
+                <span class="entry-icon red"><FontAwesomeIcon :icon="faChartColumn" /></span>
+                <div>
+                  <h2>新建费用综合分析</h2>
+                  <p>该能力已并入费用审计入口，可在当前页打开新建任务弹窗。</p>
+                </div>
+              </header>
+              <button class="entry-action" type="button" @click="store.setNotice('已打开新建费用综合分析弹窗。')">打开新建任务</button>
+            </article>
             <article v-for="entry in dataEntries" :key="entry.title" class="expense-entry-card">
               <header>
                 <span class="entry-icon" :class="entry.tone"><FontAwesomeIcon :icon="entry.icon" /></span>
@@ -202,7 +222,7 @@
               <span class="source-badge" :class="{ optional: source.optional }">{{ source.badge }}</span>
             </div>
           </article>
-          <RouterLink class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
+          <RouterLink v-if="showDemoControls" class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
         </aside>
       </div>
     </div>
@@ -211,6 +231,7 @@
 
 <script setup>
 import { computed, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faBookOpen,
@@ -227,7 +248,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const store = inject('store');
+const route = useRoute();
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
+const showDemoControls = computed(() => import.meta.env.DEV || route.query.demo === '1');
 
 const metrics = [
   { label: '费用数据快照', unit: '个', tone: 'red', icon: faDatabase },
@@ -242,7 +265,7 @@ const entries = [
     title: '费用综合分析',
     description: '对费用数据进行结构分析与统计汇总。',
     action: '新建综合分析',
-    to: '/expense/usage/new',
+    to: '/expense/workbench?action=create-usage',
     tone: 'red',
     icon: faChartColumn,
     steps: ['选择数据快照', '预算执行分析', '汇总统计']
@@ -320,7 +343,7 @@ const dataTasks = [
   { id: 'EXP-20260715001', type: '费用审计总览', unit: '上海分公司', period: '2025Q1', source: '费控 / 预算 / 凭证', status: '已生成', tone: 'success', output: '综合看板 / 明细清单', action: '查看总览', to: '/expense/audit/overview' },
   { id: 'EXP-20260715002', type: '费用异常监控', unit: '上海分公司', period: '2025Q1', source: '费控 / 审批链路', status: '待确认', tone: 'warning', output: '36 条待确认异常', action: '处理异常', to: '/expense/anomaly/dashboard' },
   { id: 'EXP-20260715003', type: '费用趋势分析', unit: '上海分公司', period: '2025Q1', source: '费控 / 预算', status: '已加入重点', tone: 'info', output: '12 条趋势预警', action: '查看趋势', to: '/expense/usage/dashboard' },
-  { id: 'EXP-20260715004', type: '预算偏差复核', unit: '计划财务部', period: '2025Q1', source: '预算 / 财务凭证', status: '进行中', tone: 'processing', output: '预算偏差摘要', action: '继续分析', to: '/expense/usage/drilldown' }
+  { id: 'EXP-20260715004', type: '预算偏差复核', unit: '计划财务部', period: '2025Q1', source: '预算 / 财务凭证', status: '进行中', tone: 'processing', output: '预算偏差摘要', action: '继续分析', to: '/expense/usage/dashboard?panel=drilldown' }
 ];
 
 const dataSources = [

@@ -501,16 +501,6 @@ export const store = reactive({
     this.addLog('加入监督共享报告来源', '来源资料', row.sourceId);
     this.setNotice(`${row.fileName} 已加入报告来源，来源状态已更新。`);
   },
-  handleRegulatoryHistoryAction(row, action) {
-    if (action === 'view') {
-      this.openDrawer('regulatory-history-detail', row);
-      this.addLog('查看监管分析历史详情', '监管分析历史', row.taskId || row.historyId || row.taskName);
-      return;
-    }
-    const blocked = row.referenceCount > 0;
-    this.addLog('监管分析历史逻辑删除校验', '监管分析历史', row.taskId || row.historyId || row.taskName, blocked ? '被阻断' : '成功', blocked ? '历史结果已被报告或任务引用' : '');
-    this.setNotice(blocked ? '该分析结果已被引用，逻辑删除被阻断。' : '逻辑删除校验通过，操作已记录。');
-  },
   handleAssetAction(assetId, action) {
     const asset = this.db.fileAssets.find((item) => item.assetId === assetId) || this.db.fileAssetsExtended.find((item) => item.assetId === assetId);
     const guard = guardAssetAction(asset, action);

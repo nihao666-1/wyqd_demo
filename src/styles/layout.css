@@ -236,19 +236,24 @@
   border-top: 1px solid var(--color-line);
 }
 
-.sidebar a {
+.sidebar a,
+.bottom-nav button {
   min-height: var(--ui-control-md);
   padding: var(--ui-space-3) var(--ui-space-4);
+  border: 0;
   border-radius: 0;
+  background: transparent;
   color: #303848;
   display: flex;
   align-items: center;
   gap: var(--ui-space-4);
   font-weight: 700;
   font-size: var(--ui-font-sm);
+  cursor: pointer;
 }
 
-.sidebar a:hover {
+.sidebar a:hover,
+.bottom-nav button:hover {
   background: #fff7f7;
   color: var(--color-primary);
 }
@@ -1704,6 +1709,93 @@
   .expense-trend-shell .brand,
   .task-archived-shell .brand {
     padding: 0 14px;
+  }
+}
+
+.app-shell.sidebar-collapsed {
+  --shell-sidebar-width: 72px;
+}
+
+.sidebar-collapsed .brand {
+  justify-items: center;
+  padding: 0;
+}
+
+.sidebar-collapsed .brand strong {
+  overflow: hidden;
+  width: 28px;
+  color: transparent;
+  font-size: 0;
+  white-space: nowrap;
+}
+
+.sidebar-collapsed .brand strong::after {
+  content: "审";
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.sidebar-collapsed .sidebar a,
+.sidebar-collapsed .bottom-nav button {
+  justify-content: center;
+  gap: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.sidebar-collapsed .nav-label,
+.sidebar-collapsed .nav-caret,
+.sidebar-collapsed .nav-children {
+  overflow: hidden;
+  color: transparent;
+  font-size: 0;
+}
+
+@media (min-width: 1367px) {
+  .app-shell.regulatory-result-shell {
+    --shell-sidebar-width: 268px;
+    --shell-page-gutter: 10px;
+    --ui-topbar-height: 56px;
+  }
+
+  .app-shell.regulatory-result-shell .sidebar {
+    width: var(--shell-sidebar-width);
+    flex: 0 0 var(--shell-sidebar-width);
+  }
+
+  .app-shell.regulatory-result-shell .main {
+    padding: 0 var(--shell-page-gutter) 12px;
+    overflow: hidden;
+  }
+
+  .app-shell.regulatory-result-shell .topbar {
+    height: var(--ui-topbar-height);
+    min-height: var(--ui-topbar-height);
+    margin: 0 calc(0px - var(--shell-page-gutter)) 8px;
+    padding: 0 16px;
+  }
+
+  .app-shell.regulatory-result-shell .brand {
+    min-height: var(--ui-topbar-height);
+    padding: 0 14px;
+  }
+
+  .app-shell.regulatory-result-shell .brand strong {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  .app-shell.regulatory-result-shell .sidebar a {
+    min-height: 39px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  .app-shell.regulatory-result-shell .nav-children .nav-child {
+    min-height: 31px;
+    padding: 5px 12px 5px 44px;
+    font-size: 12px;
   }
 }
 

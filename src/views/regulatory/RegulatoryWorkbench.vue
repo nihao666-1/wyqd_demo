@@ -1,5 +1,9 @@
 <template>
   <div class="special-audit-page route-fill-page">
+    <section v-if="route.query.action === 'create'" class="special-merge-hint">
+      <strong>新建分析已并入专项审计工作台</strong>
+      <p>可在当前页面选择监管案例舆情或监督共享信息，打开新建分析弹窗并继续执行。</p>
+    </section>
     <section v-if="isEmptyMode" class="special-empty-page" aria-label="专项审计分析空白页">
       <div class="special-empty-grid">
         <main class="special-empty-main">
@@ -206,7 +210,7 @@
           <h2>所需资料与输出说明</h2>
           <article v-for="item in materials" :key="item.title">
             <span class="material-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
-            <div><h3>{{ item.title }}</h3><p>{{ item.desc }}</p><RouterLink :to="item.to">查看详情</RouterLink></div>
+            <div><h3>{{ item.title }}</h3><p>{{ item.desc }}</p><RouterLink v-if="item.to" :to="item.to">查看详情</RouterLink></div>
           </article>
         </section>
         <section class="pending-panel">
@@ -226,7 +230,7 @@
 
 <script setup>
 import { computed, inject } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faBriefcase,
@@ -246,6 +250,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const store = inject('store');
+const route = useRoute();
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
 
 const emptyMetrics = [
@@ -334,19 +339,19 @@ const topics = [
 ];
 const departments = [{ name: '合规法务部', value: 18 }, { name: '风险管理部', value: 12 }, { name: '审计部', value: 8 }, { name: '运营管理部', value: 6 }, { name: '财务部', value: 4 }];
 const recentTasks = [
-  { id: 'TASK-20250428001', type: '监管案例舆情分析', unit: '上海分公司', period: '2025Q1', status: '已完成', tone: 'success', output: '案例 18 条 / 舆情 9 条 / 建议 6 条', updated: '2025-04-28 10:21', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/history' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
+  { id: 'TASK-20250428001', type: '监管案例舆情分析', unit: '上海分公司', period: '2025Q1', status: '已完成', tone: 'success', output: '案例 18 条 / 舆情 9 条 / 建议 6 条', updated: '2025-04-28 10:21', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/result?tab=history' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
   { id: 'TASK-20250427002', type: '监管共享信息分析', unit: '上海分公司', period: '2025Q1', status: '已完成', tone: 'success', output: '共享文件 86 份 / 标签 312 条 / 报告 2 份', updated: '2025-04-27 16:48', actions: [{ text: '查看结果', to: '/tasks/detail/supervision-share' }, { text: '查看依据', to: '/supervision/workbench' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
-  { id: 'TASK-20250426003', type: '监管案例舆情分析', unit: '上海分公司', period: '2024Q4', status: '已完成', tone: 'success', output: '案例 15 条 / 舆情 6 条 / 建议 4 条', updated: '2025-04-26 14:32', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/history' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
+  { id: 'TASK-20250426003', type: '监管案例舆情分析', unit: '上海分公司', period: '2024Q4', status: '已完成', tone: 'success', output: '案例 15 条 / 舆情 6 条 / 建议 4 条', updated: '2025-04-26 14:32', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/result?tab=history' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
   { id: 'TASK-20250425004', type: '监管共享信息分析', unit: '上海分公司', period: '2025Q1', status: '处理中', tone: 'processing', output: '共享文件 128 份 / 标签提取中', updated: '2025-04-28 11:05', actions: [{ text: '查看进度', to: '/tasks/detail' }, { text: '查看依据', to: '/supervision/workbench' }, { text: '取消任务', to: '/tasks' }] },
-  { id: 'TASK-20250424005', type: '监管案例舆情分析', unit: '上海分公司', period: '2025Q1', status: '待确认', tone: 'warning', output: '关注点 12 条 / 风险 7 条', updated: '2025-04-25 09:41', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/history' }, { text: '确认关注点', to: '/regulatory/result' }] },
+  { id: 'TASK-20250424005', type: '监管案例舆情分析', unit: '上海分公司', period: '2025Q1', status: '待确认', tone: 'warning', output: '关注点 12 条 / 风险 7 条', updated: '2025-04-25 09:41', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/result?tab=history' }, { text: '确认关注点', to: '/regulatory/result' }] },
   { id: 'TASK-20250423006', type: '监管共享信息分析', unit: '上海分公司', period: '2024Q4', status: '失败', tone: 'danger', output: '解析失败：文件格式不支持', updated: '2025-04-23 15:12', actions: [{ text: '查看日志', to: '/records' }, { text: '重新分析', to: '/supervision/report/source-select' }, { text: '删除', to: '/tasks' }] }
 ];
 const materials = [
-  { title: '监管案例库', desc: '收集最新监管处罚、现场检查、通报等案例信息。', tone: 'red', icon: faDatabase, to: '/regulatory/history' },
-  { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments, to: '/regulatory/history' },
+  { title: '监管案例库', desc: '收集最新监管处罚、现场检查、通报等案例信息。', tone: 'red', icon: faDatabase, to: '/regulatory/result?tab=history' },
+  { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments, to: '/regulatory/result?tab=history' },
   { title: '合规/风险/审计共享文件', desc: '来自合规、风险、审计条线的共享文档与数据。', tone: 'green', icon: faFolder, to: '/supervision/workbench' },
   { title: '数据标签', desc: '基于业务、风险、监管主题的标准标签体系。', tone: 'blue', icon: faTag, to: '/audit-standard/policy' },
-  { title: '使用提示', desc: '分析结果可引用到审计报告，所有过程留痕，支持追溯。', tone: 'orange', icon: faLightbulb, to: '/demo-guide' }
+  { title: '使用提示', desc: '分析结果可引用到审计报告，所有过程留痕，支持追溯。', tone: 'orange', icon: faLightbulb }
 ];
 const pendingItems = [
   { label: '待确认关注点', value: '8 条', tone: 'red', icon: faComments },
@@ -356,7 +361,7 @@ const pendingItems = [
 </script>
 
 <style scoped>
-.special-audit-page { --line:#dde3ec; --soft:#e9edf3; --red:var(--color-primary); --blue:var(--color-info); box-sizing:border-box; width:100%; max-width:none; height:0; min-height:0; margin:0; padding:var(--ui-space-3); color:#111827; overflow:auto; }
+.special-audit-page { --line:#dde3ec; --soft:#e9edf3; --red:var(--color-primary); --blue:var(--color-info); box-sizing:border-box; width:100%; max-width:none; height:0; min-height:0; margin:0; padding:var(--ui-space-3); color:#111827; overflow:auto; }.special-merge-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;margin-bottom:10px;padding:8px 12px;border:1px solid #ffd7d7;background:#fff}.special-merge-hint strong{color:var(--red)}.special-merge-hint p{margin:0;color:#667085}
 .special-empty-page { display:grid; gap:8px; min-height:calc(100vh - 74px); color:#111827; }
 .special-empty-grid { display:grid; grid-template-columns:minmax(0,1fr) var(--ui-panel-rail-lg); gap:var(--ui-space-4); align-items:start; min-width:0; }
 .special-empty-main { min-width:0; display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }

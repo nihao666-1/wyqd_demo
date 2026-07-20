@@ -115,109 +115,6 @@
       </div>
     </template>
 
-    <template v-else-if="currentMode === 'records'">
-      <nav class="top-tabs wide">
-        <button v-for="tab in recordTabs" :key="tab" :class="{ active: tab === '规则配置' }" type="button">{{ tab }}</button>
-      </nav>
-      <p class="tab-desc">用于管理审计分析、费用审计、制度比对等模块的规则配置与版本，支持启用、停用、试运行与版本管理。</p>
-
-      <div class="config-grid records-grid">
-        <aside class="side-card category-card">
-          <h3>配置分类</h3>
-          <label class="search-box">搜索配置项</label>
-          <button
-            v-for="item in configCategories.slice(0, 8)"
-            :key="item"
-            type="button"
-            :class="{ active: item === '费用异常规则配置' }"
-          >
-            <AuditIcon name="records" />
-            <span>{{ item }}</span>
-          </button>
-        </aside>
-
-        <main class="table-card data-panel">
-          <div class="toolbar">
-            <div>
-              <button class="primary" type="button">新增规则</button>
-              <button type="button">复制版本</button>
-              <button type="button">规则试运行</button>
-            </div>
-            <div>
-              <label>状态：<select><option>全部</option></select></label>
-              <input placeholder="搜索规则名称" readonly />
-              <button type="button">重置</button>
-            </div>
-          </div>
-          <div class="table-scroll">
-            <table>
-            <thead>
-              <tr>
-                <th>规则名称</th>
-                <th>适用模块</th>
-                <th>版本号</th>
-                <th>状态</th>
-                <th>命中样例</th>
-                <th>最近修改人</th>
-                <th>修改时间</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in visibleRuleRows" :key="row.name">
-                <td>{{ row.name }}</td>
-                <td>{{ row.module }}</td>
-                <td>{{ row.version }}</td>
-                <td><span class="tag" :class="row.tone">{{ row.status }}</span></td>
-                <td>{{ row.samples }}</td>
-                <td>{{ row.owner }}</td>
-                <td>{{ row.time }}</td>
-                <td class="op-cell"><button>查看</button><button>复制</button><button>{{ row.status === '已启用' ? '停用' : '启用' }}</button><button>日志</button></td>
-              </tr>
-            </tbody>
-            </table>
-          </div>
-          <footer class="pager">
-            <span>共 28 条</span>
-            <div><button type="button">‹</button><button class="active" type="button">1</button><button>2</button><button>3</button><button>›</button><select><option>10 条/页</option></select><span>跳至</span><input value="1" readonly /><span>页</span></div>
-          </footer>
-        </main>
-
-        <aside class="right-card trace-side">
-          <header><h3>变更与留痕</h3><button type="button">×</button></header>
-          <section class="trace-block">
-            <h4>版本历史 <span>差旅费报销标准规则</span></h4>
-            <table class="mini-table">
-              <thead><tr><th>版本号</th><th>状态</th><th>修改人</th><th>修改时间</th></tr></thead>
-              <tbody><tr v-for="item in versionHistory" :key="item.version"><td>{{ item.version }}</td><td><span class="tag green">{{ item.status }}</span></td><td>{{ item.owner }}</td><td>{{ item.time }}</td></tr></tbody>
-            </table>
-            <button class="trace-more" type="button">查看全部版本 ›</button>
-          </section>
-          <section class="trace-block">
-            <h4>操作日志 <span>近 7 天</span></h4>
-            <table class="mini-table">
-              <tbody><tr v-for="item in operationLogs" :key="item.time"><td>{{ item.time }}</td><td>{{ item.user }}</td><td>{{ item.action }}</td><td class="success">{{ item.result }}</td></tr></tbody>
-            </table>
-            <button class="trace-more" type="button">查看全部日志 ›</button>
-          </section>
-          <section class="trace-block">
-            <h4>复核意见</h4>
-            <table class="mini-table">
-              <tbody><tr><td>赵强</td><td>规则逻辑清晰，判定准确，建议启用。</td><td class="success">通过</td></tr><tr><td>刘洋</td><td>补充了特殊场景说明，建议更新示例。</td><td class="success">通过</td></tr></tbody>
-            </table>
-            <button class="trace-more" type="button">查看全部复核 ›</button>
-          </section>
-          <section class="trace-block">
-            <h4>导出记录 <span>近 7 天</span></h4>
-            <table class="mini-table">
-              <tbody><tr><td>05-10 16:20</td><td>差旅费报销标准规则 V2.1.0</td><td>Excel</td><td class="success">成功</td></tr><tr><td>05-09 11:12</td><td>费用异常综合判定规则 V1.5.0</td><td>PDF</td><td class="success">成功</td></tr></tbody>
-            </table>
-            <button class="trace-more" type="button">查看全部导出 ›</button>
-          </section>
-        </aside>
-      </div>
-    </template>
-
     <template v-else>
       <div class="param-head">
         <nav class="top-tabs param-tabs">
@@ -333,7 +230,6 @@ import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const pageModes = [
   { key: 'initial', label: '初始状态' },
-  { key: 'records', label: '配置与记录' },
   { key: 'params', label: '系统参数' }
 ];
 
@@ -353,7 +249,6 @@ watch(
 );
 
 const setupTabs = ['模板配置', '规则配置', '标签配置', '权限配置', '系统参数配置'];
-const recordTabs = ['模板配置', '规则配置', '标签配置', '权限配置', '版本记录', '操作留痕', '导出记录', '复核记录'];
 const paramTabs = ['基础参数', '文件参数', '模型参数', 'AI 标识', '安全参数', '通知参数', '导出参数', '审计留痕'];
 
 const initialMetrics = [

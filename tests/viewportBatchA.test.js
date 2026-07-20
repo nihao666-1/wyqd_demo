@@ -48,7 +48,7 @@ test('task center empty state fills the desktop route and keeps its create actio
   assert.match(taskEmpty, /@media\s*\(min-width:\s*1025px\)\s*\{[\s\S]*\.empty-task-center\s*\{[^}]*height:\s*100%[^}]*min-height:\s*0/s);
   assert.match(taskEmpty, /\.empty-main-column\s*\{[^}]*grid-template-rows:\s*auto auto minmax\(0,\s*1fr\) auto[^}]*min-height:\s*0/s);
   assert.match(taskEmpty, /\.empty-list-card\s*\{[^}]*display:\s*flex[^}]*min-height:\s*0[^}]*flex-direction:\s*column/s);
-  assert.match(taskEmpty, /\.empty-side-column\s*\{[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\)[^}]*gap:\s*var\(--ui-space-4\)[^}]*padding-top:\s*0/s);
+  assert.match(taskEmpty, /\.empty-side-column\s*\{[^}]*grid-template-rows:\s*minmax\(0,\s*1fr\)[^}]*gap:\s*var\(--ui-space-4\)[^}]*padding-top:\s*0/s);
   assert.match(taskEmpty, /\.empty-create-button\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
   assert.match(taskEmpty, /\.status-guide-card\s*\{[^}]*min-height:\s*0[^}]*overflow:\s*auto/s);
   assert.match(taskEmpty, /@media\s*\(min-width:\s*1025px\) and \(max-width:\s*1439px\)\s*\{[\s\S]*\.empty-metric-strip\s*\{[^}]*grid-template-columns:\s*repeat\(6,\s*minmax\(0,\s*1fr\)\)/);
@@ -56,13 +56,14 @@ test('task center empty state fills the desktop route and keeps its create actio
   assert.match(taskEmpty, /@media\s*\(min-width:\s*1025px\) and \(max-width:\s*1439px\)\s*\{[\s\S]*\.empty-illustration\s*\{[^}]*display:\s*none/s);
 });
 
-test('batch A visible type, spacing, controls, and rails use shared scale tokens', () => {
+test('batch A visible type, spacing, controls, and retained rails use shared scale tokens', () => {
   for (const source of [workbench, taskList, taskEmpty, fileCenter, fileDetail, recordCenter]) {
     assert.match(source, /var\(--ui-font-(?:xs|sm|md|lg|xl)\)/);
     assert.match(source, /var\(--ui-space-[1-6]\)/);
   }
 
-  assert.match(taskList, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+var\(--ui-panel-rail-lg\)/);
+  assert.match(taskList, /grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.doesNotMatch(taskList, /task-rail|var\(--ui-panel-rail-lg\)/);
   assert.match(fileCenter, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+var\(--ui-panel-rail-lg\)/);
   assert.match(recordCenter, /grid-template-columns:\s*minmax\(0,\s*1fr\)\s+var\(--ui-panel-rail-lg\)/);
 });

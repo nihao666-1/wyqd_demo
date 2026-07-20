@@ -21,8 +21,8 @@ test('生成中任务壳尺寸规则与其他详情状态隔离', () => {
   assert.match(css, /\.task-detail-shell \.sidebar,\s*\.task-generating-shell \.sidebar,\s*\.task-archived-shell \.sidebar[\s\S]*flex:\s*0 0 var\(--shell-sidebar-width\)[^}]*height:\s*var\(--shell-viewport-height\)/s);
 });
 
-test('生成中任务壳复刻侧栏品牌、通知角标与底部导航节奏', () => {
-  assert.match(layout, /!isEmptyMode \|\| isTaskDetailRoute" class="notice-dot"/);
+test('生成中任务壳复刻侧栏品牌与底部导航节奏', () => {
+  assert.doesNotMatch(layout, /class="notice-dot"/);
   assert.match(css, /\.task-generating-shell \.brand strong\s*\{[^}]*font-size:\s*21px/s);
   assert.match(css, /\.task-generating-shell \.brand\s*\{[^}]*min-height:\s*55px[^}]*margin-bottom:\s*24px[^}]*background:\s*var\(--color-primary\)/s);
   assert.match(css, /\.task-generating-shell \.bottom-nav\s*\{[^}]*min-height:\s*129px/s);

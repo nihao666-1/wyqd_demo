@@ -3,7 +3,7 @@
   <PageHeader eyebrow="审计规范智能化" title="审计规范工作台" description="明确 0-1 生成、1-2 优化、上传标准规范三种入口，来源、部门、时间范围均受权限控制。">
     <RouterLink class="btn primary" to="/audit-standard/generate?mode=0-1">0-1 生成</RouterLink>
     <RouterLink class="btn" to="/audit-standard/generate?mode=1-2">1-2 优化</RouterLink>
-    <RouterLink class="btn" to="/audit-standard/upload">上传标准规范</RouterLink>
+    <RouterLink class="btn" to="/audit-standard/library?action=upload">上传标准规范</RouterLink>
     <RouterLink class="btn" to="/audit-standard/policy">制度查询/变更/比对</RouterLink>
   </PageHeader>
   <section class="three-col">
@@ -20,7 +20,7 @@
     <article class="business-card">
       <h3>上传标准规范</h3>
       <p>校验文件名前缀、版本号和差异结果，确认后进入审计规范库。</p>
-      <RouterLink class="btn" to="/audit-standard/upload">上传规范</RouterLink>
+      <RouterLink class="btn" to="/audit-standard/library?action=upload">上传规范</RouterLink>
     </article>
     <article class="business-card">
       <h3>制度查询/变更/比对</h3>

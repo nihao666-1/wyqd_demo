@@ -1,6 +1,10 @@
 <template>
   <section class="reg-result-page route-fill-page" data-regulatory-result-page aria-label="监管案例舆情分析">
     <div class="reg-result-main">
+      <section v-if="route.query.panel === 'fetch' || route.query.tab === 'history'" class="compat-status-card">
+        <strong>{{ route.query.panel === 'fetch' ? '数据获取进度已并入结果页' : '历史任务已并入结果页' }}</strong>
+        <p>{{ route.query.panel === 'fetch' ? '当前页顶部展示筛选条件与刷新动作，获取进度将在结果区同步更新。' : '请在页面底部“历史分析任务”区域查看、复制或删除历史任务。' }}</p>
+      </section>
       <section class="filter-strip" data-result-region="filters" aria-label="分析筛选条件">
         <label v-for="filter in filters" :key="filter.label">
           <span>{{ filter.label }}</span>
@@ -39,7 +43,18 @@
             <polyline class="line-red" points="34,112 78,96 122,78 166,64 210,50 248,44" />
             <polyline class="line-blue" points="34,126 78,74 122,102 166,92 210,99 248,70" />
             <g class="dots-red">
-              <circle v-for="point in trendPoints" :key="point" :cx="point[0]" :cy="point[1]" r="3" />
+              <circle
+                v-for="point in trendPoints"
+                :key="point.label"
+                class="chart-hover-target"
+                :cx="point.x"
+                :cy="point.y"
+                r="3"
+                tabindex="0"
+                :aria-label="point.tip"
+              >
+                <title>{{ point.tip }}</title>
+              </circle>
             </g>
             <g class="axis-labels">
               <text v-for="month in trendMonths" :key="month.label" :x="month.x" y="148" text-anchor="middle">{{ month.label }}</text>
@@ -59,12 +74,28 @@
             <div class="donut-wrap">
               <svg viewBox="0 0 160 160" role="img" aria-label="风险主题分布环形图">
                 <circle class="donut-bg" cx="80" cy="80" r="52" />
-                <circle v-for="segment in donutSegments" :key="segment.className" :class="segment.className" cx="80" cy="80" r="52" :stroke-dasharray="segment.dash" :stroke-dashoffset="segment.offset" />
+                <circle
+                  v-for="segment in donutSegments"
+                  :key="segment.className"
+                  class="chart-hover-target"
+                  :class="segment.className"
+                  cx="80"
+                  cy="80"
+                  r="52"
+                  :stroke-dasharray="segment.dash"
+                  :stroke-dashoffset="segment.offset"
+                  tabindex="0"
+                  :aria-label="segment.tip"
+                >
+                  <title>{{ segment.tip }}</title>
+                </circle>
               </svg>
               <span>合计<br /><b>126 条</b></span>
             </div>
             <ul>
-              <li v-for="item in riskThemes" :key="item.name"><i :class="item.tone"></i>{{ item.name }}<b>{{ item.percent }}</b></li>
+              <li v-for="item in riskThemes" :key="item.name" class="chart-tip-anchor" :data-tip="item.tip" :title="item.tip">
+                <i :class="item.tone"></i><span>{{ item.name }}</span><b>{{ item.percent }}</b>
+              </li>
             </ul>
           </div>
         </article>
@@ -75,7 +106,8 @@
             <g class="grid-lines">
               <path v-for="y in [26, 54, 82, 110, 138]" :key="y" :d="`M24 ${y} H226`" />
             </g>
-            <g v-for="bar in sourceBars" :key="bar.name">
+            <g v-for="bar in sourceBars" :key="bar.name" class="chart-hover-target" tabindex="0" :aria-label="bar.tip">
+              <title>{{ bar.tip }}</title>
               <rect :x="bar.x" :y="bar.y" width="20" :height="138 - bar.y" rx="2" />
               <text :x="bar.x + 10" :y="bar.y - 6" text-anchor="middle">{{ bar.value }}</text>
               <text :x="bar.x + 10" y="150" text-anchor="middle">
@@ -87,7 +119,7 @@
 
         <article class="chart-card reason-card">
           <h3>高频处罚原因TOP5 <small>（条）</small></h3>
-          <div v-for="reason in reasonBars" :key="reason.name" class="reason-row">
+          <div v-for="reason in reasonBars" :key="reason.name" class="reason-row chart-tip-anchor" :data-tip="reason.tip" :title="reason.tip">
             <span>{{ reason.name }}</span>
             <i><b :style="{ width: reason.width }"></b></i>
             <em>{{ reason.value }}</em>
@@ -248,6 +280,7 @@
 
 <script setup>
 import { computed, inject, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faChartSimple,
@@ -263,6 +296,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const store = inject('store');
+const route = useRoute();
 
 const filters = [
   { label: '被分析单位', value: '上海分公司', type: 'select' },
@@ -281,7 +315,14 @@ const metrics = [
   { label: '已引用到任务', value: 18, unit: '条', delta: '+4', tone: 'purple', icon: faLink }
 ];
 
-const trendPoints = [[34, 112], [78, 96], [122, 78], [166, 64], [210, 50], [248, 44]];
+const trendPoints = [
+  { label: '2024-10', x: 34, y: 112, value: 42, ratio: '-8%', tip: '2024-10：关注点 42 条，同比 -8%' },
+  { label: '2024-11', x: 78, y: 96, value: 56, ratio: '+12%', tip: '2024-11：关注点 56 条，同比 +12%' },
+  { label: '2024-12', x: 122, y: 78, value: 72, ratio: '+3%', tip: '2024-12：关注点 72 条，同比 +3%' },
+  { label: '2025-01', x: 166, y: 64, value: 86, ratio: '+6%', tip: '2025-01：关注点 86 条，同比 +6%' },
+  { label: '2025-02', x: 210, y: 50, value: 104, ratio: '+2%', tip: '2025-02：关注点 104 条，同比 +2%' },
+  { label: '2025-03', x: 248, y: 44, value: 112, ratio: '+15%', tip: '2025-03：关注点 112 条，同比 +15%' }
+];
 const trendMonths = [
   { label: '2024-10', x: 34 },
   { label: '2024-11', x: 78 },
@@ -291,34 +332,34 @@ const trendMonths = [
   { label: '2025-03', x: 248 }
 ];
 const donutSegments = [
-  { className: 'donut-blue', dash: '98 328', offset: '0' },
-  { className: 'donut-green', dash: '72 328', offset: '-98' },
-  { className: 'donut-orange', dash: '57 328', offset: '-170' },
-  { className: 'donut-red', dash: '36 328', offset: '-227' },
-  { className: 'donut-cyan', dash: '31 328', offset: '-263' },
-  { className: 'donut-yellow', dash: '31 328', offset: '-294' }
+  { className: 'donut-blue', dash: '98 328', offset: '0', tip: '客户适当性：30.16%，38 条' },
+  { className: 'donut-green', dash: '72 328', offset: '-98', tip: '反洗钱管理：22.22%，28 条' },
+  { className: 'donut-orange', dash: '57 328', offset: '-170', tip: '费用报销：17.46%，22 条' },
+  { className: 'donut-red', dash: '36 328', offset: '-227', tip: '信息披露：11.11%，14 条' },
+  { className: 'donut-cyan', dash: '31 328', offset: '-263', tip: '投诉处理：9.52%，12 条' },
+  { className: 'donut-yellow', dash: '31 328', offset: '-294', tip: '其他：9.52%，12 条' }
 ];
 const riskThemes = [
-  { name: '客户适当性', percent: '30.16%', tone: 'blue' },
-  { name: '反洗钱管理', percent: '22.22%', tone: 'green' },
-  { name: '费用报销', percent: '17.46%', tone: 'orange' },
-  { name: '信息披露', percent: '11.11%', tone: 'red' },
-  { name: '投诉处理', percent: '9.52%', tone: 'cyan' },
-  { name: '其他', percent: '9.52%', tone: 'yellow' }
+  { name: '客户适当性', percent: '30.16%', tone: 'blue', tip: '客户适当性：38 条，占比 30.16%' },
+  { name: '反洗钱管理', percent: '22.22%', tone: 'green', tip: '反洗钱管理：28 条，占比 22.22%' },
+  { name: '费用报销', percent: '17.46%', tone: 'orange', tip: '费用报销：22 条，占比 17.46%' },
+  { name: '信息披露', percent: '11.11%', tone: 'red', tip: '信息披露：14 条，占比 11.11%' },
+  { name: '投诉处理', percent: '9.52%', tone: 'cyan', tip: '投诉处理：12 条，占比 9.52%' },
+  { name: '其他', percent: '9.52%', tone: 'yellow', tip: '其他：12 条，占比 9.52%' }
 ];
 const sourceBars = [
-  { name: '证监会', labelLines: ['证监会'], value: 21, x: 36, y: 48 },
-  { name: '交易所', labelLines: ['交易所'], value: 15, x: 78, y: 72 },
-  { name: '银保监会', labelLines: ['银保', '监会'], value: 10, x: 120, y: 94 },
-  { name: '地方监管局', labelLines: ['地方', '监管局'], value: 8, x: 162, y: 104 },
-  { name: '其他', labelLines: ['其他'], value: 4, x: 204, y: 120 }
+  { name: '证监会', labelLines: ['证监会'], value: 21, x: 36, y: 48, tip: '证监会：21 条案例来源' },
+  { name: '交易所', labelLines: ['交易所'], value: 15, x: 78, y: 72, tip: '交易所：15 条案例来源' },
+  { name: '银保监会', labelLines: ['银保', '监会'], value: 10, x: 120, y: 94, tip: '银保监会：10 条案例来源' },
+  { name: '地方监管局', labelLines: ['地方', '监管局'], value: 8, x: 162, y: 104, tip: '地方监管局：8 条案例来源' },
+  { name: '其他', labelLines: ['其他'], value: 4, x: 204, y: 120, tip: '其他：4 条案例来源' }
 ];
 const reasonBars = [
-  { name: '客户适当性不足', value: 18, width: '90%' },
-  { name: '未履行反洗钱义务', value: 16, width: '80%' },
-  { name: '内部控制不完善', value: 12, width: '60%' },
-  { name: '虚假或不真实披露', value: 10, width: '50%' },
-  { name: '信息披露不及时', value: 8, width: '40%' }
+  { name: '客户适当性不足', value: 18, width: '90%', tip: '客户适当性不足：18 条，高频处置原因第 1 位' },
+  { name: '未履行反洗钱义务', value: 16, width: '80%', tip: '未履行反洗钱义务：16 条，高频处置原因第 2 位' },
+  { name: '内部控制不完善', value: 12, width: '60%', tip: '内部控制不完善：12 条，高频处置原因第 3 位' },
+  { name: '虚假或不真实披露', value: 10, width: '50%', tip: '虚假或不真实披露：10 条，高频处置原因第 4 位' },
+  { name: '信息披露不及时', value: 8, width: '40%', tip: '信息披露不及时：8 条，高频处置原因第 5 位' }
 ];
 
 const tabs = ['监管案例', '舆情风险', '监管关注点', '审计检查建议', '已引用'];
@@ -396,6 +437,7 @@ function notify(message) {
   flex: 0 0 auto;
 }
 
+.compat-status-card,
 .filter-strip,
 .metric-strip,
 .chart-card,
@@ -406,6 +448,24 @@ function notify(message) {
   border: 1px solid var(--reg-line);
   border-radius: 3px;
   background: #fff;
+}
+
+.compat-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+}
+
+.compat-status-card strong {
+  color: var(--color-primary);
+}
+
+.compat-status-card p {
+  margin: 0;
+  color: #667085;
 }
 
 .filter-strip {
@@ -1490,6 +1550,368 @@ td {
   .donut-layout {
     grid-template-columns: 128px minmax(0, 1fr);
   }
+}
+
+@media (min-width: 1181px) {
+  :global(.regulatory-result-shell) {
+    --shell-sidebar-width: 268px;
+    --shell-page-gutter: 10px;
+    --ui-topbar-height: 56px;
+  }
+
+  :global(.regulatory-result-shell .sidebar) {
+    width: var(--shell-sidebar-width);
+    flex-basis: var(--shell-sidebar-width);
+  }
+
+  :global(.regulatory-result-shell .brand) {
+    min-height: var(--ui-topbar-height);
+    padding: 0 14px;
+  }
+
+  :global(.regulatory-result-shell .brand strong) {
+    font-size: 18px;
+    white-space: nowrap;
+  }
+
+  :global(.regulatory-result-shell .sidebar a) {
+    min-height: 39px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  :global(.regulatory-result-shell .nav-children .nav-child) {
+    min-height: 31px;
+    padding: 5px 12px 5px 44px;
+    font-size: 12px;
+  }
+
+  :global(.regulatory-result-shell .topbar) {
+    min-height: var(--ui-topbar-height);
+    height: var(--ui-topbar-height);
+    margin-bottom: 8px;
+  }
+
+  .reg-result-page {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 7px;
+    height: calc(var(--shell-viewport-height, 100vh) - var(--ui-topbar-height) - 8px);
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .reg-result-main {
+    gap: 8px;
+  }
+
+  .filter-strip {
+    grid-template-columns: 104px 162px 186px 76px 76px 76px minmax(210px, 1fr);
+    gap: 7px;
+    min-height: 62px;
+    padding: 6px 9px 7px;
+  }
+
+  .filter-strip label {
+    gap: 3px;
+  }
+
+  .filter-strip select,
+  .filter-strip input {
+    height: 28px;
+    padding: 0 8px;
+  }
+
+  .filter-actions {
+    gap: 6px;
+  }
+
+  .filter-actions button {
+    height: 30px;
+    min-width: 44px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .filter-actions .wide {
+    min-width: 122px;
+  }
+
+  .metric-strip {
+    min-height: 78px;
+  }
+
+  .metric-strip article {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 11px;
+  }
+
+  .metric-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+
+  .metric-strip p,
+  .metric-strip small,
+  .metric-strip em {
+    font-size: 10px;
+  }
+
+  .metric-strip strong {
+    font-size: 23px;
+  }
+
+  .chart-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .chart-card {
+    grid-template-rows: 22px minmax(0, 1fr);
+    min-height: 182px;
+    padding: 7px 8px 6px;
+    overflow: visible;
+  }
+
+  .chart-card h3 {
+    height: 22px;
+    padding-bottom: 5px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .chart-card small {
+    font-size: 10px;
+  }
+
+  .chart-card svg,
+  .trend-card svg,
+  .source-card svg {
+    height: 144px;
+    max-height: 144px;
+  }
+
+  .donut-layout {
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 6px;
+    min-height: 144px;
+  }
+
+  .donut-wrap svg {
+    width: 96px;
+    height: 96px;
+  }
+
+  .donut-wrap span {
+    font-size: 11px;
+  }
+
+  .donut-layout ul {
+    gap: 4px;
+  }
+
+  .donut-layout li {
+    grid-template-columns: 7px minmax(0, 1fr) 42px;
+    gap: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .donut-layout li span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-card svg {
+    width: 96%;
+  }
+
+  .reason-card {
+    grid-template-rows: 22px repeat(5, 20px) 15px;
+    row-gap: 4px;
+  }
+
+  .reason-row {
+    grid-template-columns: minmax(82px, 108px) minmax(0, 1fr) 20px;
+    gap: 6px;
+  }
+
+  .reason-row span,
+  .reason-row em {
+    font-size: 10px;
+  }
+
+  .reason-axis {
+    padding-left: 114px;
+    font-size: 8px;
+  }
+
+  .result-tabs {
+    height: 32px;
+    gap: 26px;
+  }
+
+  .result-tabs button {
+    height: 32px;
+    font-size: 11px;
+  }
+
+  .table-count {
+    height: 25px;
+    padding-top: 7px;
+  }
+
+  .focus-table-wrap {
+    height: 139px;
+  }
+
+  th {
+    height: 27px;
+  }
+
+  td {
+    height: 22px;
+  }
+
+  th,
+  td {
+    padding: 0 6px;
+    font-size: 9px;
+  }
+
+  .pagination {
+    height: 31px;
+    font-size: 10px;
+  }
+
+  .pagination button,
+  .pagination select,
+  .pagination input {
+    height: 22px;
+    font-size: 10px;
+  }
+
+  .process-flow-card {
+    grid-template-columns: 96px 1fr;
+    min-height: 48px;
+    padding: 0 12px;
+  }
+
+  .process-flow-card h3 {
+    font-size: 12px;
+  }
+
+  .process-flow-card strong {
+    font-size: 11px;
+  }
+
+  .process-flow-card p,
+  .process-flow-card em {
+    font-size: 9px;
+    line-height: 1.3;
+  }
+
+  .history-card {
+    padding: 8px 10px;
+  }
+
+  .history-card h3 {
+    margin-bottom: 6px;
+  }
+
+  .history-card th,
+  .history-card td {
+    height: 25px;
+  }
+
+  .focus-detail {
+    grid-template-rows: 40px minmax(0, 1fr) 56px;
+    overflow: hidden;
+  }
+
+  .focus-detail > header {
+    padding: 0 11px;
+  }
+
+  .detail-body section {
+    padding: 7px 11px;
+  }
+
+  .detail-body h4 {
+    margin-bottom: 5px;
+  }
+
+  .detail-body p,
+  .case-list b,
+  .case-list small,
+  .basis-list li,
+  .decision-row label {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .focus-detail footer {
+    gap: 7px;
+    padding: 9px 10px;
+  }
+
+  .focus-detail footer button {
+    height: 30px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .reg-result-page {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+.chart-hover-target {
+  cursor: help;
+}
+
+.chart-hover-target:hover,
+.chart-hover-target:focus {
+  filter: drop-shadow(0 0 3px rgba(47, 118, 230, 0.38));
+  outline: none;
+}
+
+.chart-tip-anchor {
+  position: relative;
+  cursor: help;
+}
+
+.chart-tip-anchor::after {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  bottom: calc(100% + 8px);
+  max-width: 220px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: rgba(17, 24, 39, 0.92);
+  color: #fff;
+  content: attr(data-tip);
+  font-size: 10px;
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  white-space: normal;
+}
+
+.chart-tip-anchor:hover::after,
+.chart-tip-anchor:focus-within::after {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 </style>

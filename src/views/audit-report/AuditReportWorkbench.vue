@@ -6,107 +6,14 @@
         <h2>{{ modeTitle }}</h2>
       </div>
       <nav class="mode-switch" aria-label="报告智能化子页面切换">
-        <button type="button" :class="{ active: activeMode === 'empty' }" @click="setMode('empty')">空白页</button>
         <button type="button" :class="{ active: activeMode === 'generate' }" @click="setMode('generate')">报告生成</button>
         <button type="button" :class="{ active: activeMode === 'review' }" @click="setMode('review')">报告审核</button>
+        <RouterLink class="mode-link" to="/audit-report/template">模板管理</RouterLink>
+        <RouterLink class="mode-link" to="/materials/import?scene=audit-report">资料导入</RouterLink>
       </nav>
     </header>
 
-    <template v-if="activeMode === 'empty'">
-      <section class="empty-shell">
-        <main class="empty-main">
-          <section class="metric-row">
-            <article v-for="item in metrics" :key="item.label" class="metric-card">
-              <span :class="item.tone">{{ item.icon }}</span>
-              <div>
-                <p>{{ item.label }}</p>
-                <strong>{{ item.value }} <small>{{ item.unit }}</small></strong>
-                <em>较昨日 0</em>
-              </div>
-            </article>
-          </section>
-
-          <section class="empty-hero panel">
-            <div>
-              <h3>暂无报告任务</h3>
-              <p>可根据审计任务、审计问题、风险事项和模板生成审计报告，也可上传报告执行格式与文字审核。</p>
-            </div>
-            <div class="hero-art" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-          </section>
-
-          <section class="action-grid">
-            <article class="panel action-card red">
-              <h3>报告生成</h3>
-              <div class="mini-flow">
-                <span>选择任务</span><b></b><span>选择报告模板</span><b></b><span>引用结果</span><b></b><span>生成草稿</span>
-              </div>
-              <button class="primary" type="button" @click="setMode('generate')">新建报告生成</button>
-            </article>
-            <article class="panel action-card blue">
-              <h3>报告审核</h3>
-              <div class="mini-flow">
-                <span>上传报告</span><b></b><span>选择审核规则</span><b></b><span>执行检查</span><b></b><span>形成问题清单</span>
-              </div>
-              <button class="blue-btn" type="button" @click="setMode('review')">上传报告审核</button>
-            </article>
-          </section>
-
-          <section class="panel report-list">
-            <header>
-              <h3>报告列表</h3>
-              <div class="list-tools">
-                <select><option>全部报告类型</option></select>
-                <input value="开始日期 至 结束日期" readonly />
-                <input placeholder="请输入报告名称" />
-                <button type="button" @click="showNotice('已按条件筛选报告列表。')">筛选</button>
-                <button type="button" @click="showNotice('报告列表已刷新。')">⟳</button>
-              </div>
-            </header>
-            <table>
-              <thead>
-                <tr><th>报告编号</th><th>报告名称</th><th>报告类型</th><th>版本</th><th>状态</th><th>创建人</th><th>更新时间</th><th>操作</th></tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="8"><div class="table-empty">暂无数据</div></td></tr>
-              </tbody>
-            </table>
-          </section>
-
-          <section class="panel process-panel">
-            <h3>报告流程</h3>
-            <div class="wide-flow">
-              <span v-for="step in reportProcess" :key="step.title">
-                <i>{{ step.icon }}</i><strong>{{ step.title }}</strong><small>{{ step.desc }}</small>
-              </span>
-            </div>
-          </section>
-        </main>
-
-        <aside class="template-rail">
-          <section class="panel">
-            <h3>报告类型与模板</h3>
-            <h4>报告类型</h4>
-            <article v-for="item in reportTypes" :key="item.title" class="template-item">
-              <span :class="item.tone">{{ item.icon }}</span>
-              <div><strong>{{ item.title }}</strong><p>{{ item.desc }}</p><small>内置模板 {{ item.count }} 个</small></div>
-              <em>未配置</em>
-            </article>
-            <h4>格式模板</h4>
-            <article v-for="item in formatTemplates" :key="item.title" class="template-item">
-              <span :class="item.tone">{{ item.icon }}</span>
-              <div><strong>{{ item.title }}</strong><p>{{ item.desc }}</p><small>{{ item.meta }}</small></div>
-              <em class="built-in">内置</em>
-            </article>
-            <button class="rail-action" type="button" @click="showNotice('已进入模板与格式管理。')">管理模板与格式</button>
-            <a class="hidden-contract-link" href="/audit-report/material/import">审计报告资料导入</a>
-          </section>
-        </aside>
-      </section>
-    </template>
-
-    <template v-else-if="activeMode === 'generate'">
+    <template v-if="activeMode === 'generate'">
       <section class="generate-page">
         <section class="panel gen-toolbar">
           <label><span>审计任务</span><select><option>上海分公司 Q1 常规审计任务</option></select></label>
@@ -301,11 +208,13 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
-const activeMode = ref('empty');
+const route = useRoute();
+const activeMode = ref(route.query.mode === 'review' ? 'review' : 'generate');
 const notice = ref('');
 const activeChapter = ref('一、基本情况');
-const expandedMode = { empty: '报告智能化', generate: '报告生成', review: '报告审核' };
+const expandedMode = { generate: '报告生成', review: '报告审核' };
 const modeTitle = computed(() => expandedMode[activeMode.value]);
 
 function setMode(mode) {
@@ -317,32 +226,6 @@ function showNotice(message) {
   notice.value = message;
 }
 
-const metrics = [
-  { label: '报告任务', value: 0, unit: '个', icon: '▤', tone: 'red' },
-  { label: '草稿报告', value: 0, unit: '份', icon: '▣', tone: 'blue' },
-  { label: '待审核报告', value: 0, unit: '份', icon: '♙', tone: 'orange' },
-  { label: '审核问题', value: 0, unit: '条', icon: '☷', tone: 'purple' },
-  { label: '导出文件', value: 0, unit: '个', icon: '⇩', tone: 'green' }
-];
-const reportProcess = [
-  { icon: '验', title: '资料预检', desc: '资料完整性检查' },
-  { icon: '章', title: '生成章节', desc: 'AI 生成报告章节' },
-  { icon: '据', title: '插入依据', desc: '引用结果与证据' },
-  { icon: '编', title: '人工编辑', desc: '补充与完善内容' },
-  { icon: '审', title: '智能审核', desc: '格式与文字检查' },
-  { icon: '导', title: '导出记录', desc: '导出与过程留痕' }
-];
-const reportTypes = [
-  { icon: '□', title: '营业部常规审计报告', desc: '适用于营业部日常经营审计', count: 3, tone: 'red' },
-  { icon: '◇', title: '营业部反洗钱审计报告', desc: '适用于反洗钱专项审计', count: 2, tone: 'green' },
-  { icon: '♙', title: '营业部负责人离任审计报告', desc: '适用于负责人离任审计', count: 2, tone: 'orange' }
-];
-const formatTemplates = [
-  { icon: 'W', title: 'Word 格式模板', desc: '适用 Word 格式', meta: '内置模板 3 个', tone: 'blue' },
-  { icon: 'P', title: 'PDF 格式模板', desc: '适用 PDF 格式', meta: '内置模板 2 个', tone: 'red' },
-  { icon: 'X', title: 'Excel 格式模板', desc: '适用 Excel 格式', meta: '内置模板 2 个', tone: 'green' },
-  { icon: '册', title: '模板示例库', desc: '示例报告与模板预览', meta: '示例 8 个', tone: 'blue' }
-];
 const chapters = [
   { title: '一、基本情况', children: ['（一）被审计单位概况', '（二）审计范围与期间', '（三）审计依据与方法'] },
   { title: '二、审计发现的主要问题', children: ['（一）内部控制问题', '（二）财务收支问题', '（三）费用管理问题'] },
@@ -402,62 +285,18 @@ const exportItems = [
 .report-title p { color:#667085; font-size:13px; }
 .report-title h2 { margin-top:4px; font-size:22px; }
 .mode-switch { display:inline-flex; padding:3px; border:1px solid #d9e1ec; border-radius:6px; background:#fff; }
-.mode-switch button { height:30px; padding:0 12px; border:0; background:transparent; font-weight:800; cursor:pointer; }
+.mode-switch button,
+.mode-link { height:30px; display:inline-flex; align-items:center; padding:0 12px; border:0; background:transparent; color:#344054; font-weight:800; cursor:pointer; text-decoration:none; }
 .mode-switch .active, .primary { background:var(--color-primary) !important; color:#fff !important; border-color:var(--color-primary) !important; }
+.mode-link { border-left:1px solid #e4e9f1; font-size:12px; }
+.mode-link:hover { color:var(--color-primary); }
 .panel { border:1px solid #e1e7ef; border-radius:6px; background:#fff; box-shadow:0 8px 18px rgba(31,41,55,.04); }
 button, input, select, textarea { font:inherit; }
 button { cursor:pointer; }
 
-.empty-shell { display:grid; grid-template-columns:minmax(0,1fr) clamp(240px,21vw,300px); gap:10px; align-items:start; }
-.empty-main { display:grid; gap:10px; min-width:0; }
-.mode-empty .empty-shell { min-height:0; flex:1; align-items:stretch; }
-.mode-empty .empty-main { grid-template-rows:auto auto auto minmax(0,1fr) auto; }
-.mode-empty .report-list { display:grid; min-height:0; grid-template-rows:auto minmax(0,1fr); }
-.mode-empty .report-list table { height:100%; }
-.mode-empty .table-empty { min-height:100%; }
-.mode-empty .template-rail .panel { height:100%; }
-.metric-row { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; min-width:0; }
-.metric-card { min-width:0; min-height:86px; display:flex; align-items:center; gap:8px; padding:10px; border:1px solid #e1e7ef; border-radius:6px; background:#fff; }
-.metric-card > span { flex:0 0 34px; width:34px; height:34px; display:grid; place-items:center; border-radius:10px; font-size:19px; }
-.metric-card > div { min-width:0; }
-.metric-card p, .metric-card em { display:block; overflow:hidden; text-overflow:ellipsis; color:#667085; font-size:12px; font-style:normal; white-space:nowrap; }
-.metric-card strong { display:block; margin:5px 0; font-size:22px; }
-.metric-card small { font-size:12px; }
 .red { color:var(--color-primary); background:#fff1f1; } .blue { color:var(--color-info); background:#eef4ff; } .orange { color:var(--color-warning); background:#fff4e8; } .purple { color:#6f668f; background:#f3edff; } .green { color:var(--color-success); background:#eaf8f1; }
-.empty-hero { min-height:160px; display:grid; grid-template-columns:minmax(0,1fr) 360px; align-items:center; padding:22px 48px; overflow:hidden; }
-.empty-hero h3 { font-size:26px; margin-bottom:12px; }
-.empty-hero p { color:#475467; line-height:1.8; max-width:540px; }
-.hero-art { height:138px; position:relative; opacity:.65; }
-.hero-art span { position:absolute; border:1px solid #d8e0ec; background:#f3f6fb; border-radius:6px; }
-.hero-art span:nth-child(1){left:40px;top:0;width:230px;height:120px}.hero-art span:nth-child(2){left:0;top:60px;width:95px;height:68px}.hero-art span:nth-child(3){right:20px;top:36px;width:118px;height:86px}
-.action-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.action-card { padding:14px 18px; }
-.action-card h3 { margin-bottom:16px; }
-.mini-flow { display:flex; align-items:center; justify-content:space-around; gap:8px; margin-bottom:14px; color:#344054; font-size:12px; }
-.mini-flow b { flex:1; border-top:1px dashed #98a2b3; }
-.action-card button { width:180px; height:34px; display:block; margin:0 auto; border:0; border-radius:4px; color:#fff; font-weight:800; }
-.blue-btn { background:#145dff; }
-.report-list header { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px; }
-.list-tools { display:flex; gap:8px; }
-.list-tools input,.list-tools select,.list-tools button { height:30px; border:1px solid #d7dee9; border-radius:4px; padding:0 9px; background:#fff; }
-.report-list table, .issue-list table, .history-table { width:100%; border-collapse:collapse; table-layout:fixed; }
-.report-list th,.report-list td,.issue-list th,.issue-list td { padding:9px 8px; border-top:1px solid #edf1f5; text-align:center; font-size:12px; }
-.table-empty { min-height:70px; display:grid; place-items:center; color:#98a2b3; }
-.process-panel { padding:14px; }
-.wide-flow { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; }
-.wide-flow span { display:grid; justify-items:center; gap:5px; color:#667085; font-size:12px; }
-.wide-flow i { width:34px; height:34px; display:grid; place-items:center; border:1px solid #d9e1ec; border-radius:50%; font-style:normal; color:#344054; }
-.template-rail .panel { padding:14px; }
-.template-rail h3 { margin-bottom:18px; }
-.template-rail h4 { margin:14px 0 8px; font-size:13px; }
-.template-item { position:relative; display:grid; grid-template-columns:38px 1fr; gap:10px; padding:11px; border:1px solid #edf1f5; border-radius:6px; margin-bottom:10px; }
-.template-item > span { width:34px; height:34px; display:grid; place-items:center; border-radius:8px; font-weight:900; }
-.template-item strong { font-size:13px; }
-.template-item p,.template-item small { color:#667085; font-size:11px; line-height:1.5; }
-.template-item em { position:absolute; right:10px; top:10px; padding:2px 6px; border-radius:3px; background:#fff1f1; color:var(--color-primary); font-size:10px; font-style:normal; }
-.template-item .built-in { background:#eef4ff; color:var(--color-info); }
-.rail-action { width:100%; height:34px; border:1px solid #d7dee9; background:#fff; border-radius:5px; font-weight:800; }
-.hidden-contract-link { display:none; }
+.issue-list table, .history-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.issue-list th,.issue-list td { padding:9px 8px; border-top:1px solid #edf1f5; text-align:center; font-size:12px; }
 
 .generate-page { display:grid; gap:10px; }
 .gen-toolbar { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)) 96px minmax(340px,auto); column-gap:14px; row-gap:10px; align-items:end; padding:12px; overflow:hidden; }
@@ -632,24 +471,20 @@ button { cursor:pointer; }
 .issue-detail footer .wide { grid-column:1 / -1; color:var(--color-primary); border-color:#efb2b8; }
 
 @media (max-width: 1280px) {
-  .empty-shell { grid-template-columns:minmax(0,1fr) 280px; }
   .gen-toolbar { grid-template-columns:repeat(4,minmax(138px,1fr)) 92px; }
   .toolbar-actions { grid-column:1 / -1; }
   .gen-workspace { grid-template-columns:200px minmax(0,1fr) 286px; }
   .review-board { grid-template-columns:176px minmax(0,1.16fr) 304px 286px; }
-  .metric-row { gap:8px; }
 }
 @media (max-width: 1120px) {
-  .empty-shell,.gen-workspace,.review-board,.gen-bottom { grid-template-columns:1fr; }
+  .gen-workspace,.review-board,.gen-bottom { grid-template-columns:1fr; }
   .review-board { grid-template-areas:"base" "upload" "progress" "check" "issues" "preview" "export" "version" "detail"; }
-  .metric-row { grid-template-columns:repeat(2,1fr); }
-  .empty-hero,.action-grid,.review-base { grid-template-columns:1fr; }
-  .generate-flow,.wide-flow,.audit-steps,.issue-stats { grid-template-columns:repeat(2,1fr); }
+  .review-base { grid-template-columns:1fr; }
+  .generate-flow,.audit-steps,.issue-stats { grid-template-columns:repeat(2,1fr); }
 }
 @media (max-width: 720px) {
-  .report-title,.review-top,.report-list header { flex-direction:column; align-items:stretch; }
-  .mode-switch,.list-tools,.toolbar-actions,.review-top div { width:100%; flex-wrap:wrap; }
+  .report-title,.review-top { flex-direction:column; align-items:stretch; }
+  .mode-switch,.toolbar-actions,.review-top div { width:100%; flex-wrap:wrap; }
   .gen-toolbar { grid-template-columns:1fr; }
-  .metric-row { grid-template-columns:1fr; }
 }
 </style>
