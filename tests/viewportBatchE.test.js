@@ -46,8 +46,9 @@ test('report workbench keeps generate and review modes without legacy empty temp
   assert.match(workbench, /\.report-ai-page\s*\{[^}]*display:\s*flex[^}]*height:\s*0[^}]*min-height:\s*0/s);
   assert.match(workbench, /activeMode === 'generate'/);
   assert.match(workbench, /activeMode === 'review'|<template v-else>/);
-  assert.match(workbench, /to="\/audit-report\/template"/);
-  assert.match(workbench, /to="\/materials\/import\?scene=audit-report"/);
+  assert.match(workbench, /const activeMode = computed\(\(\) => route\.query\.mode === 'review' \? 'review' : 'generate'\)/);
+  assert.match(workbench, /class="toolbar-link" to="\/materials\/import\?scene=audit-report"/);
+  assert.doesNotMatch(workbench, /mode-switch|mode-link|setMode\(/);
   assert.doesNotMatch(workbench, /activeMode === 'empty'|template-rail|reportTypes|formatTemplates|mode-empty/);
 
   assert.match(review, /report-review-page route-fill-page/);

@@ -126,6 +126,13 @@ test('navigation is grouped and no longer exposes demo-guide as collapse behavio
   assert.match(layout, /label: '制度比对'/);
   assert.match(layout, /label: '规范生成'/);
   assert.match(layout, /label: '规范库'/);
+  assert.match(layout, /label: '报告智能化'/);
+  assert.match(layout, /label: '报告生成'/);
+  assert.match(layout, /label: '报告审核'/);
+  assert.match(layout, /label: '模板管理'/);
+  assert.match(layout, /path: '\/audit-report\/workbench\?mode=review', mode: 'review'/);
+  assert.match(layout, /isAuditReportSection\.value && item\.path === '\/audit-report\/workbench'/);
+  assert.match(layout, /isNavChildActive\(child\)/);
   assert.doesNotMatch(layout, /label: '审计知识库'/);
   assert.doesNotMatch(layout, /RouterLink to="\/demo-guide"[\s\S]*收起导航/);
   assert.match(layout, /@click="toggleSidebar"/);

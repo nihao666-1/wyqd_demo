@@ -5,12 +5,6 @@
         <p>审计工作台 / 报告智能化</p>
         <h2>{{ modeTitle }}</h2>
       </div>
-      <nav class="mode-switch" aria-label="报告智能化子页面切换">
-        <button type="button" :class="{ active: activeMode === 'generate' }" @click="setMode('generate')">报告生成</button>
-        <button type="button" :class="{ active: activeMode === 'review' }" @click="setMode('review')">报告审核</button>
-        <RouterLink class="mode-link" to="/audit-report/template">模板管理</RouterLink>
-        <RouterLink class="mode-link" to="/materials/import?scene=audit-report">资料导入</RouterLink>
-      </nav>
     </header>
 
     <template v-if="activeMode === 'generate'">
@@ -25,6 +19,7 @@
             <label><span>多模型复核</span><input type="checkbox" checked /></label>
           </div>
           <div class="toolbar-actions">
+            <RouterLink class="toolbar-link" to="/materials/import?scene=audit-report">资料导入</RouterLink>
             <button class="primary" type="button" @click="showNotice('已开始生成报告草稿。')">开始生成</button>
             <button class="outline-danger" type="button" @click="showNotice('已对当前章节重新生成。')">章节级重新生成</button>
             <button type="button" @click="showNotice('版本已保存。')">保存版本</button>
@@ -211,16 +206,11 @@ import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-const activeMode = ref(route.query.mode === 'review' ? 'review' : 'generate');
+const activeMode = computed(() => route.query.mode === 'review' ? 'review' : 'generate');
 const notice = ref('');
 const activeChapter = ref('一、基本情况');
 const expandedMode = { generate: '报告生成', review: '报告审核' };
 const modeTitle = computed(() => expandedMode[activeMode.value]);
-
-function setMode(mode) {
-  activeMode.value = mode;
-  notice.value = `已切换至${expandedMode[mode]}页面。`;
-}
 
 function showNotice(message) {
   notice.value = message;
@@ -284,12 +274,7 @@ const exportItems = [
 .report-title { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:8px; }
 .report-title p { color:#667085; font-size:13px; }
 .report-title h2 { margin-top:4px; font-size:22px; }
-.mode-switch { display:inline-flex; padding:3px; border:1px solid #d9e1ec; border-radius:6px; background:#fff; }
-.mode-switch button,
-.mode-link { height:30px; display:inline-flex; align-items:center; padding:0 12px; border:0; background:transparent; color:#344054; font-weight:800; cursor:pointer; text-decoration:none; }
-.mode-switch .active, .primary { background:var(--color-primary) !important; color:#fff !important; border-color:var(--color-primary) !important; }
-.mode-link { border-left:1px solid #e4e9f1; font-size:12px; }
-.mode-link:hover { color:var(--color-primary); }
+.primary { background:var(--color-primary) !important; color:#fff !important; border-color:var(--color-primary) !important; }
 .panel { border:1px solid #e1e7ef; border-radius:6px; background:#fff; box-shadow:0 8px 18px rgba(31,41,55,.04); }
 button, input, select, textarea { font:inherit; }
 button { cursor:pointer; }
@@ -306,7 +291,9 @@ button { cursor:pointer; }
 .toggle-stack label { height:17px; display:flex; align-items:center; justify-content:flex-end; gap:8px; white-space:nowrap; }
 .toggle-stack input { margin:0; }
 .toolbar-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
-.toolbar-actions button,.review-top button,.detail-actions button,.issue-detail footer button { height:32px; border:1px solid #d7dee9; background:#fff; border-radius:4px; padding:0 12px; font-weight:800; }
+.toolbar-actions button,.toolbar-link,.review-top button,.detail-actions button,.issue-detail footer button { height:32px; border:1px solid #d7dee9; background:#fff; border-radius:4px; padding:0 12px; font-weight:800; }
+.toolbar-link { display:inline-flex; align-items:center; color:#344054; text-decoration:none; }
+.toolbar-link:hover { color:var(--color-primary); border-color:#efb2b8; }
 .outline-danger { color:var(--color-primary); border-color:#efb2b8 !important; background:#fff !important; }
 .gen-workspace { display:grid; grid-template-columns:210px minmax(0,1fr) 318px; gap:10px; align-items:stretch; }
 .chapter-nav,.editor-panel,.source-rail { min-height:560px; }
@@ -484,7 +471,7 @@ button { cursor:pointer; }
 }
 @media (max-width: 720px) {
   .report-title,.review-top { flex-direction:column; align-items:stretch; }
-  .mode-switch,.toolbar-actions,.review-top div { width:100%; flex-wrap:wrap; }
+  .toolbar-actions,.review-top div { width:100%; flex-wrap:wrap; }
   .gen-toolbar { grid-template-columns:1fr; }
 }
 </style>

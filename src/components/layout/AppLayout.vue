@@ -7,13 +7,13 @@
 
       <nav class="main-nav">
         <template v-for="item in businessNavItems" :key="item.path">
-          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || (isExpenseSection && item.path === '/expense/workbench') || ((isAuditReportGeneration || isReportReviewRoute) && item.path === '/audit-report/workbench') }">
+          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || (isExpenseSection && item.path === '/expense/workbench') || (isAuditReportSection && item.path === '/audit-report/workbench') }">
             <span class="nav-icon"><AuditIcon :name="item.icon" /></span>
             <span class="nav-label">{{ item.label }}</span>
             <span v-if="item.children && shouldShowChildren(item)" class="nav-caret">⌄</span>
           </RouterLink>
           <div v-if="item.children && shouldShowChildren(item)" class="nav-children">
-            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="router-link-active" :class="{ 'sub-active': child.mode && route.query.mode === child.mode }">
+            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="route-active-disabled" :class="{ 'sub-active': isNavChildActive(child) }">
               <span class="nav-child-dot"></span>
               <span>{{ child.label }}</span>
             </RouterLink>
@@ -128,7 +128,16 @@ const businessNavItems = [
       { label: '费用趋势分析', path: '/expense/usage/dashboard' }
     ]
   },
-  { icon: 'report', label: '报告智能化', path: '/audit-report/workbench' },
+  {
+    icon: 'report',
+    label: '报告智能化',
+    path: '/audit-report/workbench',
+    children: [
+      { label: '报告生成', path: '/audit-report/workbench' },
+      { label: '报告审核', path: '/audit-report/workbench?mode=review', mode: 'review' },
+      { label: '模板管理', path: '/audit-report/template' }
+    ]
+  },
   { icon: 'files', label: '文件中心', path: '/files' },
   {
     icon: 'config',
@@ -153,6 +162,7 @@ const isExpenseAuditResult = computed(() => isExpenseAuditOverview.value || isEx
 const isExpenseTrendResult = computed(() => route.path === '/expense/usage/dashboard');
 const isAuditReportGeneration = computed(() => route.path === '/audit-report/draft');
 const isReportReviewRoute = computed(() => route.path === '/audit-report/check-result');
+const isAuditReportSection = computed(() => route.path.startsWith('/audit-report'));
 const isRegulatoryResultRoute = computed(() => route.path === '/regulatory/result');
 const isSpecialAuditWorkbench = computed(() => route.path === '/regulatory/workbench');
 const isAuditStandardSection = computed(() => route.path.startsWith('/audit-standard'));
@@ -191,7 +201,18 @@ function shouldShowChildren(item) {
     ((isAuditStandardSection.value && item.path === '/audit-standard/policy') ||
       (isSpecialAuditSection.value && item.path === '/regulatory/workbench') ||
       (isExpenseSection.value && item.path === '/expense/workbench') ||
+      (isAuditReportSection.value && item.path === '/audit-report/workbench') ||
       (route.path === '/config' && item.path === '/config'))
   );
+}
+
+function isNavChildActive(child) {
+  const [path, queryString] = child.path.split('?');
+  if (route.path !== path) return false;
+  const params = new URLSearchParams(queryString || '');
+  const mode = params.get('mode');
+  if (mode) return route.query.mode === mode;
+  if (path === '/config' || path === '/audit-report/workbench') return !route.query.mode;
+  return true;
 }
 </script>
