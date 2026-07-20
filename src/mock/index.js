@@ -622,7 +622,7 @@ export const pageStates = {
   taskDetail: { state: 'running', title: '任务正在办理中', description: '费用异常待确认、报告草稿待审核，所有资料和结果均沉淀在任务台账中。' },
   fileCenter: { state: 'locked', title: '存在引用锁定文件', description: '已被报告或规范引用的文件不能直接修改、失效或删除，只能申请解锁并回退草稿。' },
   reportSource: { state: 'blocked', title: '关键资料缺口未处理', description: '来源预检前可以选择资料；关键资料缺失时不能生成正式报告草稿。' },
-  expenseCandidates: { state: 'running', title: '候选异常待人工处理', description: '确认、排除、待补充和整改建议会形成行状态变化并写入记录中心。' }
+  expenseCandidates: { state: 'running', title: '候选异常待人工处理', description: '确认、排除、待补充和整改建议会形成行状态变化并写入操作审计。' }
 };
 
 export const expenseEvidenceChains = [

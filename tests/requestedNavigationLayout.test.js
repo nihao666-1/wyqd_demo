@@ -63,13 +63,12 @@ test('config center exposes configuration and parameter workspaces while records
   compileVue(configUrl);
 });
 
-test('special audit navigation links to the existing entry and result pages', () => {
+test('knowledge base navigation links to the existing analysis pages', () => {
   const layout = read(layoutUrl);
   const workbench = read(regulatoryWorkbenchUrl);
 
-  assert.match(layout, /path: '\/regulatory\/workbench'[\s\S]*path: '\/regulatory\/result'[\s\S]*path: '\/tasks\/detail\/supervision-share'/);
-  assert.doesNotMatch(layout, /path: '\/supervision\/workbench'[\s\S]*item\.path === '\/regulatory\/workbench'/);
-  assert.match(layout, /const isSpecialAuditSection = computed\(\(\) =>[\s\S]*isSupervisionShareResultRoute\.value/);
+  assert.match(layout, /label: '审计知识库'[\s\S]*path: '\/regulatory\/workbench'[\s\S]*path: '\/audit-standard\/generate'[\s\S]*path: '\/supervision\/workbench'/);
+  assert.match(layout, /const isKnowledgeSection = computed\(\(\) =>[\s\S]*isSupervisionShareResultRoute\.value/);
 
   assert.match(workbench, /to: '\/regulatory\/result'/);
   assert.match(workbench, /to: '\/tasks\/detail\/supervision-share'/);
@@ -155,7 +154,7 @@ test('task center and expense anomaly filters keep compact top panels', () => {
   const taskEmpty = read(taskEmptyUrl);
   const anomalyAnalysis = read(expenseAnomalyAnalysisUrl);
 
-  assert.match(taskEmpty, /<section class="empty-filter-card" aria-label="任务中心筛选">/);
+  assert.match(taskEmpty, /<section class="empty-filter-card" aria-label="全部任务筛选">/);
   assert.doesNotMatch(taskEmpty, /<h2 id="empty-task-title">任务中心<\/h2>/);
   assert.match(taskEmpty, /\.empty-filter-card\{padding:8px 10px 10px\}/);
   assert.match(taskEmpty, /\.empty-filter-grid\{gap:8px 12px;align-content:start\}/);

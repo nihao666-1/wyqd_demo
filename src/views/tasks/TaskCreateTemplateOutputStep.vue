@@ -3,7 +3,7 @@
     <div class="step4-layout">
       <main class="step4-main">
         <header class="step4-title-row">
-          <button type="button" aria-label="返回任务中心" @click="$emit('request-exit')">←</button>
+          <button type="button" aria-label="返回全部任务" @click="$emit('request-exit')">←</button>
           <h2>创建审计任务</h2>
         </header>
 

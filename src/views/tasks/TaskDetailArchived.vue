@@ -2,7 +2,7 @@
   <div class="archive-page" data-archived-task-detail>
     <header class="archive-titlebar" data-archive-region="header">
       <div class="archive-title-group">
-        <RouterLink class="archive-back" to="/tasks" aria-label="返回任务中心">
+        <RouterLink class="archive-back" to="/tasks" aria-label="返回全部任务">
           <FontAwesomeIcon :icon="faArrowLeft" />
         </RouterLink>
         <h1>{{ archive.title }}</h1>

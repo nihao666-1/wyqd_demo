@@ -2,7 +2,7 @@
   <div class="audit-report-template-page route-fill-page">
   <PageHeader eyebrow="模板管理" title="报告模板管理" description="查询模板版本、引用状态、样式规则和检查规则绑定情况。">
     <RouterLink class="btn" to="/audit-report/workbench">返回入口</RouterLink>
-    <button class="btn primary" type="button" @click="store.setNotice('已打开模板上传弹窗。')">上传模板</button>
+    <button class="btn primary" type="button" @click="store.publishTemplateVersion()">发布演示新版本</button>
   </PageHeader>
   <section v-if="route.query.action || route.query.panel" class="panel merge-hint">
     <strong>{{ route.query.action === 'upload' ? '模板上传已并入当前页面' : '模板差异已并入当前页面' }}</strong>
@@ -13,7 +13,7 @@
     <div class="panel-title"><h3>模板版本</h3></div>
     <DataTable :columns="columns" :rows="store.db.reportTemplates" row-key="templateId">
       <template #actions="{ row }">
-        <button class="btn" type="button" @click="store.setNotice(`${row.name} 的新版本差异抽屉已打开。`)">新版本差异</button>
+        <button class="btn" type="button" @click="store.publishTemplateVersion()">发布新版本</button>
         <button class="btn" @click="store.validateTemplateReference(row)">引用校验</button>
       </template>
     </DataTable>

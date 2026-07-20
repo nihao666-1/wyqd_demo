@@ -39,7 +39,6 @@
     <section class="task-detail-draft-log" aria-labelledby="task-detail-draft-log-title">
       <header class="task-detail-draft-panel-header">
         <h2 id="task-detail-draft-log-title">操作留痕</h2>
-        <RouterLink :to="{ path: '/records', query: { taskId: task.id } }">全部日志 <span aria-hidden="true">›</span></RouterLink>
       </header>
       <div class="task-detail-draft-log-table">
         <table>

@@ -100,7 +100,7 @@
           </div>
 
           <footer class="record-pagination">
-            <span>共 {{ isEmptyView ? '0' : '3,426' }} 条</span>
+            <span>共 {{ isEmptyView ? '0' : activeTab === 'abnormal' ? '12' : '3,426' }} 条</span>
             <div>
               <button type="button" :disabled="isEmptyView">‹</button>
               <button type="button" class="active">1</button>
@@ -191,28 +191,6 @@
         </section>
 
         <section class="detail-section">
-          <h4>关联版本</h4>
-          <div class="related-row">
-            <p>V1.0　2025-05-10 15:12　张伟</p>
-            <button type="button">查看版本</button>
-          </div>
-        </section>
-
-        <section class="detail-section">
-          <h4>复核意见</h4>
-          <p class="review-line">王磊（工号：100115）　2025-05-10 15:40 <span>通过</span></p>
-          <p>文件解析准确，数据完整。</p>
-        </section>
-
-        <section class="detail-section">
-          <h4>导出文件</h4>
-          <div class="related-row">
-            <p><span class="pdf-dot"></span>文件解析日志_20250510.pdf</p>
-            <button type="button">下载</button>
-          </div>
-        </section>
-
-        <section class="detail-section">
           <h4>操作流程追溯</h4>
           <ol class="detail-timeline">
             <li v-for="item in detailTimeline" :key="item.label" :class="{ current: item.current }">
@@ -243,18 +221,12 @@ const activeTab = ref('operation');
 const isEmptyView = computed(() => store.demoDataMode === 'empty');
 
 const emptyMetrics = [
-  { label: '版本记录', value: '0', hint: '较昨日 0', icon: 'report', tone: 'red' },
   { label: '操作留痕', value: '0', hint: '较昨日 0', icon: 'analysis', tone: 'orange' },
-  { label: '导出记录', value: '0', hint: '较昨日 0', icon: 'upload', tone: 'blue' },
-  { label: '复核记录', value: '0', hint: '较昨日 0', icon: 'review', tone: 'purple' },
   { label: '异常操作', value: '0', hint: '较昨日 0', icon: 'anomaly', tone: 'red' }
 ];
 
 const dataMetrics = [
-  { label: '版本记录', value: '128', hint: '较上月 +18 条 ↑', icon: 'files', tone: 'blue', trendClass: 'up' },
   { label: '操作留痕', value: '3,426', hint: '较上月 +326 条 ↑', icon: 'records', tone: 'green', trendClass: 'up' },
-  { label: '导出记录', value: '286', hint: '较上月 +32 条 ↑', icon: 'upload', tone: 'orange', trendClass: 'up' },
-  { label: '复核记录', value: '74', hint: '较上月 +9 条 ↑', icon: 'review', tone: 'purple', trendClass: 'up' },
   { label: '异常操作', value: '12', hint: '较上月 -3 条 ↓', icon: 'anomaly', tone: 'red', trendClass: 'down' }
 ];
 
@@ -277,19 +249,13 @@ const filterFields = computed(() => [
 ]);
 
 const emptyTabs = [
-  { key: 'all', label: '全部记录' },
-  { key: 'version', label: '版本记录' },
   { key: 'operation', label: '操作留痕' },
-  { key: 'export', label: '导出记录' },
-  { key: 'review', label: '复核记录' }
+  { key: 'abnormal', label: '异常操作' }
 ];
 
 const dataTabs = [
-  { key: 'all', label: '全部记录（3,926）' },
-  { key: 'version', label: '版本记录（128）' },
   { key: 'operation', label: '操作留痕（3,426）' },
-  { key: 'export', label: '导出记录（286）' },
-  { key: 'review', label: '复核记录（74）' }
+  { key: 'abnormal', label: '异常操作（12）' }
 ];
 
 const activeTabs = computed(() => (isEmptyView.value ? emptyTabs : dataTabs));
@@ -308,7 +274,7 @@ const columns = [
 ];
 
 const tableRows = [
-  { id: 'LOG-01', time: '2025-05-10 14:32:18', operator: '张伟', department: '市场部', type: '创建任务', objectType: '任务', objectName: '上海分公司 Q1 常规审计任务', content: '创建审计任务并设置基础信息', result: '成功', entry: '任务中心', tone: 'blue' },
+  { id: 'LOG-01', time: '2025-05-10 14:32:18', operator: '张伟', department: '市场部', type: '创建任务', objectType: '任务', objectName: '上海分公司 Q1 常规审计任务', content: '创建审计任务并设置基础信息', result: '成功', entry: '全部任务', tone: 'blue' },
   { id: 'LOG-02', time: '2025-05-10 14:31:05', operator: '李娜', department: '审计部', type: '上传文件', objectType: '文件', objectName: '费用报销明细_202503.xlsx', content: '上传文件至任务资料', result: '成功', entry: '任务详情-资料', tone: 'green' },
   { id: 'LOG-03', time: '2025-05-10 14:31:42', operator: '李娜', department: '审计部', type: '解析文件', objectType: '文件', objectName: '费用报销明细_202503.xlsx', content: '解析文件并提取数据', result: '成功', entry: '任务详情-资料', tone: 'orange', hasDiff: true },
   { id: 'LOG-04', time: '2025-05-10 14:32:31', operator: '王磊', department: '审计部', type: '生成结果', objectType: '分析结果', objectName: '费用异常分析结果', content: '生成费用异常分析结果', result: '成功', entry: '任务详情-分析', tone: 'orange' },
@@ -319,19 +285,20 @@ const tableRows = [
   { id: 'LOG-09', time: '2025-05-10 15:35:11', operator: '王磊', department: '审计部', type: '提交复核', objectType: '报告', objectName: '审计报告（V1.0）', content: '提交报告复核', result: '成功', entry: '报告管理', tone: 'purple' },
   { id: 'LOG-10', time: '2025-05-10 16:02:45', operator: '赵强', department: '审计部', type: '导出文件', objectType: '报告', objectName: '审计报告（V1.0）.pdf', content: '导出报告 PDF', result: '成功', entry: '报告管理', tone: 'blue' },
   { id: 'LOG-11', time: '2025-05-10 16:18:30', operator: '陈晨', department: 'IT 运营部', type: '配置规则', objectType: '规则', objectName: '费用异常规则 V2.1', content: '新增费用异常规则', result: '成功', entry: '配置中心', tone: 'orange', hasDiff: true },
-  { id: 'LOG-12', time: '2025-05-10 16:40:21', operator: '赵强', department: 'IT 运营部', type: '变更权限', objectType: '权限', objectName: '审计人员角色权限', content: '调整角色权限', result: '成功', entry: '配置中心', tone: 'gray', hasDiff: true }
+  { id: 'LOG-12', time: '2025-05-10 16:40:21', operator: '赵强', department: 'IT 运营部', type: '变更权限', objectType: '权限', objectName: '审计人员角色权限', content: '越权调整角色权限，系统已阻断', result: '被阻断', entry: '系统管理', tone: 'gray', hasDiff: true }
 ];
 
-const visibleTableRows = computed(() => tableRows.slice(0, 8));
+const visibleTableRows = computed(() => {
+  const rows = activeTab.value === 'abnormal' ? tableRows.filter((row) => row.result !== '成功') : tableRows;
+  return rows.slice(0, 8);
+});
 const selectedRecord = ref(tableRows[2]);
 
 const traceSteps = [
   { title: '任务', desc: '创建审计任务', icon: 'tasks', tone: 'red' },
   { title: '文件', desc: '上传与解析资料', icon: 'files', tone: 'orange' },
   { title: '结果', desc: '模型生成结果', icon: 'analysis', tone: 'blue' },
-  { title: '报告', desc: '报告生成与编辑', icon: 'report', tone: 'purple' },
-  { title: '版本', desc: '保存版本记录', icon: 'records', tone: 'green' },
-  { title: '导出', desc: '导出与归档管理', icon: 'upload', tone: 'gray' }
+  { title: '报告', desc: '报告生成与编辑', icon: 'report', tone: 'purple' }
 ];
 
 const guideItems = [
@@ -342,8 +309,6 @@ const guideItems = [
   { title: '确认异常', desc: '记录异常确认与处理意见', icon: 'review', tone: 'blue' },
   { title: '排除异常', desc: '记录异常排除及原因说明', icon: 'failed', tone: 'red' },
   { title: '修改报告', desc: '记录报告编辑与内容变更', icon: 'report', tone: 'orange' },
-  { title: '保存版本', desc: '记录版本保存与变更历史', icon: 'records', tone: 'blue' },
-  { title: '提交复核', desc: '记录复核提交与意见处理', icon: 'review', tone: 'green' },
   { title: '配置规则', desc: '记录规则配置与参数变更', icon: 'config', tone: 'gray' },
   { title: '变更权限', desc: '记录权限分配与变更情况', icon: 'tasks', tone: 'gray' }
 ];

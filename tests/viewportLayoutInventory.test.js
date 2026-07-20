@@ -10,22 +10,19 @@ const fillRoutes = [
   '/tasks/detail/supervision-share',
   '/files',
   '/files/detail',
-  '/config',
-  '/records',
   '/materials/import',
   '/regulatory/workbench',
   '/regulatory/result',
-  '/audit-standard/workbench',
   '/audit-standard/draft',
   '/audit-standard/library',
   '/audit-standard/policy',
   '/supervision/workbench',
   '/supervision/report/draft',
-  '/expense/workbench',
   '/expense/audit/overview',
   '/expense/usage/dashboard',
   '/expense/anomaly/dashboard',
   '/audit-report/workbench',
+  '/audit-report/business-analysis',
   '/audit-report/template',
   '/audit-report/gap-list',
   '/audit-report/draft',
@@ -49,7 +46,7 @@ test('every component route has exactly one viewport layout classification', () 
   );
   const classifiedRoutes = [...fillRoutes, ...naturalRoutes, ...conditionalRoutes];
 
-  assert.equal(componentRoutes.length, 31);
+  assert.equal(componentRoutes.length, 28);
   assert.equal(new Set(classifiedRoutes).size, classifiedRoutes.length);
   assert.deepEqual([...classifiedRoutes].sort(), [...componentRoutes].sort());
   assert.equal(classifiedRoutes.some((route) => redirectRoutes.has(route)), false);

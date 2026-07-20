@@ -1,7 +1,7 @@
 <template>
   <section class="task-create-page" :class="{ 'parsing-page': step === 3 && stepFourStage === 'parsing', 'template-output-page': step === 4 && stepFourStage === 'template' }" data-page="task-create">
     <header v-if="step <= 1" class="create-title-row">
-      <RouterLink class="create-back" to="/tasks" aria-label="返回任务中心"><AuditIcon name="collapse" /></RouterLink>
+      <RouterLink class="create-back" to="/tasks" aria-label="返回全部任务"><AuditIcon name="collapse" /></RouterLink>
       <h2>创建审计任务</h2>
     </header>
 
@@ -237,13 +237,13 @@ function handleTemplateSummaryDetail(section) { goStep(section === 'task' ? 1 : 
 function exitTaskCreate() { router.push('/tasks'); }
 function submitTemplateTask() {
   saveDraft();
-  store.setNotice('任务已提交，模板、输出规则和合规设置已写入任务记录。');
-  router.push('/tasks');
+  const task = store.submitDemoTask(store.db.taskDraft);
+  router.push({ path: '/tasks/detail', query: { taskId: task.taskId, state: 'pending' } });
 }
 function submitTaskAndReturn() {
   saveDraft();
-  store.setNotice('任务已提交，可在任务中心继续查看执行进度。');
-  router.push('/tasks');
+  const task = store.submitDemoTask(store.db.taskDraft);
+  router.push({ path: '/tasks/detail', query: { taskId: task.taskId, state: 'pending' } });
 }
 function goBack() {
   if (step.value === 4 && stepFourStage.value === 'template') { backToParsing(); return; }

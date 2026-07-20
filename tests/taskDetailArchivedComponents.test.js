@@ -96,7 +96,7 @@ test('归档详情提供语义表格时间线和可观察操作反馈', () => {
   assert.match(trail, /<ol class="archive-timeline"/);
   assert.match(sidebar, /<table class="download-table">/);
   assert.match(shell, /aria-live="polite"/);
-  assert.match(shell, /aria-label="返回任务中心"/);
+  assert.match(shell, /aria-label="返回全部任务"/);
   assert.match(sidebar, /aria-label="关闭归档详情"/);
 });
 
@@ -117,7 +117,7 @@ test('应用壳只为归档详情启用专属类和紧凑面包屑', () => {
 
   assert.match(layout, /'task-archived-shell': isArchivedTaskDetail/);
   assert.match(layout, /const isArchivedTaskDetail = computed/);
-  assert.match(layout, /任务中心/);
+  assert.match(layout, /审计工作台/);
   assert.match(layout, /任务详情/);
   assert.match(layout, /class="global-data-mode"/);
 });

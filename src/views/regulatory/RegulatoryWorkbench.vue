@@ -2,12 +2,12 @@
   <div class="special-audit-page route-fill-page">
     <section v-if="route.query.action === 'create'" class="special-merge-hint">
       <strong>新建分析已并入专项审计工作台</strong>
-      <p>可在当前页面选择监管案例舆情或监督共享信息，打开新建分析弹窗并继续执行。</p>
+      <p>按被审计单位、业务范围和审计期分析监管案例与舆情，形成监管关注点和重点检查建议。</p>
     </section>
-    <section v-if="isEmptyMode" class="special-empty-page" aria-label="专项审计分析空白页">
+    <section v-if="isEmptyMode" class="special-empty-page" aria-label="监管案例与舆情分析空白页">
       <div class="special-empty-grid">
         <main class="special-empty-main">
-          <section class="empty-metric-grid" aria-label="专项审计分析空态指标">
+          <section class="empty-metric-grid" aria-label="监管案例与舆情分析空态指标">
             <article v-for="item in emptyMetrics" :key="item.label" class="empty-metric-card">
               <span class="empty-metric-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
               <div>
@@ -19,7 +19,7 @@
           </section>
 
           <section class="empty-task-hero" aria-labelledby="special-empty-title">
-            <svg class="empty-hero-art" viewBox="0 0 260 150" role="img" aria-label="暂无专项审计分析任务">
+            <svg class="empty-hero-art" viewBox="0 0 260 150" role="img" aria-label="暂无监管案例与舆情分析任务">
               <rect x="36" y="24" width="136" height="108" rx="8" fill="#f7f9fc" stroke="#dce3ed" />
               <line x1="58" y1="48" x2="122" y2="48" stroke="#d5dde9" stroke-width="7" stroke-linecap="round" />
               <line x1="58" y1="72" x2="132" y2="72" stroke="#e0e6ef" stroke-width="5" stroke-linecap="round" />
@@ -31,7 +31,7 @@
               <rect x="180" y="84" width="52" height="48" rx="6" fill="#fbfcfe" stroke="#dce3ed" />
             </svg>
             <div>
-              <h2 id="special-empty-title">暂无专项审计分析任务</h2>
+              <h2 id="special-empty-title">暂无监管案例与舆情分析任务</h2>
               <p>可以监管案例舆情或监督共享信息发起分析，形成监管关注点、审计检查建议和汇总分析报告。</p>
               <div class="empty-ability-grid">
                 <article v-for="item in emptyAbilities" :key="item.title">
@@ -71,7 +71,7 @@
                           <path d="M24 30l12 16h20l12-16M14 44h22l6 7h8l6-7h22" fill="none" stroke="#cbd6e4" />
                         </svg>
                         <strong>暂无数据</strong>
-                        <p>当前暂无专项审计分析任务，快去创建吧！</p>
+                        <p>当前暂无监管案例与舆情分析任务，快去创建吧！</p>
                       </div>
                     </td>
                   </tr>
@@ -99,7 +99,7 @@
 
     <div v-else class="page-grid">
       <main class="main-stack">
-        <section class="metric-grid" aria-label="专项审计分析概览">
+        <section class="metric-grid" aria-label="监管案例与舆情分析概览">
           <article v-for="item in metrics" :key="item.label" class="metric-card">
             <span class="icon-box" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
             <div>
@@ -205,25 +205,6 @@
         </section>
       </main>
 
-      <aside class="side-stack" aria-label="所需资料与输出说明">
-        <section class="info-panel">
-          <h2>所需资料与输出说明</h2>
-          <article v-for="item in materials" :key="item.title">
-            <span class="material-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
-            <div><h3>{{ item.title }}</h3><p>{{ item.desc }}</p><RouterLink v-if="item.to" :to="item.to">查看详情</RouterLink></div>
-          </article>
-        </section>
-        <section class="pending-panel">
-          <header><h2>待处理事项</h2><span>共 17 项</span></header>
-          <ul>
-            <li v-for="item in pendingItems" :key="item.label">
-              <span class="pending-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span>
-              <p>{{ item.label }}</p><strong :class="item.tone">{{ item.value }}</strong>
-            </li>
-          </ul>
-          <RouterLink to="/tasks">查看全部待处理事项 <FontAwesomeIcon :icon="faChevronRight" /></RouterLink>
-        </section>
-      </aside>
     </div>
   </div>
 </template>
@@ -291,9 +272,7 @@ const emptyMaterials = [
 const metrics = [
   { label: '分析任务', value: '18', unit: '个', delta: '3', tone: 'red', icon: faBriefcase },
   { label: '监管关注点', value: '126', unit: '条', delta: '8', tone: 'orange', icon: faUserCheck },
-  { label: '舆情风险', value: '42', unit: '条', delta: '5', tone: 'purple', icon: faComments },
-  { label: '共享文件', value: '384', unit: '份', delta: '27', tone: 'green', icon: faFolder },
-  { label: '汇总报告', value: '16', unit: '份', delta: '2', tone: 'blue', icon: faChartColumn }
+  { label: '舆情风险', value: '42', unit: '条', delta: '5', tone: 'purple', icon: faComments }
 ];
 
 const abilities = [
@@ -344,19 +323,7 @@ const recentTasks = [
   { id: 'TASK-20250426003', type: '监管案例舆情分析', unit: '上海分公司', period: '2024Q4', status: '已完成', tone: 'success', output: '案例 15 条 / 舆情 6 条 / 建议 4 条', updated: '2025-04-26 14:32', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/result?tab=history' }, { text: '生成报告', to: '/audit-report/draft' }, { text: '导出', to: '/files' }] },
   { id: 'TASK-20250425004', type: '监管共享信息分析', unit: '上海分公司', period: '2025Q1', status: '处理中', tone: 'processing', output: '共享文件 128 份 / 标签提取中', updated: '2025-04-28 11:05', actions: [{ text: '查看进度', to: '/tasks/detail' }, { text: '查看依据', to: '/supervision/workbench' }, { text: '取消任务', to: '/tasks' }] },
   { id: 'TASK-20250424005', type: '监管案例舆情分析', unit: '上海分公司', period: '2025Q1', status: '待确认', tone: 'warning', output: '关注点 12 条 / 风险 7 条', updated: '2025-04-25 09:41', actions: [{ text: '查看结果', to: '/regulatory/result' }, { text: '查看依据', to: '/regulatory/result?tab=history' }, { text: '确认关注点', to: '/regulatory/result' }] },
-  { id: 'TASK-20250423006', type: '监管共享信息分析', unit: '上海分公司', period: '2024Q4', status: '失败', tone: 'danger', output: '解析失败：文件格式不支持', updated: '2025-04-23 15:12', actions: [{ text: '查看日志', to: '/records' }, { text: '重新分析', to: '/supervision/report/source-select' }, { text: '删除', to: '/tasks' }] }
-];
-const materials = [
-  { title: '监管案例库', desc: '收集最新监管处罚、现场检查、通报等案例信息。', tone: 'red', icon: faDatabase, to: '/regulatory/result?tab=history' },
-  { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments, to: '/regulatory/result?tab=history' },
-  { title: '合规/风险/审计共享文件', desc: '来自合规、风险、审计条线的共享文档与数据。', tone: 'green', icon: faFolder, to: '/supervision/workbench' },
-  { title: '数据标签', desc: '基于业务、风险、监管主题的标准标签体系。', tone: 'blue', icon: faTag, to: '/audit-standard/policy' },
-  { title: '使用提示', desc: '分析结果可引用到审计报告，所有过程留痕，支持追溯。', tone: 'orange', icon: faLightbulb }
-];
-const pendingItems = [
-  { label: '待确认关注点', value: '8 条', tone: 'red', icon: faComments },
-  { label: '待补充标签', value: '5 条', tone: 'orange', icon: faBriefcase },
-  { label: '待导出报告', value: '4 份', tone: 'blue', icon: faFileLines }
+  { id: 'TASK-20250423006', type: '监管共享信息分析', unit: '上海分公司', period: '2024Q4', status: '失败', tone: 'danger', output: '解析失败：文件格式不支持', updated: '2025-04-23 15:12', actions: [{ text: '查看详情', to: '/regulatory/result?taskId=TASK-20250423006' }, { text: '重新分析', to: '/supervision/report/source-select' }, { text: '删除', to: '/tasks' }] }
 ];
 </script>
 
@@ -415,9 +382,9 @@ const pendingItems = [
 .empty-table-wrap table { height:100%; }
 .empty-table-wrap tbody,.empty-table-wrap tr,.empty-table-wrap td,.empty-table-state { height:100%; }
 .empty-info-panel { height:100%; align-content:start; }
-.page-grid { display:grid; min-height:100%; grid-template-columns:minmax(0,1fr) var(--ui-panel-rail-lg); gap:var(--ui-space-4); align-items:start; }
+.page-grid { display:grid; min-height:100%; grid-template-columns:minmax(0,1fr); gap:var(--ui-space-4); align-items:start; }
 .main-stack { min-width:0; display:grid; gap:9px; }
-.metric-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; margin-bottom:0; }
+.metric-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-bottom:0; }
 .metric-card,.ability-card,.chart-grid,.recent-panel,.info-panel,.pending-panel { min-width:0; border:1px solid var(--line); border-radius:4px; background:#fff; box-shadow:0 8px 18px rgba(35,45,66,.025); }
 .metric-card { min-height:100px; display:grid; grid-template-columns:42px minmax(0,1fr); align-items:center; gap:9px; padding:12px 12px; }
 .metric-card::before { display:none; }
@@ -496,7 +463,7 @@ th:nth-child(1){width:128px} th:nth-child(2){width:116px} th:nth-child(3){width:
 .pending-panel { padding:12px 12px 15px; }.pending-panel header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }.pending-panel header span { color:#4b5563; font-size:12px; }
 .pending-panel ul { display:grid; gap:11px; margin:0; padding:0; list-style:none; }.pending-panel li { min-height:30px; display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:9px; align-items:center; }
 .pending-icon { width:26px; height:26px; border-radius:6px; font-size:13px; }.pending-panel p { margin:0; font-size:12px; }.pending-panel strong { font-size:13px; }.pending-panel strong.red { color:var(--red); background:none; }.pending-panel strong.orange { color:var(--color-warning); background:none; }.pending-panel strong.blue { color:var(--blue); background:none; }.pending-panel > a { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:22px; color:#126dff; font-size:12px; font-weight:600; }
-@media (max-width:1500px){.special-audit-page{max-width:none;padding-left:6px;padding-right:6px}.page-grid{grid-template-columns:minmax(0,1fr) 270px;gap:10px}.metric-card{grid-template-columns:40px minmax(0,1fr);padding:12px 9px}.icon-box{width:36px;height:36px}.metric-card strong{font-size:23px}.ability-card{padding-left:11px;padding-right:11px}.ability-card h2{font-size:16px}.flow{gap:18px;margin-left:12px;margin-right:12px}.flow i{right:-16px}.ability-card dl{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(130px,1.35fr)}.ability-card dd{font-size:13px}.donut-layout{grid-template-columns:116px minmax(0,1fr)}.donut{width:106px;height:106px}.topic-list li{gap:4px;font-size:11px}}
+@media (max-width:1500px){.special-audit-page{max-width:none;padding-left:6px;padding-right:6px}.page-grid{grid-template-columns:minmax(0,1fr);gap:10px}.metric-card{grid-template-columns:40px minmax(0,1fr);padding:12px 9px}.icon-box{width:36px;height:36px}.metric-card strong{font-size:23px}.ability-card{padding-left:11px;padding-right:11px}.ability-card h2{font-size:16px}.flow{gap:18px;margin-left:12px;margin-right:12px}.flow i{right:-16px}.ability-card dl{grid-template-columns:repeat(3,minmax(0,1fr)) minmax(130px,1.35fr)}.ability-card dd{font-size:13px}.donut-layout{grid-template-columns:116px minmax(0,1fr)}.donut{width:106px;height:106px}.topic-list li{gap:4px;font-size:11px}}
 @media (max-width:1280px){.special-empty-grid{grid-template-columns:1fr}.empty-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.empty-info-panel{grid-template-columns:repeat(2,minmax(0,1fr))}.empty-info-panel h2{grid-column:1/-1}.empty-task-hero{grid-template-columns:220px minmax(0,1fr);gap:20px;padding-left:22px;padding-right:22px}.empty-hero-art{width:220px}.empty-info-panel article{grid-template-columns:36px minmax(0,1fr);padding-left:10px;padding-right:10px}}
 @media (max-width:1180px){.page-grid{grid-template-columns:1fr}.side-stack{grid-template-columns:1fr;margin-top:0}.info-panel{grid-template-columns:repeat(2,minmax(0,1fr))}.info-panel h2{grid-column:1/-1}}
 @media (max-width:1040px){.metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.chart-grid{grid-template-columns:1fr}.chart-grid article{border-right:0;border-bottom:1px solid var(--soft)}.chart-grid article:last-child{border-bottom:0}.trend svg{height:145px}.bar-list{max-width:560px}}

@@ -1,7 +1,7 @@
 <template>
   <PageHeader :eyebrow="mode" :title="`${mode} 审计规范配置`" description="选择公司、部门、时间范围和来源类型，完成生成前预检后进入三栏草稿。">
     <RouterLink class="btn" to="/audit-standard/workbench">返回工作台</RouterLink>
-    <button class="btn primary" type="button" @click="store.setNotice('生成前预检确认区已展开。')">生成前预检</button>
+    <RouterLink class="btn primary" to="/audit-standard/draft" @click="store.setNotice('来源预检通过，审计规范演示结果已生成。')">开始生成演示结果</RouterLink>
   </PageHeader>
   <section v-if="route.query.step === 'precheck'" class="panel merge-hint">
     <strong>生成前预检已并入配置页</strong>
@@ -17,7 +17,7 @@
       <label><span>来源类型</span><input value="内部制度、外部法规、法规库扩展、案例库、历史规范" readonly /></label>
       <label><span>模板</span><input value="费用审计规范模板 V1.3" readonly /></label>
       <label><span>权限规则</span><input value="大权限覆盖小权限，不允许跨分公司" readonly /></label>
-      <label><span>后续状态</span><input value="待预检" readonly /></label>
+      <label><span>后续状态</span><input value="来源完整，可生成" readonly /></label>
     </div>
   </section>
   <section class="panel">

@@ -46,7 +46,7 @@ test('布局为费用趋势页提供专用壳层面包屑和导航状态', () =>
   const css = read(layoutCssUrl);
   assert.match(layout, /'expense-trend-shell': isExpenseTrendResult/);
   assert.match(layout, /const isExpenseTrendResult = computed\(\(\) => route\.path === '\/expense\/usage\/dashboard'\)/);
-  assert.match(layout, /费用审计分析<\/span><i>\/<\/i><strong>费用趋势分析<\/strong>/);
+  assert.match(layout, /费用智能化审计<\/span><i>\/<\/i><strong>费用综合分析<\/strong>/);
   assert.match(layout, /class="global-data-mode"/);
   assert.match(css, /\.expense-trend-shell \.sidebar \{[\s\S]*width: var\(--shell-sidebar-width\)/);
   assert.match(css, /\.expense-trend-shell \.topbar \{[\s\S]*height: var\(--ui-topbar-height\)/);

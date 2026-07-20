@@ -7,9 +7,10 @@ const workbench = readFileSync(
   'utf8'
 );
 
-test('workbench todo items use two compact rows with both actions visible', () => {
+test('workbench todo items stay compact and only open task detail', () => {
   assert.match(workbench, /class="todo-heading"[\s\S]*item\.title[\s\S]*class="status-tag"/);
-  assert.match(workbench, /class="todo-support"[\s\S]*item\.meta[\s\S]*去处理[\s\S]*查看详情/);
+  assert.match(workbench, /class="todo-support"[\s\S]*item\.meta[\s\S]*查看任务/);
+  assert.doesNotMatch(workbench, />去处理<|todo-detail-link/);
   assert.match(workbench, /\.todo-item\s*\{[^}]*grid-template-rows:\s*auto auto[^}]*min-height:\s*44px/s);
   assert.match(workbench, /\.todo-heading,\s*\.todo-support\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) auto/s);
   assert.match(workbench, /\.todo-item \.row-actions\s*\{[^}]*flex-wrap:\s*nowrap/s);

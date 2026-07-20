@@ -86,6 +86,5 @@ export const taskQuickLinks = [
   { label: '报表模板', to: '/audit-report/workbench', tone: 'purple' },
   { label: '知识库检索', to: '/audit-standard/library', tone: 'purple' },
   { label: '数据标签', to: '/files', tone: 'orange' },
-  { label: '审计规则库', to: '/audit-standard/workbench', tone: 'blue' },
-  { label: '系统监控', to: '/records', tone: 'green' }
+  { label: '审计规则库', to: '/audit-standard/workbench', tone: 'blue' }
 ];

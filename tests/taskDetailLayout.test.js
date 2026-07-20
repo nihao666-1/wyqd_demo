@@ -9,7 +9,7 @@ test('任务详情使用独立应用壳和正确面包屑', () => {
   assert.match(layout, /'task-detail-shell': isTaskDetailRoute/);
   assert.match(layout, /const isTaskDetailRoute = computed\(\(\) => route\.path === '\/tasks\/detail'\)/);
   assert.match(layout, /v-else-if="isTaskDetailRoute" class="task-breadcrumb"/);
-  assert.match(layout, /<span>任务中心<\/span><i>\/<\/i><strong>任务详情<\/strong>/);
+  assert.match(layout, /<span>审计工作台<\/span><i>\/<\/i><strong>任务详情<\/strong>/);
   assert.match(layout, /class="global-data-mode"/);
 });
 

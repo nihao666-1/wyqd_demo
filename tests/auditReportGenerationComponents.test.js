@@ -105,7 +105,7 @@ test('报告生成页专属 shell 接入面包屑和报告智能化激活', () =
   assert.match(layout, /isAuditReportGeneration/);
   assert.match(layout, /route\.path === '\/audit-report\/draft'/);
   assert.match(layout, /<strong>报告生成<\/strong>/);
-  assert.match(layout, /item\.path === '\/audit-report\/workbench'/);
+  assert.match(layout, /item\.path === '\/audit-report\/business-analysis'/);
   assert.match(css, /\.audit-report-generation-shell/);
   assert.match(css, /\.audit-report-generation-shell \.sidebar[\s\S]*width:\s*var\(--shell-sidebar-width\)/s);
   assert.match(css, /\.audit-report-generation-shell \.topbar\s*\{[^}]*height:\s*56px/s);

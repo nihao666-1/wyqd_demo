@@ -34,16 +34,16 @@ test('任务详情能力 5 的查看结果携带 taskId 进入审计规范结果
   assert.match(source, /router\.push/);
 });
 
-test('审计规范结果页使用专属 shell、三段面包屑并保持任务中心激活', () => {
+test('审计规范结果页使用专属 shell、三段面包屑并归属审计知识库', () => {
   const source = compileSfc(appLayoutUrl);
 
   assert.match(source, /isAuditStandardResult/);
   assert.match(source, /route\.path === ['"]\/audit-standard\/draft['"]/);
   assert.match(source, /audit-standard-result-shell/);
-  for (const crumb of ['任务中心', '上海分公司Q1常规审计任务', '审计规范生成']) {
+  for (const crumb of ['审计知识库', '上海分公司Q1常规审计任务', '审计规范智能化']) {
     assert.match(source, new RegExp(crumb));
   }
-  assert.match(source, /isAuditStandardResult[\s\S]*item\.path === ['"]\/tasks['"]/);
+  assert.match(source, /isKnowledgeSection[\s\S]*item\.path === ['"]\/audit-standard\/policy['"]/);
   assert.match(source, /class="global-data-mode"/);
 });
 

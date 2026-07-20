@@ -1,12 +1,10 @@
 <template>
   <div class="report-ai-page route-fill-page" :class="`mode-${activeMode}`">
-    <header class="report-title">
-      <div>
-        <p>审计工作台 / 报告智能化</p>
-        <h2>{{ modeTitle }}</h2>
-      </div>
-    </header>
-
+    <section class="panel report-closure-strip" aria-live="polite">
+      <div><strong>最小演示流程</strong><span>{{ reportDemoState.status }}</span></div>
+      <p>业务分析确认 → 生成草稿 → 智能审核 → 导出报告</p>
+      <small>导出状态：{{ reportDemoState.exportStatus }}</small>
+    </section>
     <template v-if="activeMode === 'generate'">
       <section class="generate-page">
         <section class="panel gen-toolbar">
@@ -20,11 +18,10 @@
           </div>
           <div class="toolbar-actions">
             <RouterLink class="toolbar-link" to="/materials/import?scene=audit-report">资料导入</RouterLink>
-            <button class="primary" type="button" @click="showNotice('已开始生成报告草稿。')">开始生成</button>
-            <button class="outline-danger" type="button" @click="showNotice('已对当前章节重新生成。')">章节级重新生成</button>
-            <button type="button" @click="showNotice('版本已保存。')">保存版本</button>
-            <button type="button" @click="showNotice('已提交审核。')">提交审核</button>
-            <button class="outline-danger" type="button" @click="showNotice('已导出报告。')">导出报告⌄</button>
+            <RouterLink class="toolbar-link" to="/audit-report/template">模板管理</RouterLink>
+            <button class="primary" type="button" @click="store.handleReportDemoAction('generate')">开始生成</button>
+            <RouterLink class="toolbar-link" to="/audit-report/workbench?mode=review" @click="store.handleReportDemoAction('review')">提交审核</RouterLink>
+            <button class="outline-danger" type="button" @click="store.handleReportDemoAction('export')">导出报告</button>
           </div>
         </section>
 
@@ -84,30 +81,19 @@
           </aside>
         </section>
 
-        <section class="gen-bottom">
-          <div class="panel generate-flow">
-            <h3>报告生成流程</h3>
-            <span v-for="step in generateSteps" :key="step.title" :class="step.state"><b>{{ step.no }}</b><strong>{{ step.title }}</strong><small>{{ step.status }}</small><em>{{ step.count }}</em></span>
-          </div>
-          <aside class="panel progress-card">
-            <h3>生成建议</h3>
-            <p>已完成 66%</p><small>预计剩余时间：6 分钟</small>
-            <div class="ring">66%</div>
-          </aside>
-        </section>
       </section>
     </template>
 
     <template v-else>
       <section class="review-page">
         <header class="review-top">
-          <h2>报告审核</h2>
+          <h2>报告智能审核</h2>
           <div>
             <button @click="showNotice('已返回任务。')">← 返回任务</button>
             <button @click="showNotice('已上传新版本。')">上传新版本</button>
-            <button @click="showNotice('已重新检查。')">重新检查</button>
-            <button class="primary" @click="showNotice('已生成复核记录。')">生成复核记录</button>
-            <button class="outline-danger" @click="showNotice('已导出问题清单。')">导出问题清单</button>
+            <button @click="store.handleReportDemoAction('review')">重新检查</button>
+            <button class="primary" @click="store.handleReportDemoAction('review')">完成审核</button>
+            <button class="outline-danger" @click="store.handleReportDemoAction('export')">导出问题清单</button>
           </div>
         </header>
         <section class="review-board">
@@ -202,15 +188,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+const store = inject('store');
 const activeMode = computed(() => route.query.mode === 'review' ? 'review' : 'generate');
+const reportDemoState = computed(() => store.db.reportDemoState || { status: '待生成', exportStatus: '未导出' });
 const notice = ref('');
 const activeChapter = ref('一、基本情况');
-const expandedMode = { generate: '报告生成', review: '报告审核' };
-const modeTitle = computed(() => expandedMode[activeMode.value]);
 
 function showNotice(message) {
   notice.value = message;
@@ -226,16 +212,8 @@ const evidenceItems = [
   { no: 1, title: '《证券公司信息隔离墙制度指引》', desc: '第六条 公司应建立健全信息隔离制度。', source: '公司制度库', rate: '98%' },
   { no: 2, title: '《财务管理制度》', desc: '费用报销应遵循真实性、合规性和完整性原则。', source: '公司制度库', rate: '96%' },
   { no: 3, title: '上海分公司组织架构及人员情况表', desc: '包含人员分公司架构、人员编制及营业网点信息。', source: '监督共享平台', rate: '92%' },
-  { no: 4, title: '费用异常：超预算报销', desc: '涉及金额 28,650.00 元，发生日期 2025-03-12。', source: '费用审计分析', rate: '91%' },
+  { no: 4, title: '费用异常：超预算报销', desc: '涉及金额 28,650.00 元，发生日期 2025-03-12。', source: '费用智能化审计', rate: '91%' },
   { no: 5, title: '财务费用明细单据', desc: '报销单据、发票、附件和审批流信息。', source: '任务附件', rate: '89%' }
-];
-const generateSteps = [
-  { no: 1, title: '读取资料', status: '已完成', count: '18/18', state: 'done' },
-  { no: 2, title: '生成章节', status: '已完成', count: '4/4', state: 'done' },
-  { no: 3, title: '插入依据', status: '进行中', count: '12/18', state: 'active' },
-  { no: 4, title: '人工编辑', status: '未开始', count: '0/4', state: '' },
-  { no: 5, title: '智能审核', status: '未开始', count: '0/2', state: '' },
-  { no: 6, title: '导出记录', status: '未开始', count: '0/1', state: '' }
 ];
 const auditSteps = [
   { no: 1, title: '上传报告', time: '05-10 14:10', state: 'done' },
@@ -270,6 +248,7 @@ const exportItems = [
 </script>
 
 <style scoped>
+.report-closure-strip{display:flex;align-items:center;gap:18px;margin-bottom:10px;padding:12px 14px}.report-closure-strip div{display:grid;gap:4px}.report-closure-strip span{color:var(--color-primary);font-weight:800}.report-closure-strip p{flex:1;margin:0;color:#667085}.report-closure-strip small{white-space:nowrap;color:#667085}
 .report-ai-page { display:flex; height:0; min-height:0; flex-direction:column; overflow:auto; color:#111827; min-width:0; }
 .report-title { display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:8px; }
 .report-title p { color:#667085; font-size:13px; }
@@ -293,7 +272,7 @@ button { cursor:pointer; }
 .toolbar-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .toolbar-actions button,.toolbar-link,.review-top button,.detail-actions button,.issue-detail footer button { height:32px; border:1px solid #d7dee9; background:#fff; border-radius:4px; padding:0 12px; font-weight:800; }
 .toolbar-link { display:inline-flex; align-items:center; color:#344054; text-decoration:none; }
-.toolbar-link:hover { color:var(--color-primary); border-color:#efb2b8; }
+.toolbar-link:hover { border-color:var(--color-primary); color:var(--color-primary); }
 .outline-danger { color:var(--color-primary); border-color:#efb2b8 !important; background:#fff !important; }
 .gen-workspace { display:grid; grid-template-columns:210px minmax(0,1fr) 318px; gap:10px; align-items:stretch; }
 .chapter-nav,.editor-panel,.source-rail { min-height:560px; }

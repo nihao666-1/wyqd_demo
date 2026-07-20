@@ -14,7 +14,7 @@
             <div class="filter-actions">
               <button class="primary" type="button" @click="showNotice('已按当前条件查询，当前文件库暂无文件。')">查询</button>
               <button type="button" @click="showNotice('筛选条件已重置。')">重置</button>
-              <button class="outline-danger" type="button" @click="showNotice('已打开上传文件入口。')">上传文件</button>
+              <button class="outline-danger" type="button" @click="handleFileAction('upload')">上传演示文件</button>
             </div>
           </div>
 
@@ -74,7 +74,7 @@
                         可在这里统一管理解析状态、引用关系和权限范围。
                       </p>
                       <div class="empty-actions">
-                        <button class="primary" type="button" @click="showNotice('已进入上传文件流程。')">
+                        <button class="primary" type="button" @click="handleFileAction('upload')">
                           <AuditIcon name="upload" />上传文件
                         </button>
                         <button type="button" @click="showNotice('已进入上传文件夹流程。')">
@@ -142,24 +142,15 @@
       </aside>
     </section>
 
-    <section v-else class="data-layout">
+    <section v-else class="data-layout" :class="{ 'has-detail': selectedFile }">
       <main class="main-stack">
         <section class="panel data-filter-panel">
-          <nav class="top-tabs" aria-label="文件中心功能">
-            <button
-              v-for="tab in topTabs"
-              :key="tab.key"
-              type="button"
-              :class="{ active: activeTopTab === tab.key }"
-              @click="selectTopTab(tab.key)"
-            >
-              {{ tab.label }}
-            </button>
-          </nav>
-
           <div class="subpage-summary">
-            <strong>{{ activeTopTabInfo.title }}</strong>
-            <span>{{ activeTopTabInfo.desc }}</span>
+            <strong>文件资产</strong>
+            <span>统一查询和管理文件、解析状态、权限范围与引用关系。</span>
+            <button class="upload-inline" type="button" @click="handleFileAction('upload')">
+              <AuditIcon name="upload" />上传演示文件
+            </button>
           </div>
 
           <div class="filter-grid data-filter-grid">
@@ -226,7 +217,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="file in files" :key="file.id" :class="{ selected: selectedFile.id === file.id }">
+                <tr v-for="file in files" :key="file.id" :class="{ selected: selectedFile?.id === file.id }">
                   <td><input type="checkbox" :aria-label="`选择 ${file.name}`" /></td>
                   <td>
                     <div class="file-name">
@@ -246,14 +237,14 @@
                   <td>{{ file.refs }}</td>
                   <td>{{ file.permission }}</td>
                   <td class="ops">
-                    <button type="button" @click="selectFile(file, '查看文件详情')">查看</button>
-                    <button type="button" @click="showNotice(`已下载：${file.name}`)">下载</button>
+                    <a :data-testid="`view-file-${file.id}`" :href="`/files?demo=1&amp;detail=${file.id}`">查看</a>
+                    <button type="button" @click="handleFileAction('download', file)">下载</button>
                     <span class="more-menu">
                       <button type="button" @click="toggleMore(file.id)">更多⌄</button>
                       <span v-if="expandedMoreFileId === file.id" class="more-popover">
-                        <button type="button" @click="selectFile(file, '已加入任务')">加入任务</button>
-                        <button type="button" @click="selectFile(file, '查看引用关系')">查看引用</button>
-                        <button class="danger-link" type="button" @click="selectFile(file, '作废前已触发引用校验')">作废文件</button>
+                        <button type="button" @click="handleFileAction('add', file)">加入任务</button>
+                        <a :href="`/files?demo=1&amp;detail=${file.id}`">查看引用</a>
+                        <button class="danger-link" type="button" @click="showNotice(`作废前已校验引用：${file.name}`)">作废文件</button>
                       </span>
                     </span>
                   </td>
@@ -283,10 +274,10 @@
         </section>
       </main>
 
-      <aside class="reference-rail">
+      <aside v-if="selectedFile" class="reference-rail">
         <header>
           <h3>文件引用详情</h3>
-          <button type="button" aria-label="关闭详情" @click="showNotice('已关闭文件引用详情面板。')">×</button>
+          <a href="/files?demo=1" aria-label="关闭详情">×</a>
         </header>
 
         <section class="file-profile">
@@ -345,25 +336,6 @@
           <p>关键词：{{ selectedFile.metadata.keywords }}</p>
         </section>
 
-        <section class="ref-block history-block">
-          <div class="block-title">
-            <h4>操作历史</h4>
-            <button type="button" @click="showNotice('已打开全部操作历史。')">全部查看</button>
-          </div>
-          <table>
-            <thead>
-              <tr><th>操作人</th><th>操作时间</th><th>操作</th><th>结果</th></tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in selectedFile.history" :key="`${item.user}-${item.time}-${item.action}`">
-                <td>{{ item.user }}</td>
-                <td>{{ item.time }}</td>
-                <td>{{ item.action }}</td>
-                <td class="ok">{{ item.result }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
       </aside>
     </section>
   </div>
@@ -371,11 +343,12 @@
 
 <script setup>
 import { computed, inject, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const store = inject('store');
+const route = useRoute();
 const activeAssetTab = ref('制度文件');
-const activeTopTab = ref('manage');
 const notice = ref('');
 const expandedMoreFileId = ref('');
 
@@ -403,10 +376,7 @@ const dataFilters = [
   { label: '文件类型', options: optionAll },
   { label: '所属单位', options: optionAll },
   { label: '来源', options: optionAll },
-  { label: '上传人', kind: 'input', placeholder: '请输入上传人' },
-  { label: '上传时间', kind: 'date' },
-  { label: '解析状态', options: optionAll },
-  { label: '权限范围', options: optionAll }
+  { label: '解析状态', options: optionAll }
 ];
 
 const emptyMetrics = [
@@ -430,16 +400,6 @@ const dataAssetTabs = [
   { name: '生成报告', count: '68' },
   { name: '导出文件', count: '111' }
 ];
-
-const topTabs = [
-  { key: 'manage', label: '文件管理', title: '文件管理', desc: '管理文件生命周期、解析状态、权限范围和操作记录。' },
-  { key: 'search', label: '文件查询', title: '文件查询', desc: '按名称、类型、来源、单位、上传人和时间快速定位资产。' },
-  { key: 'detail', label: '文件详情', title: '文件详情', desc: '查看文件元数据、解析结果、权限和来源快照。' },
-  { key: 'reference', label: '引用关系', title: '引用关系', desc: '追踪文件被任务、报告章节和分析结果引用的位置。' },
-  { key: 'parse', label: '解析状态', title: '解析状态', desc: '监控待解析、解析中、解析成功和解析失败文件。' }
-];
-
-const activeTopTabInfo = computed(() => topTabs.find((tab) => tab.key === activeTopTab.value) || topTabs[0]);
 
 const accessFlow = [
   { title: '上传文件', desc: '支持单文件或批量上传，自动校验格式与大小', icon: 'upload', tone: 'red' },
@@ -498,7 +458,7 @@ const files = [
   makeFile('F010', '上海分公司Q1常规审计报告.pdf', 'PDF', 'pdf', '生成报告', '上海分公司', '系统生成', '系统', '2025-05-01 17:35', '已引用', 'used', 0, '本单位可见', '2.20 MB')
 ];
 
-const selectedFile = ref(files[0]);
+const selectedFile = computed(() => files.find((file) => file.id === route.query.detail) ?? null);
 
 function makeFile(id, name, ext, tone, type, unit, source, uploader, time, status, statusTone, refs, permission, size) {
   return {
@@ -520,24 +480,17 @@ function makeFile(id, name, ext, tone, type, unit, source, uploader, time, statu
   };
 }
 
-function selectTopTab(key) {
-  activeTopTab.value = key;
-  const tab = topTabs.find((item) => item.key === key);
-  notice.value = `已切换至${tab.label}子页面。`;
-}
-
-function selectFile(file, action) {
-  selectedFile.value = file;
-  expandedMoreFileId.value = '';
-  notice.value = `${action}：${file.name}`;
-}
-
 function toggleMore(fileId) {
   expandedMoreFileId.value = expandedMoreFileId.value === fileId ? '' : fileId;
 }
 
 function showNotice(message) {
   notice.value = message;
+}
+
+function handleFileAction(action, file = {}) {
+  store.handleFileDemoAction(action, file);
+  notice.value = store.notice;
 }
 </script>
 
@@ -827,6 +780,26 @@ button {
   margin-left: 0;
   color: #667085;
   font-size: 10px;
+}
+
+.subpage-summary span {
+  flex: 1;
+  color: var(--color-muted);
+}
+
+.upload-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  min-height: var(--ui-control-md);
+  padding: 0 var(--ui-space-4);
+  border: 1px solid var(--color-primary);
+  border-radius: 4px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .table-shell {
@@ -1255,7 +1228,8 @@ button {
   white-space: nowrap;
 }
 
-.ops button {
+.ops button,
+.ops a {
   display: inline-flex;
   align-items: center;
   min-height: 20px;
@@ -1291,7 +1265,8 @@ button {
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
 }
 
-.more-popover button {
+.more-popover button,
+.more-popover a {
   justify-content: flex-start;
   min-height: 22px;
   margin: 0;
@@ -1315,7 +1290,8 @@ button {
   border-bottom: 1px solid #edf1f5;
 }
 
-.reference-rail > header button {
+.reference-rail > header button,
+.reference-rail > header a {
   border: 0;
   background: transparent;
   color: #667085;
@@ -1578,5 +1554,19 @@ button {
   width: var(--ui-icon-lg);
   height: var(--ui-icon-lg);
   font-size: var(--ui-icon-md);
+}
+
+.data-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.data-layout.has-detail {
+  grid-template-columns: minmax(0, 1fr) var(--ui-panel-rail-lg);
+}
+
+@media (max-width: 1180px) {
+  .data-layout.has-detail {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

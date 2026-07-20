@@ -14,10 +14,18 @@
           <input v-else :value="filter.value" :aria-label="filter.label" readonly />
         </label>
         <div class="filter-actions">
+          <RouterLink class="primary wide" to="/regulatory/workbench?action=create">新建案例舆情分析</RouterLink>
           <button type="button" class="primary" @click="notify('已按当前条件刷新监管案例舆情分析。')">查询</button>
           <button type="button" @click="notify('筛选条件已重置为默认范围。')">重置</button>
-          <button type="button" class="primary wide" @click="notify('已进入新建案例舆情分析流程。')">新建案例舆情分析</button>
+          <button type="button" class="primary wide" @click="store.handleRegulatoryAction('confirm')">确认结果</button>
+          <button type="button" @click="store.handleRegulatoryAction('lock')">锁定版本</button>
+          <button type="button" @click="store.handleRegulatoryAction('export')">导出结果</button>
         </div>
+      </section>
+
+      <section class="compat-status-card" aria-live="polite">
+        <strong>本次分析：{{ regulatoryResultState.status }}</strong>
+        <p>版本 {{ regulatoryResultState.versionNo }} · 导出状态 {{ regulatoryResultState.exportStatus }}</p>
       </section>
 
       <section class="metric-strip" data-result-region="metrics" aria-label="监管分析汇总指标">
@@ -272,7 +280,7 @@
       <footer>
         <button type="button" class="primary" @click="notify(`${selectedFocus.id} 已加入审计重点。`)">加入审计重点</button>
         <button type="button" class="outline" @click="notify(`${selectedFocus.id} 已引用到当前任务。`)">引用到当前任务</button>
-        <button type="button" @click="notify('监管案例舆情分析结果已导出。')">导出结果</button>
+        <button type="button" @click="store.handleRegulatoryAction('confirm')">确认本条处理</button>
       </footer>
     </aside>
   </section>
@@ -297,6 +305,11 @@ import {
 
 const store = inject('store');
 const route = useRoute();
+const regulatoryResultState = computed(() => store.db.regulatoryResultState || {
+  status: '待确认',
+  versionNo: '草稿版',
+  exportStatus: '未导出'
+});
 
 const filters = [
   { label: '被分析单位', value: '上海分公司', type: 'select' },

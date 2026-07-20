@@ -148,6 +148,24 @@ export const store = reactive({
     this.addLog('暂存任务配置', '任务', 'TASK-2026-NEW');
     this.setNotice('任务配置已暂存，已写入任务办理记录。');
   },
+  submitDemoTask(payload = {}) {
+    const taskId = `TASK-DEMO-${Date.now()}`;
+    const task = {
+      taskId,
+      name: payload.taskName || '新建审计任务',
+      auditedUnit: payload.auditedUnit || '上海分公司',
+      status: '资料已就绪',
+      progress: '进入分析执行',
+      createdBy: this.db.currentUser.name,
+      createdAt: this.now()
+    };
+    this.ensureCollection('demoTasks').unshift(task);
+    this.db.latestSubmittedTask = task;
+    this.demoDataMode = 'data';
+    this.addLog('提交演示任务', '任务', taskId);
+    this.setNotice(`${task.name} 已创建，已进入任务详情，可继续生成、确认和导出。`);
+    return task;
+  },
   openCapabilityGate(row) {
     this.openDrawer('capability-gate', row);
     this.addLog(`查看${row.capabilityName}前置条件`, '能力目录', row.capabilityId);
@@ -297,6 +315,103 @@ export const store = reactive({
       this.setNotice('费用综合分析报告导出记录已生成。');
     }
   },
+  handleExpenseOverviewAction(action) {
+    const state = this.db.expenseOverviewState || (this.db.expenseOverviewState = {
+      status: '待分析',
+      exportStatus: '未导出',
+      updatedAt: ''
+    });
+    if (action === 'analyze') {
+      state.status = '待确认';
+      state.updatedAt = this.now();
+      this.addLog('生成费用综合分析', '费用综合分析', 'EXP-OVERVIEW-DEMO');
+      this.setNotice('费用综合分析演示结果已生成，请确认后导出。');
+      return;
+    }
+    if (action === 'confirm') {
+      state.status = '已确认';
+      state.updatedAt = this.now();
+      this.addLog('确认费用综合分析', '费用综合分析', 'EXP-OVERVIEW-DEMO');
+      this.setNotice('费用综合分析结果已确认，可以导出 Excel。');
+      return;
+    }
+    if (state.status !== '已确认') {
+      this.setNotice('请先确认费用综合分析结果，再导出。');
+      return;
+    }
+    state.exportStatus = '已导出';
+    this.ensureCollection('exportRecords').unshift({
+      exportId: `EXP-OVERVIEW-${Date.now()}`,
+      objectType: '费用综合分析',
+      objectName: '上海分公司费用综合分析结果',
+      format: 'Excel',
+      exportedBy: this.db.currentUser.name,
+      exportedAt: this.now()
+    });
+    this.addLog('导出费用综合分析', '费用综合分析', 'EXP-OVERVIEW-DEMO');
+    this.setNotice('费用综合分析 Excel 已生成，并写入导出记录。');
+  },
+  handleBusinessAnalysisAction(action) {
+    const state = this.db.businessAnalysisState || (this.db.businessAnalysisState = {
+      status: '待分析',
+      updatedAt: ''
+    });
+    state.status = action === 'confirm' ? '已确认，可供报告引用' : '待确认';
+    state.updatedAt = this.now();
+    this.addLog(action === 'confirm' ? '确认经营分析' : '生成经营分析', '被审计单位业务分析', 'BUS-DEMO');
+    this.setNotice(action === 'confirm' ? '经营分析已确认，可以进入报告生成。' : '经营分析演示结果已生成，请人工确认。');
+  },
+  handleReportDemoAction(action) {
+    const state = this.db.reportDemoState || (this.db.reportDemoState = {
+      status: '待生成',
+      exportStatus: '未导出',
+      updatedAt: ''
+    });
+    if (action === 'generate') state.status = '草稿待审核';
+    if (action === 'review') state.status = '审核完成';
+    if (action === 'export') {
+      if (state.status !== '审核完成') {
+        this.setNotice('请先完成报告审核，再导出演示报告。');
+        return;
+      }
+      state.status = '已完成';
+      state.exportStatus = '已导出';
+      this.ensureCollection('exportRecords').unshift({
+        exportId: `EXP-REPORT-${Date.now()}`,
+        objectType: '审计报告',
+        objectName: '上海分公司Q1常规审计报告',
+        format: 'Word',
+        exportedBy: this.db.currentUser.name,
+        exportedAt: this.now()
+      });
+    }
+    state.updatedAt = this.now();
+    const labels = { generate: '报告草稿已生成，请提交审核。', review: '报告审核已完成，可以导出。', export: '演示报告已导出并形成记录。' };
+    this.addLog(`报告演示-${action}`, '审计报告', 'REPORT-DEMO');
+    this.setNotice(labels[action]);
+  },
+  handleFileDemoAction(action, payload = {}) {
+    const state = this.db.fileDemoState || (this.db.fileDemoState = {
+      uploadedCount: 0,
+      taskFileIds: [],
+      downloads: 0,
+      invalidIds: []
+    });
+    const fileId = payload.id || 'FILE-DEMO-UPLOAD';
+    if (action === 'upload') state.uploadedCount += 1;
+    if (action === 'add' && !state.taskFileIds.includes(fileId)) state.taskFileIds.push(fileId);
+    if (action === 'download') state.downloads += 1;
+    if (action === 'invalidate' && !state.invalidIds.includes(fileId)) state.invalidIds.push(fileId);
+    const labels = {
+      upload: '演示文件已上传并完成解析。',
+      add: '文件已加入上海分公司Q1常规审计任务。',
+      download: '演示下载已完成并形成记录。',
+      invalidate: '文件已标记作废并保留引用记录。'
+    };
+    this.addLog(labels[action], '文件', fileId);
+    this.setNotice(labels[action]);
+    return state;
+  },
   publishTemplateVersion() {
     const template = this.db.reportTemplates.find((item) => item.templateId === 'TPL-002') || this.db.reportTemplates[0];
     template.status = '已发布';
@@ -324,7 +439,7 @@ export const store = reactive({
       exportedAt: this.now()
     });
     this.addLog('下载报告检查结果', '报告检查', 'CHK-RPT-001');
-    this.setNotice('报告检查结果已生成下载记录，并写入记录中心。');
+    this.setNotice('报告检查结果已生成下载记录，并写入系统操作审计。');
   },
   requestAssetUnlock(assetId) {
     const requests = this.ensureCollection('assetChangeRequests');

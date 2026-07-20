@@ -9,7 +9,7 @@
     <div>
       <span class="state-label">综合报告状态</span>
       <h3>{{ report.status }} / {{ report.versionNo }} / {{ report.exportStatus || '未导出' }}</h3>
-      <p>确认、锁定、导出均会写入记录中心；未锁定前不能导出正式报告。</p>
+      <p>确认、锁定、导出均会写入系统操作审计；未锁定前不能导出正式报告。</p>
     </div>
   </section>
   <section class="two-col">

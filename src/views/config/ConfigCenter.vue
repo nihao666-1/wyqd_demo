@@ -203,7 +203,7 @@
           </section>
           <section class="trace-block">
             <h4>影响模块</h4>
-            <div class="chips"><span>费用审计分析</span><span>制度比对</span><span>报告智能化</span><span>专项审计分析</span><span>任务中心</span></div>
+            <div class="chips"><span>费用审计分析</span><span>制度比对</span><span>报告智能化</span><span>专项审计分析</span><span>全部任务</span></div>
           </section>
           <section class="trace-block">
             <h4>操作日志 <span>近 7 条</span></h4>

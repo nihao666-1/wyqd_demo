@@ -5,6 +5,7 @@ import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc';
 
 const workbenchUrl = new URL('../src/views/expense/ExpenseWorkbench.vue', import.meta.url);
 const layoutUrl = new URL('../src/components/layout/AppLayout.vue', import.meta.url);
+const routerUrl = new URL('../src/router/index.js', import.meta.url);
 
 function read(url) {
   return readFileSync(url, 'utf8');
@@ -119,17 +120,15 @@ test('费用审计有数据态宽屏任务行保持紧凑高度', () => {
   );
 });
 
-test('布局为费用空白页提供专用壳层面包屑和二级导航', () => {
+test('旧费用入口重定向并仅保留两个业务子页面', () => {
   const content = read(layoutUrl);
-  assert.match(content, /'expense-empty-shell': isExpenseWorkbenchRoute/);
-  assert.match(content, /const isExpenseWorkbenchRoute = computed\(\(\) => route\.path === '\/expense\/workbench'\)/);
-  assert.match(content, /v-else-if="isExpenseWorkbenchRoute" class="task-breadcrumb"/);
-  assert.match(content, /审计工作台<\/span><i>\/<\/i><strong>费用审计分析<\/strong>/);
+  const router = read(routerUrl);
+  assert.match(router, /path: '\/expense\/workbench', redirect: '\/expense\/audit\/overview'/);
   assert.match(content, /const isExpenseSection = computed/);
-  assert.match(content, /isExpenseSection\.value && item\.path === '\/expense\/workbench'/);
-  assert.match(content, /费用异常监控/);
-  assert.match(content, /费用趋势分析/);
+  assert.match(content, /isExpenseSection && item\.path === '\/expense\/audit\/overview'/);
+  assert.match(content, /费用综合分析/);
+  assert.match(content, /费用异常分析/);
+  assert.doesNotMatch(content, /label: '费用审计入口'|label: '费用趋势分析'/);
   assert.match(content, /class="global-data-mode"/);
   compileVue(layoutUrl);
 });
-

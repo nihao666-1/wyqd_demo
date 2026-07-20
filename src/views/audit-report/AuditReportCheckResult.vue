@@ -446,7 +446,7 @@ function writeReviewRecord() {
     createdAt: store.now()
   });
   store.addLog('写入报告审核复核记录', '审核问题', selectedIssue.value.issueId);
-  notice('复核记录已写入记录中心。');
+  notice('复核记录已写入系统操作审计。');
 }
 
 function exportIssues() {

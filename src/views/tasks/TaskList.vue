@@ -76,7 +76,7 @@ function tabCount(tab) { return getTaskCenterRows(taskRows, { ...filters, status
 function goToPage(value) { const next = Number(value); page.value = Number.isFinite(next) ? Math.min(Math.max(next, 1), paged.value.totalPages) : 1; }
 function metricTrend(label) { return label === '全部任务' ? '+4' : label === '待确认' ? '+2' : label === '失败/异常' ? '-1' : '+1'; }
 function detailRoute(task) { return { path: '/tasks/detail', query: { taskId: task.id } }; }
-function actionRoute(task) { return task.action === '查看日志' ? { path: '/records', query: { taskId: task.id } } : { path: '/tasks/detail', query: { taskId: task.id, tab: task.statusKey === 'confirming' ? 'reviews' : task.statusKey === 'failed' ? 'results' : 'analysis', action: task.action } }; }
+function actionRoute(task) { return { path: '/tasks/detail', query: { taskId: task.id, tab: task.action === '查看日志' ? 'logs' : task.statusKey === 'confirming' ? 'reviews' : task.statusKey === 'failed' ? 'results' : 'analysis', action: task.action } }; }
 </script>
 
 <style scoped>

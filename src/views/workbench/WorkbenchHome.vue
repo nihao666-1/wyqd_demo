@@ -103,36 +103,24 @@
     </template>
 
     <template v-else>
-      <section class="workbench-top">
-        <div class="capability-grid workbench-metrics">
-          <RouterLink
-            v-for="item in capabilityMetrics"
-            :key="item.title"
-            class="metric-card workbench-metric capability-card"
-            :to="item.to"
-          >
-            <div class="capability-card-head">
-              <div class="metric-icon" aria-hidden="true"><AuditIcon :name="item.icon" /></div>
-              <div class="capability-title-block">
-                <span class="capability-title">{{ item.title }}</span>
-              </div>
-              <span class="range-pill">{{ item.range }} <i>⌄</i></span>
-            </div>
-            <dl class="capability-status-grid">
-              <div v-for="status in item.statuses" :key="status.key" :class="['capability-status', status.key]">
-                <dt>{{ status.label }}</dt>
-                <dd>{{ status.value }}</dd>
-              </div>
-            </dl>
-            <div class="capability-card-foot">
-              <strong>查看明细 <b aria-hidden="true">›</b></strong>
-            </div>
+      <section class="workbench-top" data-workbench-section="关键指标摘要">
+        <div class="overview-title">
+          <div>
+            <h3>关键指标摘要</h3>
+            <p>只保留需要立即关注的数字。</p>
+          </div>
+        </div>
+        <div class="overview-strip">
+          <RouterLink v-for="item in overviewStats" :key="item.label" :to="item.to">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+            <small>{{ item.hint }}</small>
           </RouterLink>
         </div>
       </section>
 
       <section class="dashboard-row primary-row">
-        <section class="panel todo-panel">
+        <section class="panel todo-panel" data-workbench-section="我的待办">
           <div class="panel-title">
             <h3>我的待办</h3>
             <RouterLink class="btn" to="/tasks">查看全部</RouterLink>
@@ -151,55 +139,46 @@
               <div class="todo-support">
                 <p>{{ item.meta }}</p>
                 <div class="row-actions">
-                  <RouterLink class="btn primary" :to="item.primaryTo">去处理</RouterLink>
-                  <RouterLink class="btn todo-detail-link" :to="item.detailTo">查看详情</RouterLink>
+                  <RouterLink class="btn primary" :to="item.detailTo">查看任务</RouterLink>
                 </div>
               </div>
             </article>
           </div>
         </section>
 
-        <section class="panel recent-task-panel">
+        <section class="panel recent-task-panel" data-workbench-section="最近访问">
           <div class="panel-title">
-            <h3>最近审计任务</h3>
-            <RouterLink class="btn" to="/tasks">任务列表</RouterLink>
+            <h3>最近访问</h3>
+            <RouterLink class="btn" to="/tasks">全部任务</RouterLink>
           </div>
           <div class="compact-table">
             <table class="recent-task-table">
               <colgroup>
                 <col class="task-name-col" />
                 <col class="unit-col" />
-                <col class="period-col" />
                 <col class="stage-col" />
-                <col class="progress-col" />
                 <col class="status-col" />
+                <col class="visited-col" />
                 <col class="action-col" />
               </colgroup>
               <thead>
                 <tr>
                   <th>任务名称</th>
                   <th>审计单位</th>
-                  <th>审计期间</th>
                   <th>当前阶段</th>
-                  <th>进度</th>
                   <th>状态</th>
-                  <th>操作</th>
+                  <th>最近访问</th>
+                  <th>入口</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="task in recentAuditTasks" :key="task.id">
+                <tr v-for="task in recentVisitTasks.slice(0, 3)" :key="task.id">
                   <td>{{ task.name }}</td>
                   <td>{{ task.unit }}</td>
-                  <td>{{ task.period }}</td>
                   <td>{{ task.stage }}</td>
-                  <td>
-                    <div class="progress-cell">
-                      <span><i :style="{ width: `${task.progress}%` }"></i></span>
-                      <b>{{ task.progress }}%</b>
-                    </div>
-                  </td>
                   <td><span class="status-tag" :class="task.statusClass">{{ task.status }}</span></td>
-                  <td><RouterLink class="table-link" :to="task.to">进入</RouterLink></td>
+                  <td>{{ task.visitedAt }}</td>
+                  <td><RouterLink class="table-link" :to="task.to">查看</RouterLink></td>
                 </tr>
               </tbody>
             </table>
@@ -209,7 +188,7 @@
       </section>
 
       <section class="dashboard-row secondary-row">
-        <section class="panel risk-panel">
+        <section class="panel risk-panel" data-workbench-section="风险提醒">
           <div class="panel-title">
             <h3>风险提醒</h3>
             <RouterLink class="btn" to="/expense/anomaly/dashboard">风险看板</RouterLink>
@@ -226,19 +205,16 @@
           </div>
         </section>
 
-        <section class="panel result-panel">
-          <div class="panel-title"><h3>最近生成结果</h3></div>
-          <div class="result-list">
-            <article v-for="result in generatedResults" :key="result.name" class="result-item">
-              <div>
-                <strong>{{ result.name }}</strong>
-                <p>{{ result.type }} / {{ result.time }}</p>
-              </div>
-              <div class="row-actions">
-                <RouterLink class="btn" :to="result.viewTo">查看</RouterLink>
-                <RouterLink class="btn" :to="result.downloadTo">下载</RouterLink>
-              </div>
-            </article>
+        <section class="panel quick-panel" data-workbench-section="快捷入口">
+          <div class="panel-title">
+            <h3>快捷入口</h3>
+            <span class="section-note">常用能力直达</span>
+          </div>
+          <div class="quick-grid">
+            <RouterLink v-for="entry in quickEntries" :key="entry.title" class="quick-entry" :to="entry.to">
+              <span aria-hidden="true"><AuditIcon :name="entry.icon" /></span>
+              <strong>{{ entry.title }}</strong>
+            </RouterLink>
           </div>
         </section>
       </section>
@@ -324,6 +300,13 @@ const buildCapabilityMetrics = (empty = false) =>
 
 const capabilityMetrics = computed(() => buildCapabilityMetrics(false));
 
+const overviewStats = [
+  { label: '我的待办', value: '12', hint: '5 项需今日处理', to: '/tasks' },
+  { label: '高风险异常', value: '4', hint: '较昨日新增 1 项', to: '/expense/anomaly/dashboard' },
+  { label: '待复核报告', value: '3', hint: '最早已等待 2 天', to: '/audit-report/workbench?mode=review' },
+  { label: '本月已完成', value: '148', hint: '覆盖 5 类审计能力', to: '/tasks' }
+];
+
 const startCards = [
   {
     icon: 'create',
@@ -345,13 +328,6 @@ const startCards = [
     description: '查询制度、识别变更，辅助形成审计依据。',
     steps: ['制度查询', '制度比对', '引用条款'],
     to: '/audit-standard/policy'
-  },
-  {
-    icon: 'config',
-    title: '查看系统配置',
-    description: '检查模板、规则、权限和数据源初始化状态。',
-    steps: ['模板配置', '规则配置', '权限配置'],
-    to: '/config'
   }
 ];
 
@@ -385,7 +361,6 @@ const todoItems = [
     meta: '上海分公司 / 经纪业务部 / 高风险',
     status: '待确认',
     statusClass: 'warning',
-    primaryTo: '/expense/anomaly/candidates',
     detailTo: '/tasks/detail'
   },
   {
@@ -394,7 +369,6 @@ const todoItems = [
     meta: '审计报告草稿 / 来源依据部分缺失',
     status: '待复核',
     statusClass: 'warning',
-    primaryTo: '/audit-report/draft',
     detailTo: '/tasks/detail'
   },
   {
@@ -403,8 +377,7 @@ const todoItems = [
     meta: '风险事项台账.xlsx / 三字段待确认',
     status: '待预检',
     statusClass: 'warning',
-    primaryTo: '/materials/import?scene=supervision&step=precheck',
-    detailTo: '/files/detail'
+    detailTo: '/tasks/detail'
   },
   {
     id: 'TODO-004',
@@ -412,8 +385,7 @@ const todoItems = [
     meta: '费用报销管理办法 V2.1 / 3 项差异',
     status: '待处理',
     statusClass: 'success',
-    primaryTo: '/audit-standard/library?panel=diff',
-    detailTo: '/audit-standard/library'
+    detailTo: '/tasks/detail'
   },
   {
     id: 'TODO-005',
@@ -421,24 +393,26 @@ const todoItems = [
     meta: '发票 OCR 快照同步失败 / 需重新执行',
     status: '失败重试',
     statusClass: 'danger',
-    primaryTo: '/tasks/detail',
-    detailTo: '/records'
+    detailTo: '/tasks/detail'
   }
 ];
 
 const recentAuditTasks = [
-  { id: 'TASK-2026-001', name: '上海分公司二季度费用异常审计', unit: '上海分公司', period: '2026Q2', stage: '候选异常确认', progress: 72, status: '处理中', statusClass: 'warning', to: '/tasks/detail' },
-  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', period: '2026Q1', stage: '入库预检', progress: 48, status: '待预检', statusClass: 'warning', to: '/materials/import?scene=supervision&step=precheck' },
-  { id: 'TASK-2026-003', name: '营业部常规审计报告', unit: '审计部', period: '2026H1', stage: '报告复核', progress: 86, status: '待复核', statusClass: 'success', to: '/audit-report/draft' },
-  { id: 'TASK-2026-004', name: '监管案例舆情分析', unit: '经纪业务部', period: '2026Q2', stage: '数据获取', progress: 35, status: '进行中', statusClass: 'warning', to: '/regulatory/workbench' }
+  { id: 'TASK-2026-001', name: '上海分公司二季度费用异常审计', unit: '上海分公司', stage: '候选异常确认', status: '处理中', statusClass: 'warning', visitedAt: '10 分钟前', to: '/tasks/detail' },
+  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', stage: '入库预检', status: '待预检', statusClass: 'warning', visitedAt: '35 分钟前', to: '/tasks/detail' },
+  { id: 'TASK-2026-003', name: '营业部常规审计报告', unit: '审计部', stage: '报告复核', status: '待复核', statusClass: 'success', visitedAt: '今天 09:48', to: '/tasks/detail' },
+  { id: 'TASK-2026-004', name: '监管案例舆情分析', unit: '经纪业务部', stage: '数据获取', status: '进行中', statusClass: 'warning', visitedAt: '昨天 16:20', to: '/tasks/detail' },
+  { id: 'TASK-2026-005', name: '年度制度执行情况审计', unit: '审计部', stage: '资料准备', status: '待开始', statusClass: 'warning', visitedAt: '昨天 14:05', to: '/tasks/detail' }
 ];
+
+const recentVisitTasks = recentAuditTasks.slice(0, 4);
 
 const quickEntries = [
   { icon: 'create', title: '创建任务', to: '/tasks/create' },
   { icon: 'upload', title: '上传资料', to: '/files' },
   { icon: 'qa', title: '知识库问答', to: '/audit-standard/policy' },
   { icon: 'compare', title: '制度比对', to: '/audit-standard/workbench' },
-  { icon: 'monitor', title: '费用异常监控', to: '/expense/anomaly/dashboard' },
+  { icon: 'monitor', title: '费用异常分析', to: '/expense/anomaly/dashboard' },
   { icon: 'report-generate', title: '报告生成', to: '/audit-report/source-select' }
 ];
 
@@ -475,12 +449,6 @@ const riskAlerts = [
   { level: '高', title: '合同付款节点不一致', unit: '计划财务部', time: '10:15', className: 'danger', to: '/expense/anomaly/candidates' },
   { level: '中', title: '报告整改建议依据不足', unit: '审计部', time: '09:58', className: 'warning', to: '/audit-report/gap-list' },
   { level: '中', title: '制度版本引用待确认', unit: '配置管理员', time: '09:30', className: 'warning', to: '/audit-standard/library' }
-];
-
-const generatedResults = [
-  { name: '制度差异清单', type: '制度比对', time: '10:20', viewTo: '/audit-standard/library?panel=diff', downloadTo: '/audit-standard/library' },
-  { name: '费用异常汇总', type: '费用审计', time: '10:12', viewTo: '/expense/anomaly/dashboard', downloadTo: '/expense/usage/dashboard?panel=report' },
-  { name: '审计报告草稿', type: '报告生成', time: '09:48', viewTo: '/audit-report/draft', downloadTo: '/audit-report/draft' }
 ];
 
 const notices = [
@@ -546,6 +514,60 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .workbench-top {
   min-width: 0;
+}
+
+.overview-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.overview-title h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--ui-font-md);
+}
+
+.overview-title p,
+.section-note {
+  margin: 3px 0 0;
+  color: var(--color-muted);
+  font-size: var(--ui-font-xs);
+}
+
+.overview-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.overview-strip a {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 12px 16px;
+  border-right: 1px solid var(--color-line);
+  color: var(--color-text);
+}
+
+.overview-strip a:last-child {
+  border-right: 0;
+}
+
+.overview-strip span,
+.overview-strip small {
+  color: var(--color-muted);
+  font-size: var(--ui-font-xs);
+}
+
+.overview-strip strong {
+  font-size: 22px;
+  line-height: 1.25;
 }
 
 .workbench-metrics {
@@ -1211,12 +1233,6 @@ const operationRows = computed(() => store.db.operationLogs);
   line-height: 16px;
 }
 
-.todo-item .todo-detail-link {
-  border-color: transparent;
-  background: transparent;
-  color: var(--color-muted);
-}
-
 .row-actions {
   display: flex;
   gap: 6px;
@@ -1234,27 +1250,23 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .recent-task-table .task-name-col {
-  width: 27%;
+  width: 32%;
 }
 
 .recent-task-table .unit-col {
-  width: 14%;
-}
-
-.recent-task-table .period-col {
-  width: 11%;
+  width: 17%;
 }
 
 .recent-task-table .stage-col {
-  width: 16%;
-}
-
-.recent-task-table .progress-col {
-  width: 15%;
+  width: 20%;
 }
 
 .recent-task-table .status-col {
-  width: 10%;
+  width: 12%;
+}
+
+.recent-task-table .visited-col {
+  width: 12%;
 }
 
 .recent-task-table .action-col {
@@ -1300,7 +1312,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   height: calc(100% - 42px);
 }
@@ -1317,6 +1329,11 @@ const operationRows = computed(() => store.db.operationLogs);
   background: #fff;
   color: var(--color-text);
   text-align: center;
+  text-decoration: none;
+}
+
+.quick-entry strong {
+  font-size: var(--ui-font-sm);
 }
 
 .chart-filter {
@@ -1599,6 +1616,18 @@ const operationRows = computed(() => store.db.operationLogs);
 
   .workbench-metrics {
     grid-template-columns: 1fr;
+  }
+
+  .overview-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overview-strip a:nth-child(2) {
+    border-right: 0;
+  }
+
+  .overview-strip a:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--color-line);
   }
 
   .welcome-preview {

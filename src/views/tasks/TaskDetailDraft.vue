@@ -2,7 +2,7 @@
   <main class="task-detail-draft-page">
     <header class="task-detail-draft-header">
       <div class="task-detail-draft-title-row">
-        <RouterLink class="task-detail-draft-back" to="/tasks" aria-label="返回任务中心"><FontAwesomeIcon :icon="faArrowLeft" /></RouterLink>
+        <RouterLink class="task-detail-draft-back" to="/tasks" aria-label="返回全部任务"><FontAwesomeIcon :icon="faArrowLeft" /></RouterLink>
         <h1>{{ task.title }}</h1>
         <span class="task-detail-draft-status">草稿</span>
       </div>
@@ -78,7 +78,7 @@
         @keydown.tab="trapDeleteFocus"
       >
         <h2 id="task-detail-draft-delete-title">确认删除草稿？</h2>
-        <p id="task-detail-draft-delete-description">删除后将返回任务中心，此操作不可撤销。</p>
+        <p id="task-detail-draft-delete-description">删除后将返回全部任务，此操作不可撤销。</p>
         <div class="task-detail-draft-dialog-actions">
           <button ref="cancelDeleteButton" type="button" @click="closeDelete">取消</button>
           <button ref="confirmDeleteButton" type="button" class="task-detail-draft-dialog-confirm" @click="confirmDelete">确认删除</button>
