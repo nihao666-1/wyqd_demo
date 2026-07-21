@@ -36,7 +36,8 @@ test('报告生成页标记参考图八个红框功能区域', () => {
     'generation-progress',
     'draft-editor',
     'source-rail',
-    'output-version'
+    'output-version',
+    'official-report-compare'
   ]) {
     assert.match(page, new RegExp(`data-report-region="${region}"`));
   }
@@ -48,6 +49,9 @@ test('报告生成页覆盖关键动作和真实图标组件', () => {
   for (const action of ['开始生成', '章节级重新生成', '查看来源', '替换来源', '保存版本', '提交复核', '导出报告']) {
     assert.match(page, new RegExp(action));
   }
+  assert.match(page, /openOfficialCompare/);
+  assert.match(page, /handleOfficialReportUpload/);
+  assert.match(page, /startOfficialCompare/);
   assert.match(page, /FontAwesomeIcon/);
   assert.match(page, /aria-label="上一页"/);
   assert.match(page, /aria-label="下一页"/);

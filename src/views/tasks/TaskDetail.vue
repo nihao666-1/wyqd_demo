@@ -60,7 +60,7 @@
 
       <section v-else class="tab-placeholder">
         <h2>{{ taskDetailTabs.find((tab) => tab.id === activeTab)?.label }}</h2>
-        <p>当前演示聚焦“生成结果”待确认工作台，该栏目入口已保留。</p>
+        <p>当前版本聚焦“生成结果”待确认工作台，该栏目入口已保留。</p>
         <button type="button" @click="activeTab = 'results'">返回生成结果</button>
       </section>
     </main>
@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   canSubmitReview,
@@ -127,7 +127,9 @@ import EvidenceTracePanel from './task-detail/EvidenceTracePanel.vue';
 
 const route = useRoute();
 const router = useRouter();
-const selectedTask = computed(() => route.query.state === 'generating' ? undefined : taskRows.find((task) => task.id === route.query.taskId));
+const store = inject('store');
+const allTaskRows = computed(() => [...(store?.db.createdTasks || []), ...taskRows]);
+const selectedTask = computed(() => route.query.state === 'generating' ? undefined : allTaskRows.value.find((task) => task.id === route.query.taskId));
 const detailMode = computed(() => resolveTaskDetailMode({
   explicitState: String(route.query.state || ''),
   statusKey: selectedTask.value?.statusKey || '',
@@ -310,7 +312,7 @@ function handleSubmitReview() {
 function handleExportResults() {
   files.value = files.value.map((file) => ({ ...file, exported: true }));
   pushLog('导出生成结果', `${files.value.length} 个文件`);
-  showToast('已生成 4 个演示导出记录');
+  showToast('已生成 4 个导出记录');
 }
 
 function handleUploadReport() {

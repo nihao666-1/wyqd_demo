@@ -100,6 +100,20 @@ export const auditReportGenerationSnapshot = {
     title: '导出记录（近 7 天）',
     status: '暂无导出记录'
   },
+  officialCompare: {
+    emptyHint: '上传线下定稿后的正式报告后，系统会与当前生成稿进行内容、结构、依据和风险差异比对。',
+    latestResult: '暂未回传正式报告。',
+    checkItems: ['内容差异', '结构差异', '依据差异', '风险提示'],
+    summary: [
+      { label: '内容差异', value: '--', hint: '等待上传', tone: 'muted' },
+      { label: '结构差异', value: '--', hint: '等待上传', tone: 'muted' },
+      { label: '依据差异', value: '--', hint: '等待上传', tone: 'muted' },
+      { label: '风险提示', value: '--', hint: '等待上传', tone: 'muted' }
+    ],
+    records: [
+      { name: '当前生成稿 V1.0', status: '等待正式报告回传' }
+    ]
+  },
   chapterStats: {
     references: '18 条',
     issues: '2 条',

@@ -82,7 +82,7 @@
             <p class="materials-alert"><AuditIcon name="anomaly" />已根据所选能力自动生成资料清单，请上传或选择资料后继续。<span v-if="materialNotice">{{ materialNotice }}</span></p>
             <section class="material-source-card" aria-label="资料来源">
               <nav class="material-source-tabs">
-                <button v-for="item in [{ key: 'local', label: '本地上传', icon: 'upload' }, { key: 'fileCenter', label: '文件中心选择', icon: 'files' }, { key: 'history', label: '历史任务复用', icon: 'records' }, { key: 'simulation', label: '系统模拟数据', icon: 'report' }]" :key="item.key" :class="{ active: materialSource === item.key }" type="button" @click="selectMaterialSource(item.key)"><AuditIcon :name="item.icon" />{{ item.label }}</button>
+                <button v-for="item in [{ key: 'local', label: '本地上传', icon: 'upload' }, { key: 'fileCenter', label: '文件中心选择', icon: 'files' }, { key: 'history', label: '历史任务复用', icon: 'records' }, { key: 'simulation', label: '平台资料复用', icon: 'report' }]" :key="item.key" :class="{ active: materialSource === item.key }" type="button" @click="selectMaterialSource(item.key)"><AuditIcon :name="item.icon" />{{ item.label }}</button>
               </nav>
               <div class="material-dropzone">
                 <span class="dropzone-icon"><AuditIcon name="upload" /></span><h3>拖拽文件或文件夹到此处</h3>
@@ -97,7 +97,7 @@
             </section>
           </main>
           <aside class="materials-sidebar">
-            <section class="material-progress-card"><h3>资料完成度</h3><div class="progress-summary"><div class="progress-ring" :style="{ '--completion': `${materialProgress.percentage}%` }"><div><strong>{{ materialProgress.percentage }}%</strong><span>完成度</span></div></div><ul><li><i class="red"></i>必需资料 <b>{{ materialProgress.required.completed }} / {{ materialProgress.required.total }}</b></li><li><i class="orange"></i>可选资料 <b>{{ materialProgress.optional.completed }} / {{ materialProgress.optional.total }}</b></li><li><i class="green"></i>已上传文件 <b>{{ materialProgress.uploadedFiles }} 个</b></li></ul></div><section v-if="materialProgress.blockingItems.length" class="blocking-items"><h4>阻断项（{{ materialProgress.blockingItems.length }} 项）</h4><p v-for="item in materialProgress.blockingItems" :key="item.id"><AuditIcon name="anomaly" />{{ item.name }} 未上传</p></section><section class="material-help"><h4>资料说明</h4><ul><li>必需资料为完成审计任务的必备资料，请尽快上传。</li><li>建议文件内容完整、清晰，确保能准确解析。</li><li>上传后系统将自动解析并建立知识关联。</li></ul></section><button class="btn primary" type="button" @click="uploadBlockingMaterials"><AuditIcon name="upload" />批量上传</button><button class="btn" type="button" @click="simulateFillMaterials"><AuditIcon name="files" />使用模拟数据补齐</button></section>
+            <section class="material-progress-card"><h3>资料完成度</h3><div class="progress-summary"><div class="progress-ring" :style="{ '--completion': `${materialProgress.percentage}%` }"><div><strong>{{ materialProgress.percentage }}%</strong><span>完成度</span></div></div><ul><li><i class="red"></i>必需资料 <b>{{ materialProgress.required.completed }} / {{ materialProgress.required.total }}</b></li><li><i class="orange"></i>可选资料 <b>{{ materialProgress.optional.completed }} / {{ materialProgress.optional.total }}</b></li><li><i class="green"></i>已上传文件 <b>{{ materialProgress.uploadedFiles }} 个</b></li></ul></div><section v-if="materialProgress.blockingItems.length" class="blocking-items"><h4>阻断项（{{ materialProgress.blockingItems.length }} 项）</h4><p v-for="item in materialProgress.blockingItems" :key="item.id"><AuditIcon name="anomaly" />{{ item.name }} 未上传</p></section><section class="material-help"><h4>资料说明</h4><ul><li>必需资料为完成审计任务的必备资料，请尽快上传。</li><li>建议文件内容完整、清晰，确保能准确解析。</li><li>上传后系统将自动解析并建立知识关联。</li></ul></section><button class="btn primary" type="button" @click="uploadBlockingMaterials"><AuditIcon name="upload" />批量上传</button><button class="btn" type="button" @click="simulateFillMaterials"><AuditIcon name="files" />从平台资料补齐</button></section>
           </aside>
         </div>
       </div>
@@ -133,7 +133,12 @@ const taskCreateEntry = resolveTaskCreateEntry(route.query);
 const step = ref(taskCreateEntry.step);
 const stepFourStage = ref(taskCreateEntry.stage);
 const steps = ['选择能力', '填写基础信息', '资料选择', '模板与输出设置', '确认提交'];
-const form = reactive({ ...initialTaskCreateForm, participants: [...initialTaskCreateForm.participants], dataScope: [...initialTaskCreateForm.dataScope] });
+const form = reactive({
+  ...initialTaskCreateForm,
+  taskType: taskCreateEntry.taskType || initialTaskCreateForm.taskType,
+  participants: [...initialTaskCreateForm.participants],
+  dataScope: [...initialTaskCreateForm.dataScope]
+});
 const templateOutputSettings = ref(createTemplateOutputSettings());
 const errors = ref({});
 const draftSaved = ref(false);
@@ -170,7 +175,7 @@ const requiredChecks = computed(() => [
   { label: '选择审计能力', complete: Boolean(selectedIds.value.length) }
 ]);
 const availableCapabilities = computed(() => capabilities);
-const selectedIds = ref([capabilities[0].id]);
+const selectedIds = ref(getInitialSelectedCapabilityIds(taskCreateEntry));
 const selectedCapabilities = computed(() => availableCapabilities.value.filter((item) => selectedIds.value.includes(item.id)));
 const selectedAbilityNames = computed(() => selectedCapabilities.value.map((item) => item.name));
 const templateTaskSummary = computed(() => ({
@@ -191,6 +196,9 @@ const nextStepButtonText = computed(() => {
 });
 
 function setFieldRef(name, element) { if (element) fieldRefs[name] = element; }
+function getInitialSelectedCapabilityIds(entry) {
+  return capabilities.some((item) => item.id === entry.capabilityId) ? [entry.capabilityId] : [capabilities[0].id];
+}
 function goStep(index) {
   if (index > step.value) return;
   step.value = index;
@@ -214,15 +222,20 @@ function resetMaterialRows() {
 function selectMaterialSource(source) { materialSource.value = source; }
 function uploadMaterialRows(ids) { materialRows.value = applyMaterialSource(materialRows.value, ids, materialSource.value); materialNotice.value = '资料已加入解析队列。'; }
 function uploadBlockingMaterials() { uploadMaterialRows(materialProgress.value.blockingItems.map((item) => item.id)); }
-function simulateFillMaterials() { materialRows.value = applyMaterialSource(materialRows.value, materialRows.value.map((item) => item.id), 'simulation'); materialNotice.value = '已使用系统模拟数据补齐资料。'; }
+function simulateFillMaterials() { materialRows.value = applyMaterialSource(materialRows.value, materialRows.value.map((item) => item.id), 'simulation'); materialNotice.value = '已从平台资料补齐资料。'; }
 function removeMaterial(id) { materialRows.value = materialRows.value.map((item) => item.id === id ? { ...item, source: '—', uploadStatus: '未上传', parseStatus: '—' } : item); }
-function saveDraft() {
-  draftSaved.value = true;
-  store.saveTaskDraft({
+function buildTaskDraftPayload() {
+  return {
     ...createTaskDraftSnapshot(form, taskTypeProfile.value, materialRows.value),
     selectedCapabilityIds: [...selectedIds.value],
     templateOutputSettings: cloneTemplateOutputSettings(templateOutputSettings.value)
-  });
+  };
+}
+function saveDraft() {
+  const payload = buildTaskDraftPayload();
+  draftSaved.value = true;
+  store.saveTaskDraft(payload);
+  return payload;
 }
 function syncStepFourQuery(stage) {
   const query = { ...route.query };
@@ -236,13 +249,15 @@ function backToParsing() { step.value = 3; stepFourStage.value = 'parsing'; sync
 function handleTemplateSummaryDetail(section) { goStep(section === 'task' ? 1 : 0); }
 function exitTaskCreate() { router.push('/tasks'); }
 function submitTemplateTask() {
-  saveDraft();
-  store.setNotice('任务已提交，模板、输出规则和合规设置已写入任务记录。');
+  const payload = saveDraft();
+  store.setDemoDataMode('data');
+  store.submitCreatedTask(payload);
   router.push('/tasks');
 }
 function submitTaskAndReturn() {
-  saveDraft();
-  store.setNotice('任务已提交，可在任务中心继续查看执行进度。');
+  const payload = saveDraft();
+  store.setDemoDataMode('data');
+  store.submitCreatedTask(payload);
   router.push('/tasks');
 }
 function goBack() {
@@ -254,6 +269,12 @@ function goBack() {
   else if (step.value === 2) syncStepFourQuery('materials');
   else syncStepFourQuery('');
 }
+watch(() => [route.query.capability, route.query.ability, route.query.preselect], () => {
+  const nextEntry = resolveTaskCreateEntry(route.query);
+  const nextSelectedIds = getInitialSelectedCapabilityIds(nextEntry);
+  selectedIds.value = nextSelectedIds;
+  if (nextEntry.taskType) form.taskType = nextEntry.taskType;
+});
 watch(() => form.taskType, () => { if (!selectedIds.value.length) selectedIds.value = [capabilities[0].id]; });
 watch(() => form.owner, () => { form.participants = form.participants.filter((person) => person !== form.owner); });
 watch([() => form.taskType, selectedAbilityNames], resetMaterialRows, { immediate: true });

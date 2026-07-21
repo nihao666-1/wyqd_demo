@@ -54,19 +54,22 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from 'vue';
+import { computed, inject, nextTick, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCirclePause, faCirclePlay, faFileLines, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { getTaskDetailExecutionSnapshot } from './taskDetailExecutionData.js';
+import { taskRows } from './taskCenterData.js';
 import TaskCapabilityExecutionGrid from './TaskCapabilityExecutionGrid.vue';
 import TaskExecutionLogRail from './TaskExecutionLogRail.vue';
 
 const route = useRoute();
 const router = useRouter();
-const snapshot = getTaskDetailExecutionSnapshot(route.query.taskId);
-const activeTab = ref(snapshot.activeTab);
-const requestedTab = snapshot.tabs.find((tab) => tab.key === route.query.tab);
+const store = inject('store');
+const executionRows = computed(() => [...(store?.db.createdTasks || []), ...taskRows]);
+const snapshot = computed(() => getTaskDetailExecutionSnapshot(route.query.taskId, executionRows.value));
+const activeTab = ref(snapshot.value.activeTab);
+const requestedTab = snapshot.value.tabs.find((tab) => tab.key === route.query.tab);
 if (requestedTab) activeTab.value = requestedTab.key;
 
 const isPaused = ref(false);
@@ -77,7 +80,7 @@ const drawerCloseRef = ref(null);
 const drawerState = ref({ open: false, eyebrow: '', title: '', details: [], description: '' });
 let lastTrigger = null;
 
-const activeTabLabel = computed(() => snapshot.tabs.find((tab) => tab.key === activeTab.value)?.label || '任务详情');
+const activeTabLabel = computed(() => snapshot.value.tabs.find((tab) => tab.key === activeTab.value)?.label || '任务详情');
 
 function selectTab(tab) {
   if (!tab) return;
@@ -109,11 +112,11 @@ function showAllLogs() {
 
 function viewResult(capability) {
   if (capability.id === 'expense-audit') {
-    router.push({ path: '/expense/audit/overview', query: { taskId: snapshot.task.id } });
+    router.push({ path: '/expense/audit/overview', query: { taskId: snapshot.value.task.id } });
     return;
   }
   if (capability.id === 'supervision-share') {
-    router.push({ path: '/tasks/detail/supervision-share', query: { taskId: snapshot.task.id } });
+    router.push({ path: '/tasks/detail/supervision-share', query: { taskId: snapshot.value.task.id } });
     return;
   }
   openDrawer('生成结果', capability.name, [
@@ -123,13 +126,13 @@ function viewResult(capability) {
 
 function viewSource(source) {
   openDrawer('来源资料', source.label, [
-    { label: '资料名称', value: source.label }, { label: '解析快照', value: source.value }, { label: '引用任务', value: snapshot.task.name }
+    { label: '资料名称', value: source.label }, { label: '解析快照', value: source.value }, { label: '引用任务', value: snapshot.value.task.name }
   ], '当前页面展示的是任务启动时锁定的来源快照，不会被浏览器本地状态覆盖。');
 }
 
 function handlePending(item) {
   const details = item.id === 'all-pending'
-    ? snapshot.pendingItems.map((pending) => ({ label: pending.title, value: pending.description }))
+    ? snapshot.value.pendingItems.map((pending) => ({ label: pending.title, value: pending.description }))
     : [{ label: '当前状态', value: item.status }, { label: '等待条件', value: item.description }];
   openDrawer('待处理事项', item.title, details, '依赖满足后系统会自动开始；当前不会伪造后台轮询或进度跳变。');
 }

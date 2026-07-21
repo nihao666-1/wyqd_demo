@@ -19,6 +19,7 @@ test('任务列表移除右侧栏后保留操作列宽并扩大表格可读性',
   assert.match(source, /th:nth-child\(12\)\{width:10%\}/);
   assert.doesNotMatch(source, /th:last-child\{width:9%\}/);
   assert.match(source, /<td class="operation-cell"><span class="operation-actions"><RouterLink[\s\S]*<\/span><\/td>/);
+  assert.match(source, /v-if="task\.action !== '查看详情'"/);
   assert.doesNotMatch(source, /\.operation-cell\{[^}]*display:flex/);
   assert.match(source, /\.operation-cell\{[^}]*min-width:120px[^}]*white-space:nowrap/);
   assert.match(source, /\.operation-actions\{[^}]*display:flex[^}]*gap:8px/);

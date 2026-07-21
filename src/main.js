@@ -10,5 +10,6 @@ import './styles/components.css';
 
 const stopViewportScale = installViewportScale();
 window.addEventListener('pagehide', stopViewportScale, { once: true });
+store.startCreatedTaskProgressSimulation();
 
 createApp(App).use(router).provide('store', store).mount('#app');

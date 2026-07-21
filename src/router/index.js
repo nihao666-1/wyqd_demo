@@ -8,7 +8,6 @@ import FileCenter from '../views/files/FileCenter.vue';
 import FileDetail from '../views/files/FileDetail.vue';
 import ConfigCenter from '../views/config/ConfigCenter.vue';
 import RecordCenter from '../views/records/RecordCenter.vue';
-import DemoGuide from '../views/demo-guide/DemoGuide.vue';
 import MaterialImportWorkspace from '../views/materials/MaterialImportWorkspace.vue';
 import RegulatoryWorkbench from '../views/regulatory/RegulatoryWorkbench.vue';
 import RegulatoryResult from '../views/regulatory/RegulatoryResult.vue';
@@ -43,10 +42,10 @@ export const routes = [
   { path: '/files/detail', component: FileDetail, meta: { title: '文件详情' } },
   { path: '/config', component: ConfigCenter, meta: { title: '配置中心' } },
   { path: '/records', component: RecordCenter, meta: { title: '记录中心' } },
-  { path: '/demo-guide', component: DemoGuide, meta: { title: '演示指南' } },
+  { path: '/demo-guide', redirect: '/workbench' },
   { path: '/materials/import', component: MaterialImportWorkspace, meta: { title: '资料导入工作区' } },
   { path: '/regulatory/workbench', component: RegulatoryWorkbench, meta: { title: '专项审计分析' } },
-  { path: '/regulatory/new', redirect: { path: '/regulatory/workbench', query: { action: 'create' } } },
+  { path: '/regulatory/new', redirect: { path: '/tasks/create', query: { capability: 'regulatory' } } },
   { path: '/regulatory/data-fetch', redirect: { path: '/regulatory/result', query: { panel: 'fetch' } } },
   { path: '/regulatory/result', component: RegulatoryResult, meta: { title: '监管分析结果' } },
   { path: '/regulatory/history', redirect: { path: '/regulatory/result', query: { tab: 'history' } } },
@@ -68,7 +67,7 @@ export const routes = [
   { path: '/supervision/report/draft', component: SupervisionReportDraft, meta: { title: '监督共享报告草稿' } },
   { path: '/expense/workbench', component: ExpenseWorkbench, meta: { title: '费用审计入口' } },
   { path: '/expense/audit/overview', component: ExpenseAuditOverview, meta: { title: '费用审计分析' } },
-  { path: '/expense/usage/new', redirect: { path: '/expense/workbench', query: { action: 'create-usage' } } },
+  { path: '/expense/usage/new', redirect: { path: '/tasks/create', query: { capability: 'expense' } } },
   { path: '/expense/usage/dashboard', component: ExpenseUsageDashboard, meta: { title: '费用趋势分析' } },
   { path: '/expense/usage/drilldown', redirect: { path: '/expense/usage/dashboard', query: { panel: 'drilldown' } } },
   { path: '/expense/usage/report', redirect: { path: '/expense/usage/dashboard', query: { panel: 'report' } } },

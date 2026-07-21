@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }">
+  <div class="app-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }" @click.capture="handleGlobalUploadClick">
     <aside class="sidebar">
       <div class="brand">
         <strong>审计大模型系统</strong>
@@ -13,7 +13,7 @@
             <span v-if="item.children && shouldShowChildren(item)" class="nav-caret">⌄</span>
           </RouterLink>
           <div v-if="item.children && shouldShowChildren(item)" class="nav-children">
-            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="router-link-active" :class="{ 'sub-active': child.mode && route.query.mode === child.mode }">
+            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="router-link-active" :class="{ 'sub-active': isNavChildActive(child) }">
               <span class="nav-child-dot"></span>
               <span>{{ child.label }}</span>
             </RouterLink>
@@ -23,7 +23,6 @@
 
       <nav class="bottom-nav">
         <button type="button" @click="toggleSidebar"><span class="nav-icon"><AuditIcon name="collapse" /></span><span class="nav-label">{{ sidebarCollapsed ? '展开导航' : '收起导航' }}</span></button>
-        <RouterLink v-if="showDemoControls" to="/demo-guide"><span class="nav-icon"><AuditIcon name="qa" /></span>演示指南</RouterLink>
       </nav>
     </aside>
 
@@ -69,11 +68,55 @@
         <RouterView />
       </div>
     </main>
+
+    <div v-if="uploadDialogOpen" class="global-upload-mask" role="presentation">
+      <section class="global-upload-modal" role="dialog" aria-modal="true" aria-labelledby="global-upload-title">
+        <header>
+          <div>
+            <span>{{ uploadDialog.context }}</span>
+            <h2 id="global-upload-title">本地文件上传</h2>
+          </div>
+          <button type="button" aria-label="关闭上传弹窗" @click="closeUploadDialog">×</button>
+        </header>
+        <label class="global-upload-drop">
+          <input type="file" :multiple="uploadDialog.multiple" @change="handleUploadFiles" />
+          <strong>{{ uploadFileSummary }}</strong>
+          <span>支持选择本地文件，上传后进入资料校验和解析流程。</span>
+        </label>
+        <div class="global-upload-form">
+          <label>
+            <span>归属任务</span>
+            <select v-model="uploadDialog.task">
+              <option>上海分公司 Q1 常规审计任务</option>
+              <option>营业部费用异常审计任务</option>
+              <option>暂不绑定任务</option>
+            </select>
+          </label>
+          <label>
+            <span>资料类型</span>
+            <select v-model="uploadDialog.fileType">
+              <option>审计资料</option>
+              <option>报告文件</option>
+              <option>制度规范</option>
+              <option>费用明细</option>
+            </select>
+          </label>
+          <label class="upload-note">
+            <span>上传说明</span>
+            <textarea v-model="uploadDialog.note" placeholder="可填写资料来源、版本或补充说明"></textarea>
+          </label>
+        </div>
+        <footer>
+          <button type="button" @click="closeUploadDialog">取消</button>
+          <button type="button" class="primary" @click="confirmUploadDialog">确认上传</button>
+        </footer>
+      </section>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChevronDown, faCircleUser } from '@fortawesome/free-solid-svg-icons';
@@ -84,6 +127,21 @@ import { taskRows } from '../../views/tasks/taskCenterData.js';
 const store = inject('store');
 const route = useRoute();
 const sidebarCollapsed = ref(false);
+const uploadDialogOpen = ref(false);
+const uploadDialog = reactive({
+  context: '上传文件',
+  multiple: false,
+  files: [],
+  task: '上海分公司 Q1 常规审计任务',
+  fileType: '审计资料',
+  note: ''
+});
+
+const uploadFileSummary = computed(() => {
+  if (!uploadDialog.files.length) return '选择本地文件';
+  if (uploadDialog.files.length === 1) return uploadDialog.files[0].name;
+  return `已选择 ${uploadDialog.files.length} 个文件`;
+});
 
 watch(
   () => route.fullPath,
@@ -128,7 +186,16 @@ const businessNavItems = [
       { label: '费用趋势分析', path: '/expense/usage/dashboard' }
     ]
   },
-  { icon: 'report', label: '报告智能化', path: '/audit-report/workbench' },
+  {
+    icon: 'report',
+    label: '报告智能化',
+    path: '/audit-report/workbench',
+    children: [
+      { label: '报告生成', path: '/audit-report/workbench?mode=generate', mode: 'generate' },
+      { label: '报告审核', path: '/audit-report/workbench?mode=review', mode: 'review' },
+      { label: '模板管理', path: '/audit-report/template' }
+    ]
+  },
   { icon: 'files', label: '文件中心', path: '/files' },
   {
     icon: 'config',
@@ -153,6 +220,7 @@ const isExpenseAuditResult = computed(() => isExpenseAuditOverview.value || isEx
 const isExpenseTrendResult = computed(() => route.path === '/expense/usage/dashboard');
 const isAuditReportGeneration = computed(() => route.path === '/audit-report/draft');
 const isReportReviewRoute = computed(() => route.path === '/audit-report/check-result');
+const isAuditReportSection = computed(() => route.path.startsWith('/audit-report'));
 const isRegulatoryResultRoute = computed(() => route.path === '/regulatory/result');
 const isSpecialAuditWorkbench = computed(() => route.path === '/regulatory/workbench');
 const isAuditStandardSection = computed(() => route.path.startsWith('/audit-standard'));
@@ -185,12 +253,54 @@ function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value;
 }
 
+function isNavChildActive(child) {
+  if (child.mode) return route.path === '/audit-report/workbench' && String(route.query.mode || 'generate') === child.mode;
+  return route.path === child.path;
+}
+
+function handleGlobalUploadClick(event) {
+  const action = event.target.closest?.('button, a');
+  if (!action || action.closest('.global-upload-modal, .official-workflow-modal, .official-upload-modal, .compare-modal')) return;
+
+  const label = action.textContent?.replace(/\s+/g, '') || '';
+  const uploadLabels = ['上传文件', '上传文件夹', '上传资料', '上传报告', '上传新版本', '上传规范', '上传标准规范', '批量上传', '新建文件导入', '进入文件导入'];
+  if (!uploadLabels.some((text) => label.includes(text))) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+  openUploadDialog(label);
+}
+
+function openUploadDialog(label) {
+  uploadDialog.context = label || '上传文件';
+  uploadDialog.multiple = /批量|文件夹|资料/.test(label);
+  uploadDialog.files = [];
+  uploadDialog.fileType = /报告|新版本/.test(label) ? '报告文件' : /规范|标准/.test(label) ? '制度规范' : '审计资料';
+  uploadDialog.note = '';
+  uploadDialogOpen.value = true;
+}
+
+function handleUploadFiles(event) {
+  uploadDialog.files = Array.from(event.target.files || []);
+}
+
+function closeUploadDialog() {
+  uploadDialogOpen.value = false;
+}
+
+function confirmUploadDialog() {
+  const count = uploadDialog.files.length || 1;
+  store.setNotice(`${uploadDialog.context}已提交，${count} 个文件进入校验队列。`);
+  uploadDialogOpen.value = false;
+}
+
 function shouldShowChildren(item) {
   return Boolean(
     item.children &&
     ((isAuditStandardSection.value && item.path === '/audit-standard/policy') ||
       (isSpecialAuditSection.value && item.path === '/regulatory/workbench') ||
       (isExpenseSection.value && item.path === '/expense/workbench') ||
+      (isAuditReportSection.value && item.path === '/audit-report/workbench') ||
       (route.path === '/config' && item.path === '/config'))
   );
 }

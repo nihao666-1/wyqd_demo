@@ -11,6 +11,9 @@ test('任务详情编排生成中驾驶舱而非旧通用台账', () => {
   assert.deepEqual(parsed.errors, []);
   assert.doesNotMatch(source, /import PageHeader|import PageState|import MetricGrid|import DataTable/);
   assert.match(source, /getTaskDetailExecutionSnapshot/);
+  assert.match(source, /import \{ computed, inject, nextTick, ref \} from 'vue'/);
+  assert.match(source, /const executionRows = computed\(\(\) => \[\.\.\.\(store\?\.db\.createdTasks \|\| \[\]\), \.\.\.taskRows\]\)/);
+  assert.match(source, /const snapshot = computed\(\(\) => getTaskDetailExecutionSnapshot\(route\.query\.taskId, executionRows\.value\)\)/);
   assert.match(source, /TaskCapabilityExecutionGrid/);
   assert.match(source, /TaskExecutionLogRail/);
   assert.match(source, /data-detail-region="task-header"/);
@@ -21,7 +24,7 @@ test('任务详情编排生成中驾驶舱而非旧通用台账', () => {
 
 test('任务详情包含目标操作、分析页签和确定性交互', () => {
   for (const label of ['后台运行', '暂停任务', '查看日志']) assert.match(source, new RegExp(label));
-  assert.match(source, /ref\(snapshot\.activeTab\)/);
+  assert.match(source, /ref\(snapshot\.value\.activeTab\)/);
   assert.match(source, /function pauseTask\(/);
   assert.match(source, /function runInBackground\(/);
   assert.match(source, /function viewCapabilityLog\(/);

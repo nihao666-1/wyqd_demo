@@ -37,12 +37,11 @@
               <h2>欢迎使用审计大模型系统</h2>
               <strong>当前暂无审计任务</strong>
               <p>
-                从创建任务开始，按资料准备、智能分析、人工确认、报告生成和归档追溯推进。也可以导入模拟数据，查看完整工作台样例。
+                从创建任务开始，按资料准备、智能分析、人工确认、报告生成和归档追溯推进。需要查看已有任务时，可切换到有数据视图。
               </p>
               <div class="head-actions">
                 <RouterLink class="btn primary" to="/tasks/create">创建审计任务</RouterLink>
-                <button class="btn" type="button" @click="store.setDemoDataMode('data')">导入模拟数据</button>
-                <RouterLink v-if="showDemoControls" class="btn" to="/demo-guide">查看演示流程</RouterLink>
+                <button class="btn" type="button" @click="store.setDemoDataMode('data')">查看已有任务</button>
               </div>
             </div>
             <div class="welcome-preview" aria-hidden="true">
@@ -61,7 +60,7 @@
             <div class="panel-title">
               <div>
                 <h3>推荐开始方式</h3>
-                <p>选择一个入口完成首次演示，不提前展示业务结果。</p>
+                <p>选择业务入口完成任务发起、资料准备或规则维护。</p>
               </div>
             </div>
             <div class="start-card-grid">
@@ -77,7 +76,7 @@
           </section>
 
           <section class="panel compact-guide-panel">
-            <div class="panel-title"><h3>快速引导</h3></div>
+            <div class="panel-title"><h3>办理路径</h3></div>
             <div class="flow-strip compact-flow">
               <div v-for="(step, index) in lifecycleSteps.slice(0, 5)" :key="step" class="flow-node">
                 <span>{{ index + 1 }}</span>
@@ -86,19 +85,6 @@
             </div>
           </section>
         </div>
-
-        <aside class="summary-rail empty-rail">
-          <section class="panel">
-            <div class="panel-title"><h3>系统初始化状态</h3></div>
-            <div class="status-stack">
-              <p v-for="item in initStatus" :key="item.label">
-                <span>{{ item.label }}</span>
-                <b :class="item.className">{{ item.status }}</b>
-              </p>
-            </div>
-          </section>
-
-        </aside>
       </section>
     </template>
 
@@ -248,14 +234,11 @@
 
 <script setup>
 import { computed, inject } from 'vue';
-import { useRoute } from 'vue-router';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const store = inject('store');
-const route = useRoute();
 
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
-const showDemoControls = computed(() => import.meta.env.DEV || route.query.demo === '1');
 
 const legacyWorkbenchMetricLabels = ['进行中任务', '待确认异常', '待复核报告', '失败任务'];
 
@@ -348,8 +331,8 @@ const startCards = [
   },
   {
     icon: 'config',
-    title: '查看系统配置',
-    description: '检查模板、规则、权限和数据源初始化状态。',
+    title: '维护模板与规则',
+    description: '维护模板、规则、权限和数据源连接状态。',
     steps: ['模板配置', '规则配置', '权限配置'],
     to: '/config'
   }
@@ -362,13 +345,6 @@ const beginnerGuide = [
   { title: '准备来源资料', description: '上传文件或选择已入库资料。' },
   { title: '选择智能能力', description: '按任务需要勾选费用、制度、报告等能力。' },
   { title: '处理生成结果', description: '人工确认异常、报告和版本。' }
-];
-
-const initStatus = [
-  { label: '报告模板', status: '已内置', className: 'success' },
-  { label: '费用规则', status: '待确认', className: 'warning' },
-  { label: '文件中心', status: '暂无资料', className: 'danger' },
-  { label: '最近操作', status: '暂无记录', className: 'danger' }
 ];
 
 const todoTabs = [
@@ -722,6 +698,71 @@ const operationRows = computed(() => store.db.operationLogs);
   font-size: 18px;
 }
 
+.workbench-metric {
+  border-color: #d9e1ea;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.workbench-metric::before {
+  display: none;
+}
+
+.workbench-metric .metric-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d9e1ea;
+  border-radius: 4px;
+  background: #fff;
+  color: #526173;
+  box-shadow: none;
+}
+
+.workbench-metric .capability-card-head {
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.workbench-metric .capability-title {
+  color: #172033;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.workbench-metric .range-pill {
+  min-width: 70px;
+  height: 28px;
+  border-radius: 4px;
+  background: #fff;
+  color: #526173;
+}
+
+.workbench-metric .capability-status-grid {
+  border-top: 1px solid #e7ecf2;
+  border-bottom: 1px solid #e7ecf2;
+  padding: 11px 0;
+}
+
+.workbench-metric .capability-status dt {
+  font-size: 12px;
+}
+
+.workbench-metric .capability-status dd {
+  margin-top: 7px;
+  font-size: 21px;
+}
+
+.workbench-metric .capability-card-foot {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.workbench-metric .capability-card-foot strong {
+  color: #8a1f2d;
+  font-weight: 700;
+}
+
 .start-icon,
 .quick-entry span {
   width: 34px;
@@ -755,7 +796,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .empty-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 292px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   min-height: 0;
   align-items: stretch;

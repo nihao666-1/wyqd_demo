@@ -3,6 +3,7 @@
     <header class="report-titlebar" data-report-region="title-actions">
       <h2>报告生成</h2>
       <div class="title-actions">
+        <button type="button" class="compare-action" @click="openOfficialCompare">回传正式报告比对</button>
         <button type="button" @click="notify('已返回任务详情')">返回任务</button>
         <button type="button" @click="notify('已重新触发报告生成')">重新生成</button>
         <button type="button" @click="saveVersion">保存版本</button>
@@ -231,6 +232,69 @@
     </section>
 
     <button v-if="!sourceRailOpen" type="button" class="reopen-source" @click="sourceRailOpen = true">依据来源</button>
+    <section class="official-compare-panel" data-report-region="official-report-compare">
+      <header>
+        <div>
+          <span>正式报告回传比对</span>
+          <h3>生成稿与正式稿差异复核</h3>
+        </div>
+        <button type="button" @click="openOfficialCompare">上传正式报告</button>
+      </header>
+      <div class="compare-summary-grid">
+        <article v-for="item in snapshot.officialCompare.summary" :key="item.label" :class="item.tone">
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+          <em>{{ item.hint }}</em>
+        </article>
+      </div>
+      <div class="compare-detail-row">
+        <div>
+          <h4>{{ compareResultVisible ? '最近比对结果' : '待回传正式报告' }}</h4>
+          <p>{{ compareResultVisible ? snapshot.officialCompare.latestResult : snapshot.officialCompare.emptyHint }}</p>
+        </div>
+        <ol>
+          <li v-for="record in snapshot.officialCompare.records" :key="record.name">
+            <strong>{{ record.name }}</strong>
+            <span>{{ record.status }}</span>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <div v-if="compareDialogOpen" class="compare-modal-mask" role="presentation">
+      <section class="compare-modal" role="dialog" aria-modal="true" aria-labelledby="compare-modal-title">
+        <header>
+          <div>
+            <span>正式报告回传</span>
+            <h3 id="compare-modal-title">回传正式报告比对</h3>
+          </div>
+          <button type="button" aria-label="关闭回传正式报告比对" @click="compareDialogOpen = false"><FontAwesomeIcon :icon="faXmark" /></button>
+        </header>
+        <label class="official-upload-box">
+          <input type="file" accept=".doc,.docx,.pdf" @change="handleOfficialReportUpload" />
+          <FontAwesomeIcon :icon="faFileLines" />
+          <strong>{{ officialReportFileName || '上传正式报告文件' }}</strong>
+          <span>支持 Word / PDF，用于与当前生成稿进行差异比对</span>
+        </label>
+        <label class="compare-base-select">
+          <span>比对基准</span>
+          <select v-model="compareBaseVersion">
+            <option v-for="version in snapshot.versions" :key="version.id" :value="version.id">
+              {{ version.id }} - {{ version.label }}
+            </option>
+          </select>
+        </label>
+        <div class="compare-check-list">
+          <span v-for="item in snapshot.officialCompare.checkItems" :key="item">
+            <FontAwesomeIcon :icon="faCheck" />{{ item }}
+          </span>
+        </div>
+        <footer>
+          <button type="button" @click="compareDialogOpen = false">取消</button>
+          <button type="button" class="danger" @click="startOfficialCompare">开始比对</button>
+        </footer>
+      </section>
+    </div>
     <div v-if="toast" class="report-toast" role="status">{{ toast }}</div>
   </section>
 </template>
@@ -267,6 +331,10 @@ const toast = ref('');
 const sourceRailOpen = ref(true);
 const activeSourceTab = ref('引用结果');
 const sourceTabs = ['引用结果', '制度条款', '费用异常', '监督共享资料', '历史报告'];
+const compareDialogOpen = ref(false);
+const compareResultVisible = ref(false);
+const officialReportFileName = ref('');
+const compareBaseVersion = ref('V1.0');
 let toastTimer;
 
 const metaItems = computed(() => [
@@ -328,6 +396,34 @@ function exportReport() {
   notify('已生成 Word 与 PDF 导出任务');
 }
 
+function openOfficialCompare() {
+  compareDialogOpen.value = true;
+  notify('请上传线下定稿后的正式报告');
+}
+
+function handleOfficialReportUpload(event) {
+  const [file] = Array.from(event.target.files || []);
+  officialReportFileName.value = file?.name || '';
+}
+
+function startOfficialCompare() {
+  officialReportFileName.value ||= '上海分公司Q1常规审计正式报告.docx';
+  compareResultVisible.value = true;
+  compareDialogOpen.value = false;
+  snapshot.value.officialCompare.summary = [
+    { label: '内容差异', value: '12', hint: '新增 4 / 修改 8', tone: 'red' },
+    { label: '结构差异', value: '2', hint: '章节顺序需复核', tone: 'orange' },
+    { label: '依据差异', value: '3', hint: '引用来源变化', tone: 'blue' },
+    { label: '风险提示', value: '1', hint: '影响审计结论', tone: 'red' }
+  ];
+  snapshot.value.officialCompare.latestResult = `${officialReportFileName.value} 已与 ${compareBaseVersion.value} 生成稿完成比对，发现 18 处差异，其中 1 处可能影响审计结论，建议进入复核处理。`;
+  snapshot.value.officialCompare.records.unshift({
+    name: officialReportFileName.value,
+    status: '已完成比对'
+  });
+  notify('正式报告比对已完成');
+}
+
 function sourceIcon(tone) {
   return { red: faFileLines, green: faTableList, orange: faClipboardCheck }[tone] || faUserShield;
 }
@@ -340,6 +436,7 @@ function sourceIcon(tone) {
 .editor-card{height:306px;display:grid;grid-template-columns:146px minmax(0,1fr) 126px}.chapter-list{border-right:1px solid #e2e7ef;padding:10px 8px}.chapter-list h3 span{color:#667085;font-weight:700}.chapter-list button{width:100%;height:27px;border:0;border-radius:4px;background:transparent;text-align:left;font-size:11px;font-weight:700;color:#1f2937}.chapter-list button.active{background:#fff0f0;color:var(--color-primary)}.chapter-list span{margin-right:5px}.editor-surface{min-width:0}.editor-toolbar{height:34px;border-bottom:1px solid #e2e7ef;display:flex;align-items:center;gap:5px;padding:0 8px}.editor-toolbar button,.editor-toolbar select{height:24px;border:0;background:#fff;color:#344054;font-size:12px}.editor-toolbar select{border:1px solid #dde3eb;border-radius:3px}.doc-paper{height:271px;padding:17px 30px;overflow:hidden}.doc-paper h1{text-align:center;font-size:18px;margin-bottom:16px}.doc-paper h4,.doc-paper h5{margin:0 0 8px;font-size:13px}.doc-paper p{margin:0 0 10px;font-size:12px;line-height:1.75}.ai-paragraph{position:relative;border:1px solid #b9d3ff;border-radius:4px;background:#f4f8ff;padding:8px 45px 8px 34px}.ai-paragraph span{position:absolute;left:8px;top:10px;width:18px;height:18px;border-radius:3px;background:var(--color-info);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800}.ai-paragraph button,.issue-tag{height:22px;border:1px solid #ffb3a8;border-radius:4px;background:#fff1ef;color:var(--color-primary);font-size:11px}.ai-paragraph button{position:absolute;right:8px;top:20px}.chapter-actions{border-left:1px solid #e2e7ef;padding:10px 9px;display:grid;align-content:start;gap:8px}.chapter-actions button{width:100%;height:29px;padding:0 6px}.chapter-actions .red-outline{border-color:#ff9f9f;color:var(--color-primary)}.chapter-actions dl{margin:9px 0 0;display:grid;gap:6px}.chapter-actions dl div{display:flex;justify-content:space-between}.chapter-actions dt{color:#667085}.chapter-actions dd{margin:0}.danger-count{color:var(--color-primary)}
 .source-rail{position:absolute;right:14px;top:62px;width:326px;height:auto;display:grid;grid-template-rows:42px 43px 43px minmax(0,1fr) 43px}.source-rail header{display:flex;align-items:center;justify-content:space-between;padding:0 12px}.source-rail header button{border:0;background:#fff;font-size:22px}.source-tabs{display:flex;align-items:end;gap:14px;padding:0 10px;border-bottom:1px solid #e2e7ef;overflow-x:auto}.source-tabs button{height:36px;border:0;background:#fff;color:#344054;font-size:12px;font-weight:800;white-space:nowrap}.source-tabs .active{color:var(--color-primary);border-bottom:2px solid var(--color-primary)}.source-tools{display:flex;align-items:center;gap:8px;padding:0 10px}.source-tools strong{margin-right:auto}.source-tools select{height:28px;width:84px;border:1px solid #d8dee8;border-radius:4px;background:#fff;font-size:11px}.source-tools button{height:28px;padding:0 9px}.source-list{overflow:auto;padding:0 9px 8px;display:grid;gap:8px;align-content:start}.source-card{min-height:192px;border:1px solid #e1e7ef;border-radius:6px;background:#fff;padding:12px}.source-card>div:first-child{display:flex;align-items:center;gap:8px}.source-index{width:18px;height:18px;border-radius:4px;background:var(--color-info);color:#fff;display:grid;place-items:center;font-weight:800}.source-card em{height:22px;padding:0 8px;border-radius:4px;background:#eaf3ff;color:var(--color-info);display:inline-flex;align-items:center;font-style:normal;font-weight:800}.source-card h4{margin:10px 0 7px;font-size:13px}.source-card p{height:42px;overflow:hidden;color:#344054;font-size:12px;line-height:1.7}.source-card dl{display:grid;grid-template-columns:1fr 1fr 45px;margin:6px 0 9px}.source-card dl div{display:flex;gap:3px}.source-card dt{color:#667085}.source-card dd{margin:0}.source-card footer{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.source-card footer button{height:28px;padding:0;border-color:#dbe2ec;font-size:11px}.pager{display:flex;align-items:center;justify-content:center;gap:7px;border-top:1px solid #e2e7ef}.pager button{width:24px;height:24px;border:1px solid #dbe2ec;border-radius:4px;background:#fff}.pager button.active{border-color:var(--color-primary);background:var(--color-primary);color:#fff}.pager strong{font-weight:700;color:#344054}
 .bottom-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,358px) minmax(120px,160px);gap:10px;margin-top:10px;margin-left:0}.output-panel,.version-panel,.export-history-panel{height:122px;padding:9px 10px}.output-panel p{margin:6px 0 8px;color:#344054;font-weight:700;line-height:1}.output-files{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.output-files article{height:60px;border:1px solid #e2e7ef;border-radius:4px;background:#fff;display:grid;align-content:center;justify-items:start;padding:8px;gap:4px}.output-files span{height:18px;min-width:18px;border-radius:3px;color:#fff;display:inline-grid;place-items:center;font-size:9px;font-weight:800}.output-files .word{background:var(--color-info)}.output-files .pdf{background:var(--color-primary)}.output-files .zip{background:var(--color-warning)}.output-files .excel{background:var(--color-success)}.output-files strong{font-size:11px}.output-files small{color:#667085}.version-panel ol{position:relative;list-style:none;margin:15px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr)}.version-panel ol::before{content:"";position:absolute;left:16px;right:16px;top:7px;border-top:2px dotted #c4ccd8}.version-panel li{position:relative;display:grid;gap:4px}.version-panel li span{width:10px;height:10px;border-radius:50%;background:#8f99a8;z-index:1}.version-panel li.active span{background:var(--color-info)}.version-panel li.current span{background:var(--color-primary)}.version-panel strong{font-size:13px}.version-panel em,.version-panel time{font-style:normal;font-size:11px;color:#344054}.version-panel time{color:#667085}.export-history-panel p{margin-top:34px;color:#667085;text-align:center;line-height:1.4}.report-toast{position:fixed;right:24px;top:68px;z-index:80;padding:9px 14px;border-radius:4px;background:rgba(31,41,55,.94);color:#fff}.reopen-source{position:fixed;right:16px;top:120px;z-index:30;height:34px;border:1px solid var(--color-primary);border-radius:4px;background:#fff;color:var(--color-primary);font-weight:800}
+.title-actions .compare-action{border-color:#a32035;background:#fff7f7;color:#a32035}.official-compare-panel{margin-top:10px;border:1px solid #e2e7ef;border-left:3px solid #a32035;border-radius:4px;background:#fff;padding:10px 12px}.official-compare-panel>header{display:flex;align-items:center;justify-content:space-between;gap:12px}.official-compare-panel>header span,.compare-modal header span{display:block;margin-bottom:4px;color:#667085;font-size:11px;font-weight:800}.official-compare-panel h3,.compare-modal h3{font-size:14px;font-weight:800}.official-compare-panel>header button{height:30px;padding:0 14px;border:1px solid #a32035;border-radius:4px;background:#a32035;color:#fff;font-size:12px;font-weight:800}.compare-summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.compare-summary-grid article{min-height:62px;border:1px solid #e2e7ef;border-radius:4px;background:#fbfcfe;padding:8px}.compare-summary-grid span{display:block;color:#667085;font-size:11px;font-weight:800}.compare-summary-grid strong{display:block;margin-top:5px;font-size:22px;line-height:1;color:#344054}.compare-summary-grid em{display:block;margin-top:6px;color:#667085;font-size:11px;font-style:normal}.compare-summary-grid .red strong{color:#a32035}.compare-summary-grid .orange strong{color:#8a5a16}.compare-summary-grid .blue strong{color:#315d96}.compare-detail-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid #edf0f5}.compare-detail-row h4{margin:0 0 5px;font-size:13px}.compare-detail-row p{margin:0;color:#344054;line-height:1.7}.compare-detail-row ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}.compare-detail-row li{display:flex;align-items:center;justify-content:space-between;gap:10px}.compare-detail-row li strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.compare-detail-row li span{height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:3px;background:#fff0f0;color:#a32035;font-size:11px;font-weight:800;white-space:nowrap}.compare-modal-mask{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:rgba(15,23,42,.28)}.compare-modal{width:min(520px,calc(100vw - 32px));border:1px solid #e2e7ef;border-radius:6px;background:#fff;box-shadow:0 18px 48px rgba(15,23,42,.18);padding:16px}.compare-modal header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.compare-modal header button{width:30px;height:30px;border:0;background:#fff;color:#344054}.official-upload-box{min-height:116px;border:1px dashed #d5adad;border-radius:6px;background:#fff8f8;display:grid;place-items:center;align-content:center;gap:7px;color:#a32035;cursor:pointer}.official-upload-box input{position:absolute;inline-size:1px;block-size:1px;opacity:0}.official-upload-box svg{font-size:22px}.official-upload-box strong{font-size:14px}.official-upload-box span{color:#667085;font-size:12px}.compare-base-select{display:grid;gap:6px;margin-top:12px;font-weight:800}.compare-base-select select{height:34px;border:1px solid #d8dee8;border-radius:4px;background:#fff;color:#344054}.compare-check-list{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}.compare-check-list span{height:30px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;background:#f3f5f8;color:#344054;font-size:12px;font-weight:800}.compare-check-list svg{color:#2d7a5f}.compare-modal footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.compare-modal footer button{height:32px;padding:0 16px;border:1px solid #d4dbe5;border-radius:4px;background:#fff;font-weight:800}.compare-modal footer .danger{border-color:#a32035;background:#a32035;color:#fff}
 @media (max-width:1500px){.report-generation-page{width:100%;max-width:none;margin:0}.report-titlebar,.task-meta-strip,.report-generation-grid,.bottom-row{transform-origin:top left}}
 @media (max-width:1180px){.report-generation-page{transform:none;width:100%;max-width:none;overflow:hidden}.task-meta-strip{margin-right:0;grid-template-columns:repeat(3,1fr);height:auto}.report-generation-grid{grid-template-columns:204px minmax(0,1fr)}.source-rail{position:fixed;right:0;top:56px;z-index:40;width:326px}.bottom-row{grid-template-columns:1fr;width:100%}}
 .report-generation-page{box-sizing:border-box;width:100%;max-width:none;margin:0;padding:12px;color:#172033}.report-generation-grid{grid-template-columns:minmax(180px,220px) minmax(0,1fr) minmax(280px,326px);min-width:0}.task-meta-strip{margin-right:0;grid-template-columns:repeat(6,minmax(0,1fr))}.source-rail{position:static;width:auto;height:auto;min-width:0}.bottom-row{width:100%;grid-template-columns:minmax(0,1fr) minmax(260px,358px) minmax(120px,160px)}

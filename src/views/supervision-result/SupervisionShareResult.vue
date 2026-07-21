@@ -254,7 +254,7 @@
     </main>
 
     <aside v-if="!isCompactDetail" class="source-detail-panel" data-result-region="source-detail">
-      <button class="new-analysis" type="button" @click="liveMessage = '已准备新建共享信息分析。'">新建共享信息分析</button>
+      <button class="new-analysis" type="button" @click="createSupervisionAnalysis">新建共享信息分析</button>
       <section class="source-detail-card">
         <header>
           <h2>来源文件详情</h2>
@@ -521,6 +521,10 @@ function resetFilters() {
   }
   setState(nextState);
   liveMessage.value = '筛选条件已重置。';
+}
+
+function createSupervisionAnalysis() {
+  router.push({ path: '/tasks/create', query: { capability: 'supervision' } });
 }
 
 function rememberTrigger() {

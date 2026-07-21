@@ -16,7 +16,7 @@
         <div class="filter-actions">
           <button type="button" class="primary" @click="notify('已按当前条件刷新监管案例舆情分析。')">查询</button>
           <button type="button" @click="notify('筛选条件已重置为默认范围。')">重置</button>
-          <button type="button" class="primary wide" @click="notify('已进入新建案例舆情分析流程。')">新建案例舆情分析</button>
+          <button type="button" class="primary wide" @click="createRegulatoryAnalysis">新建案例舆情分析</button>
         </div>
       </section>
 
@@ -280,7 +280,7 @@
 
 <script setup>
 import { computed, inject, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
   faChartSimple,
@@ -297,6 +297,7 @@ import {
 
 const store = inject('store');
 const route = useRoute();
+const router = useRouter();
 
 const filters = [
   { label: '被分析单位', value: '上海分公司', type: 'select' },
@@ -404,6 +405,10 @@ const comment = ref('');
 
 function notify(message) {
   store?.setNotice?.(message);
+}
+
+function createRegulatoryAnalysis() {
+  router.push({ path: '/tasks/create', query: { capability: 'regulatory' } });
 }
 
 </script>

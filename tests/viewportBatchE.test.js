@@ -47,7 +47,13 @@ test('report workbench keeps generate and review modes without legacy empty temp
   assert.match(workbench, /activeMode === 'generate'/);
   assert.match(workbench, /activeMode === 'review'|<template v-else>/);
   assert.match(workbench, /to="\/audit-report\/template"/);
-  assert.match(workbench, /to="\/materials\/import\?scene=audit-report"/);
+  assert.doesNotMatch(workbench, /to="\/materials\/import\?scene=audit-report"/);
+  assert.match(workbench, /class="compare-entry"/);
+  assert.match(workbench, /class="official-workflow-modal"/);
+  assert.match(workbench, /class="official-upload-modal"/);
+  assert.match(workbench, /function openOfficialCompare/);
+  assert.match(workbench, /function openUploadOfficialReport/);
+  assert.match(workbench, /function startOfficialCompare/);
   assert.doesNotMatch(workbench, /activeMode === 'empty'|template-rail|reportTypes|formatTemplates|mode-empty/);
 
   assert.match(review, /report-review-page route-fill-page/);
@@ -58,6 +64,8 @@ test('report workbench keeps generate and review modes without legacy empty temp
   assert.match(review, /@media \(min-width:\s*1200px\) and \(max-width:\s*1700px\)[\s\S]*\.workbench-panel\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)[^}]*height:\s*auto/s);
   assert.match(review, /@media \(min-width:\s*1200px\) and \(max-width:\s*1700px\)[\s\S]*\.issue-table\s*\{[^}]*min-width:\s*780px/s);
   assert.match(review, /@media \(min-width:\s*1701px\) and \(max-width:\s*2150px\)[\s\S]*\.issue-table th:nth-child\(3\)[\s\S]*display:\s*none/s);
+  assert.match(workbench, /<div class="export-actions"><button>查看<\/button><button>下载<\/button><\/div>/);
+  assert.match(workbench, /\.export-actions\s*\{[^}]*position:\s*absolute[^}]*bottom:\s*10px[^}]*grid-template-columns:\s*38px 1fr/s);
 });
 
 test('report draft owns its vertical scrolling without extending the document', () => {

@@ -19,6 +19,9 @@ test('报告生成执行页快照覆盖参考图核心区域', () => {
   assert.equal(snapshot.sources.length, 3);
   assert.equal(snapshot.outputs.length, 5);
   assert.equal(snapshot.versions.at(-1).id, 'V1.0');
+  assert.equal(snapshot.officialCompare.summary.length, 4);
+  assert.equal(snapshot.officialCompare.checkItems.length, 4);
+  assert.equal(snapshot.officialCompare.records.length, 1);
   assert.equal(snapshot.exportHistory.title, '导出记录（近 7 天）');
 });
 
@@ -28,7 +31,9 @@ test('报告生成执行页快照返回隔离副本', () => {
 
   first.sources[0].title = 'changed';
   first.outputs.push({ name: 'extra' });
+  first.officialCompare.records.push({ name: 'extra', status: 'changed' });
 
   assert.equal(second.sources[0].title, '《证券公司客户适当性管理办法（2023年修订）》');
   assert.equal(second.outputs.length, 5);
+  assert.equal(second.officialCompare.records.length, 1);
 });

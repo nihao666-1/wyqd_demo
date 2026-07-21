@@ -32,13 +32,13 @@ test('legacy short-step routes redirect into consolidated workspaces', () => {
   const router = read(routerUrl);
 
   const redirects = [
-    ['/regulatory/new', "/regulatory/workbench', query: { action: 'create' }"],
+    ['/regulatory/new', "/tasks/create', query: { capability: 'regulatory' }"],
     ['/regulatory/data-fetch', "/regulatory/result', query: { panel: 'fetch' }"],
     ['/regulatory/history', "/regulatory/result', query: { tab: 'history' }"],
     ['/audit-standard/upload', "/audit-standard/library', query: { action: 'upload' }"],
     ['/audit-standard/diff', "/audit-standard/library', query: { panel: 'diff' }"],
     ['/audit-standard/precheck', "/audit-standard/generate', query: { step: 'precheck' }"],
-    ['/expense/usage/new', "/expense/workbench', query: { action: 'create-usage' }"],
+    ['/expense/usage/new', "/tasks/create', query: { capability: 'expense' }"],
     ['/expense/usage/drilldown', "/expense/usage/dashboard', query: { panel: 'drilldown' }"],
     ['/expense/usage/report', "/expense/usage/dashboard', query: { panel: 'report' }"],
     ['/audit-report/template-upload', "/audit-report/template', query: { action: 'upload' }"],
@@ -136,19 +136,34 @@ test('navigation is grouped and no longer exposes demo-guide as collapse behavio
   compileVue(layoutUrl);
 });
 
+test('report intelligence navigation exposes the three phase-one subitems only', () => {
+  const layout = read(layoutUrl);
+
+  assert.match(layout, /label: '报告智能化'[\s\S]*children:\s*\[/);
+  assert.match(layout, /label: '报告生成'[\s\S]*mode: 'generate'/);
+  assert.match(layout, /label: '报告审核'[\s\S]*mode: 'review'/);
+  assert.match(layout, /label: '模板管理'[\s\S]*path: '\/audit-report\/template'/);
+  assert.doesNotMatch(layout, /label: '资料导入'[\s\S]*item\.path === '\/audit-report\/workbench'/);
+});
+
 test('dashboard and task center remove duplicate rail content without touching core task creation', () => {
   const workbench = read(workbenchUrl);
   const taskList = read(taskListUrl);
+  const taskEmpty = read(new URL('../src/views/tasks/TaskCenterEmptyState.vue', import.meta.url));
 
   assert.match(workbench, /核心指标|legacyWorkbenchMetricLabels/);
   assert.doesNotMatch(workbench, /<h3>快捷入口<\/h3>/);
   assert.doesNotMatch(workbench, /<h3>系统通知<\/h3>/);
   assert.doesNotMatch(workbench, /<h3>最近操作日志<\/h3>/);
+  assert.doesNotMatch(workbench, /<h3>快速引导<\/h3>/);
+  assert.match(workbench, /<h3>办理路径<\/h3>/);
   assert.doesNotMatch(workbench, /<h3>任务流程预览<\/h3>[\s\S]*<h3>新手引导<\/h3>/);
 
   assert.match(taskList, /class="create-task-inline" to="\/tasks\/create"/);
   assert.doesNotMatch(taskList, /class="task-rail"/);
   assert.doesNotMatch(taskList, /今日待办与提醒|失败任务|最近操作日志|快捷入口/);
+  assert.doesNotMatch(taskEmpty, /任务办理流程|推荐演示路径/);
+  assert.match(taskEmpty, /任务流转节点/);
   assert.match(taskList, /table\{[^}]*min-width:1180px/);
   assert.match(taskList, /td\{[^}]*font-size:11px/);
 });

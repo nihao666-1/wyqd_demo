@@ -9,7 +9,6 @@
         <button type="button" :class="{ active: activeMode === 'generate' }" @click="setMode('generate')">报告生成</button>
         <button type="button" :class="{ active: activeMode === 'review' }" @click="setMode('review')">报告审核</button>
         <RouterLink class="mode-link" to="/audit-report/template">模板管理</RouterLink>
-        <RouterLink class="mode-link" to="/materials/import?scene=audit-report">资料导入</RouterLink>
       </nav>
     </header>
 
@@ -25,10 +24,11 @@
             <label><span>多模型复核</span><input type="checkbox" checked /></label>
           </div>
           <div class="toolbar-actions">
-            <button class="primary" type="button" @click="showNotice('已开始生成报告草稿。')">开始生成</button>
+            <button class="compare-entry" type="button" @click="openOfficialCompare">回传正式报告比对</button>
+            <button class="primary" type="button" @click="startReportGeneration">开始生成</button>
             <button class="outline-danger" type="button" @click="showNotice('已对当前章节重新生成。')">章节级重新生成</button>
             <button type="button" @click="showNotice('版本已保存。')">保存版本</button>
-            <button type="button" @click="showNotice('已提交审核。')">提交审核</button>
+            <button type="button" @click="submitGeneratedReportForReview">提交审核</button>
             <button class="outline-danger" type="button" @click="showNotice('已导出报告。')">导出报告⌄</button>
           </div>
         </section>
@@ -98,6 +98,16 @@
             <h3>生成建议</h3>
             <p>已完成 66%</p><small>预计剩余时间：6 分钟</small>
             <div class="ring">66%</div>
+          </aside>
+          <aside class="panel official-compare-card">
+            <h3>正式报告比对</h3>
+            <p>{{ officialCompare.status }}</p>
+            <div>
+              <span v-for="item in officialCompare.metrics" :key="item.label">
+                <b>{{ item.value }}</b>{{ item.label }}
+              </span>
+            </div>
+            <button type="button" @click="openUploadOfficialReport">上传正式报告</button>
           </aside>
         </section>
       </section>
@@ -176,7 +186,11 @@
 
           <section class="panel export-row">
             <h3>复核与导出</h3>
-            <article v-for="item in exportItems" :key="item.title"><div class="export-logo"><i :class="item.tone">{{ item.icon }}</i><button>查看</button></div><div class="export-copy"><strong>{{ item.title }}</strong><small>{{ item.format }}</small><em>{{ item.desc }}</em><button>下载</button></div></article>
+            <article v-for="item in exportItems" :key="item.title">
+              <div class="export-logo"><i :class="item.tone">{{ item.icon }}</i></div>
+              <div class="export-copy"><strong>{{ item.title }}</strong><small>{{ item.format }}</small><em>{{ item.desc }}</em></div>
+              <div class="export-actions"><button>查看</button><button>下载</button></div>
+            </article>
           </section>
 
           <section class="panel version-line">
@@ -203,27 +217,203 @@
         </section>
       </section>
     </template>
+    <div v-if="compareWorkflowOpen" class="official-modal-mask" role="presentation">
+      <section class="official-workflow-modal" role="dialog" aria-modal="true" aria-labelledby="official-workflow-title">
+        <header>
+          <div>
+            <span>正式报告回传比对</span>
+            <h3 id="official-workflow-title">生成稿与正式稿比对流程</h3>
+          </div>
+          <button type="button" aria-label="关闭正式报告比对流程" @click="compareWorkflowOpen = false">×</button>
+        </header>
+        <ol class="official-workflow-steps">
+          <li v-for="step in compareWorkflowSteps" :key="step.title" :class="{ active: officialCompare.phase >= step.index }">
+            <b>{{ step.index }}</b>
+            <strong>{{ step.title }}</strong>
+            <span>{{ step.desc }}</span>
+          </li>
+        </ol>
+        <section class="official-workflow-body">
+          <div class="workflow-file-state">
+            <span>正式报告文件</span>
+            <strong>{{ officialReportFileName || '尚未上传' }}</strong>
+            <button type="button" @click="openUploadOfficialReport">上传正式报告</button>
+          </div>
+          <label>
+            <span>比对基准</span>
+            <select v-model="compareBaseVersion">
+              <option>当前生成稿 V1.0</option>
+              <option>人工编辑稿 V0.9</option>
+              <option>章节生成稿 V0.5</option>
+            </select>
+          </label>
+          <div class="workflow-result">
+            <h4>{{ officialCompare.resultTitle }}</h4>
+            <p>{{ officialCompare.resultDesc }}</p>
+            <ul>
+              <li v-for="item in officialCompare.resultItems" :key="item">{{ item }}</li>
+            </ul>
+          </div>
+        </section>
+        <footer>
+          <button type="button" @click="compareWorkflowOpen = false">暂不处理</button>
+          <button type="button" class="outline-danger" @click="openUploadOfficialReport">上传正式报告</button>
+          <button type="button" class="primary" @click="startOfficialCompare">开始比对</button>
+        </footer>
+      </section>
+    </div>
+
+    <div v-if="uploadDialogOpen" class="official-modal-mask upload-mask" role="presentation">
+      <section class="official-upload-modal" role="dialog" aria-modal="true" aria-labelledby="official-upload-title">
+        <header>
+          <div>
+            <span>上传本地文件</span>
+            <h3 id="official-upload-title">上传正式报告</h3>
+          </div>
+          <button type="button" aria-label="关闭上传正式报告弹窗" @click="uploadDialogOpen = false">×</button>
+        </header>
+        <label class="official-file-drop">
+          <input type="file" accept=".doc,.docx,.pdf" @change="handleOfficialReportUpload" />
+          <strong>{{ officialReportFileName || '选择本地正式报告文件' }}</strong>
+          <span>支持 .docx / .doc / .pdf，上传后可与当前生成稿进行比对</span>
+        </label>
+        <label class="upload-remark">
+          <span>上传说明</span>
+          <textarea v-model="officialUploadRemark" placeholder="可填写线下修改来源、定稿人或版本说明"></textarea>
+        </label>
+        <footer>
+          <button type="button" @click="uploadDialogOpen = false">取消</button>
+          <button type="button" class="primary" @click="confirmUploadOfficialReport">确认上传</button>
+        </footer>
+      </section>
+    </div>
+
+    <div v-if="notice" class="report-workbench-toast" role="status">{{ notice }}</div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
-const activeMode = ref(route.query.mode === 'review' ? 'review' : 'generate');
+const router = useRouter();
+const resolveReportMode = () => route.query.mode === 'review' ? 'review' : 'generate';
+const activeMode = ref(resolveReportMode());
 const notice = ref('');
 const activeChapter = ref('一、基本情况');
+const compareWorkflowOpen = ref(false);
+const uploadDialogOpen = ref(false);
+const officialReportFileName = ref('');
+const officialUploadRemark = ref('');
+const compareBaseVersion = ref('当前生成稿 V1.0');
+const officialCompare = ref({
+  status: '待回传正式报告',
+  phase: 1,
+  metrics: [
+    { label: '内容差异', value: '--' },
+    { label: '依据差异', value: '--' },
+    { label: '风险提示', value: '--' }
+  ],
+  resultTitle: '等待上传正式报告',
+  resultDesc: '请先上传线下定稿后的正式报告，再与当前生成稿进行自动差异比对。',
+  resultItems: ['内容差异、结构差异、依据差异和风险提示将在比对后展示。']
+});
 const expandedMode = { generate: '报告生成', review: '报告审核' };
 const modeTitle = computed(() => expandedMode[activeMode.value]);
+const compareWorkflowSteps = [
+  { index: 1, title: '选择比对基准', desc: '默认使用当前生成稿 V1.0' },
+  { index: 2, title: '上传正式报告', desc: '上传线下定稿 Word / PDF' },
+  { index: 3, title: '执行差异比对', desc: '识别内容、结构和依据变化' },
+  { index: 4, title: '处理复核结果', desc: '标记采纳、忽略或需复核' }
+];
 
 function setMode(mode) {
   activeMode.value = mode;
+  router.push({ path: '/audit-report/workbench', query: { mode } });
   notice.value = `已切换至${expandedMode[mode]}页面。`;
 }
 
+watch(
+  () => route.query.mode,
+  () => {
+    activeMode.value = resolveReportMode();
+  }
+);
+
 function showNotice(message) {
   notice.value = message;
+}
+
+function startReportGeneration() {
+  showNotice('已开始生成报告草稿。');
+  router.push('/audit-report/draft');
+}
+
+function submitGeneratedReportForReview() {
+  activeMode.value = 'review';
+  router.push({ path: '/audit-report/workbench', query: { mode: 'review' } });
+  showNotice('已提交审核，已进入报告审核页面。');
+}
+
+function openOfficialCompare() {
+  compareWorkflowOpen.value = true;
+  showNotice('已打开正式报告回传比对流程。');
+}
+
+function openUploadOfficialReport() {
+  uploadDialogOpen.value = true;
+  compareWorkflowOpen.value = true;
+  showNotice('请选择本地正式报告文件。');
+}
+
+function handleOfficialReportUpload(event) {
+  const [file] = Array.from(event.target.files || []);
+  if (!file) return;
+  officialReportFileName.value = file.name;
+  officialCompare.value = {
+    ...officialCompare.value,
+    phase: Math.max(officialCompare.value.phase, 2),
+    status: `已选择 ${file.name}，待开始比对`,
+    resultTitle: '正式报告已选择',
+    resultDesc: `将使用 ${compareBaseVersion.value} 与 ${file.name} 进行差异比对。`,
+    resultItems: ['点击“确认上传”后文件进入待比对状态。']
+  };
+}
+
+function confirmUploadOfficialReport() {
+  officialReportFileName.value ||= '上海分公司Q1常规审计正式报告.docx';
+  uploadDialogOpen.value = false;
+  officialCompare.value = {
+    ...officialCompare.value,
+    phase: Math.max(officialCompare.value.phase, 2),
+    status: `已上传 ${officialReportFileName.value}，待开始比对`,
+    resultTitle: '正式报告已上传',
+    resultDesc: `已回传正式报告，可基于 ${compareBaseVersion.value} 启动比对。`,
+    resultItems: ['已记录上传文件', '已绑定当前报告任务', '等待执行差异比对']
+  };
+  showNotice('正式报告已上传，下一步可开始比对。');
+}
+
+function startOfficialCompare() {
+  if (!officialReportFileName.value) {
+    openUploadOfficialReport();
+    showNotice('请先上传正式报告文件，再开始比对。');
+    return;
+  }
+  officialCompare.value = {
+    status: `已完成 ${officialReportFileName.value} 与生成稿比对`,
+    phase: 4,
+    metrics: [
+      { label: '内容差异', value: '12' },
+      { label: '依据差异', value: '3' },
+      { label: '风险提示', value: '1' }
+    ],
+    resultTitle: '比对完成，待复核处理',
+    resultDesc: `${officialReportFileName.value} 已与 ${compareBaseVersion.value} 完成比对，发现 16 处差异，其中 1 处可能影响审计结论。`,
+    resultItems: ['新增段落 4 处，修改段落 8 处', '章节顺序变化 2 处', '引用依据变化 3 处', '审计结论相关风险提示 1 处']
+  };
+  showNotice('正式报告比对已完成，请查看差异结果。');
 }
 
 const chapters = [
@@ -307,6 +497,7 @@ button { cursor:pointer; }
 .toggle-stack input { margin:0; }
 .toolbar-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 .toolbar-actions button,.review-top button,.detail-actions button,.issue-detail footer button { height:32px; border:1px solid #d7dee9; background:#fff; border-radius:4px; padding:0 12px; font-weight:800; }
+.toolbar-actions .compare-entry { border-color:#a32035; background:#fff7f7; color:#a32035; }
 .outline-danger { color:var(--color-primary); border-color:#efb2b8 !important; background:#fff !important; }
 .gen-workspace { display:grid; grid-template-columns:210px minmax(0,1fr) 318px; gap:10px; align-items:stretch; }
 .chapter-nav,.editor-panel,.source-rail { min-height:560px; }
@@ -346,7 +537,7 @@ button { cursor:pointer; }
 .source-meta small { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .source-meta button { height:24px; padding:0 8px; border:1px solid #d7dee9; background:#fff; border-radius:4px; font-size:11px; white-space:nowrap; }
 .source-rail footer { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12px; }
-.gen-bottom { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:10px; }
+.gen-bottom { display:grid; grid-template-columns:minmax(0,1fr) 220px 260px; gap:10px; }
 .generate-flow { display:grid; grid-template-columns:110px repeat(6,1fr); gap:8px; align-items:center; padding:12px; }
 .generate-flow h3 { font-size:13px; }
 .generate-flow span { text-align:center; color:#667085; font-size:11px; }
@@ -356,6 +547,49 @@ button { cursor:pointer; }
 .progress-card { position:relative; padding:16px; }
 .progress-card p { color:var(--color-success); margin:8px 0; }
 .ring { position:absolute; right:18px; top:24px; width:70px; height:70px; border:8px solid #d7f2e6; border-top-color:var(--color-success); border-radius:50%; display:grid; place-items:center; font-weight:900; }
+.official-compare-card { padding:14px; display:grid; align-content:start; gap:10px; border-left:3px solid #a32035; }
+.official-compare-card h3 { font-size:13px; }
+.official-compare-card p { color:#344054; line-height:1.5; }
+.official-compare-card div { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.official-compare-card span { min-height:48px; display:grid; place-items:center; border:1px solid #edf1f5; border-radius:4px; color:#667085; font-size:11px; }
+.official-compare-card b { display:block; color:#a32035; font-size:18px; line-height:1; }
+.official-compare-card button { height:28px; border:1px solid #a32035; border-radius:4px; background:#a32035; color:#fff; font-weight:800; }
+.report-workbench-toast { position:fixed; right:24px; top:68px; z-index:80; padding:9px 14px; border-radius:4px; background:rgba(31,41,55,.94); color:#fff; }
+.official-modal-mask { position:fixed; inset:0; z-index:90; display:grid; place-items:center; padding:20px; background:rgba(15,23,42,.32); }
+.upload-mask { z-index:100; }
+.official-workflow-modal,.official-upload-modal { width:min(760px,calc(100vw - 40px)); max-height:calc(100vh - 48px); overflow:auto; border:1px solid #e1e7ef; border-radius:8px; background:#fff; box-shadow:0 20px 56px rgba(15,23,42,.22); }
+.official-upload-modal { width:min(520px,calc(100vw - 40px)); }
+.official-workflow-modal>header,.official-upload-modal>header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:16px 18px; border-bottom:1px solid #edf1f5; }
+.official-workflow-modal>header span,.official-upload-modal>header span { display:block; margin-bottom:4px; color:#667085; font-size:12px; font-weight:800; }
+.official-workflow-modal h3,.official-upload-modal h3 { font-size:18px; }
+.official-workflow-modal>header button,.official-upload-modal>header button { width:30px; height:30px; border:0; background:#fff; color:#344054; font-size:20px; }
+.official-workflow-steps { list-style:none; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:0; padding:16px 18px; border-bottom:1px solid #edf1f5; }
+.official-workflow-steps li { min-height:96px; border:1px solid #e1e7ef; border-radius:6px; padding:10px; background:#fbfcfe; color:#667085; }
+.official-workflow-steps li.active { border-color:#a32035; background:#fff8f8; color:#344054; }
+.official-workflow-steps b { display:grid; place-items:center; width:24px; height:24px; margin-bottom:8px; border-radius:50%; background:#98a2b3; color:#fff; }
+.official-workflow-steps .active b { background:#a32035; }
+.official-workflow-steps strong { display:block; margin-bottom:6px; color:#111827; }
+.official-workflow-steps span { font-size:12px; line-height:1.5; }
+.official-workflow-body { display:grid; grid-template-columns:240px minmax(0,1fr); gap:12px; padding:16px 18px; }
+.workflow-file-state,.official-workflow-body label,.workflow-result { border:1px solid #edf1f5; border-radius:6px; padding:12px; background:#fff; }
+.workflow-file-state { display:grid; gap:8px; }
+.workflow-file-state span,.official-workflow-body label>span,.upload-remark span { color:#667085; font-size:12px; font-weight:800; }
+.workflow-file-state strong { min-height:20px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.workflow-file-state button { height:30px; border:1px solid #a32035; border-radius:4px; background:#fff7f7; color:#a32035; font-weight:800; }
+.official-workflow-body label { display:grid; gap:8px; align-content:start; }
+.official-workflow-body select { height:34px; border:1px solid #d7dee9; border-radius:4px; padding:0 10px; background:#fff; }
+.workflow-result { grid-column:1 / -1; }
+.workflow-result h4 { margin-bottom:6px; font-size:14px; }
+.workflow-result p { margin-bottom:8px; color:#344054; line-height:1.6; }
+.workflow-result ul { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px 12px; margin:0; padding-left:18px; color:#667085; }
+.official-workflow-modal>footer,.official-upload-modal>footer { display:flex; justify-content:flex-end; gap:8px; padding:14px 18px; border-top:1px solid #edf1f5; }
+.official-workflow-modal>footer button,.official-upload-modal>footer button { height:32px; border:1px solid #d7dee9; border-radius:4px; background:#fff; padding:0 14px; font-weight:800; }
+.official-file-drop { min-height:132px; margin:16px 18px 12px; border:1px dashed #d7a6ad; border-radius:6px; background:#fff8f8; display:grid; place-items:center; align-content:center; gap:8px; color:#a32035; cursor:pointer; }
+.official-file-drop input { position:absolute; width:1px; height:1px; opacity:0; }
+.official-file-drop strong { font-size:14px; }
+.official-file-drop span { color:#667085; font-size:12px; }
+.upload-remark { display:grid; gap:8px; margin:0 18px 16px; }
+.upload-remark textarea { min-height:76px; border:1px solid #d7dee9; border-radius:5px; padding:10px; resize:none; }
 
 .review-page { display:grid; gap:10px; }
 .review-top { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 10px; border-bottom:1px solid #edf1f5; }
@@ -424,18 +658,18 @@ button { cursor:pointer; }
 .report-preview mark { background:#fff4f4; border:1px solid #d9a1a1; color:var(--color-primary); }
 .mark-dot { position:absolute; right:10px; width:18px; height:18px; display:grid; place-items:center; border-radius:50%; background:var(--color-primary); color:#fff; font-size:11px; font-style:normal; }
 .dot-1 { top:70px; } .dot-2 { top:150px; } .dot-3 { top:230px; background:var(--color-info); } .dot-4 { top:300px; }
-.export-row { grid-area:export; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; align-items:start; padding:30px 12px 12px; min-height:116px; position:relative; }
+.export-row { grid-area:export; display:grid; grid-template-columns:repeat(4,1fr); gap:10px; align-items:stretch; padding:30px 12px 12px; min-height:116px; position:relative; }
 .export-row h3 { position:absolute; left:12px; top:10px; font-size:13px; }
-.export-row article { min-height:86px; border:1px solid #edf1f5; border-radius:6px; padding:10px; display:grid; grid-template-columns:38px 1fr; gap:8px; align-items:stretch; }
-.export-logo { display:grid; grid-template-rows:32px 1fr 22px; justify-items:center; gap:0; height:100%; }
-.export-logo button { grid-row:3; }
-.export-copy { display:grid; grid-template-rows:auto auto auto 1fr 22px; gap:2px; justify-items:start; height:100%; }
+.export-row article { position:relative; box-sizing:border-box; height:110px; min-height:110px; border:1px solid #edf1f5; border-radius:6px; padding:10px 10px 40px; display:grid; grid-template-columns:38px 1fr; gap:8px; align-items:start; }
+.export-logo { display:grid; justify-items:center; }
+.export-copy { display:grid; gap:2px; justify-items:start; align-content:start; min-width:0; }
+.export-actions { position:absolute; right:10px; bottom:10px; left:10px; display:grid; grid-template-columns:38px 1fr; gap:8px; align-items:center; }
+.export-actions button { justify-self:start; }
 .export-row i { width:32px; height:32px; display:grid; place-items:center; border-radius:5px; color:#fff; font-style:normal; font-weight:900; }
 .export-row i.green { background:var(--color-success); } .export-row i.blue { background:var(--color-info); } .export-row i.slate { background:#475467; }
 .export-row strong { display:block; font-size:12px; }
 .export-row small,.export-row em { display:block; color:#667085; font-size:10px; font-style:normal; }
 .export-row button { height:22px; padding:0 8px; border:1px solid #d7dee9; background:#fff; border-radius:4px; font-size:10px; }
-.export-copy button { grid-row:5; }
 .version-line { grid-area:version; padding:12px; min-height:92px; }
 .version-line header { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:18px; }
 .version-line header h3 { font-size:13px; }

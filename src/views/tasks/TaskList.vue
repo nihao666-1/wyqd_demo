@@ -31,8 +31,8 @@
         <div class="task-table-wrap">
           <table>
             <thead><tr><th>任务编号</th><th>任务名称</th><th>任务类型</th><th>被审计单位</th><th>审计期间</th><th>当前阶段</th><th>进度</th><th>风险项</th><th>创建人</th><th>更新时间</th><th>状态</th><th>操作</th></tr></thead>
-            <tbody v-if="isDataMode && paged.rows.length"><tr v-for="task in paged.rows" :key="task.id"><td :title="task.id">{{ task.id }}</td><td :title="task.name"><b>{{ task.name }}</b></td><td :title="task.type">{{ task.type }}</td><td :title="task.organization">{{ task.organization }}</td><td>{{ task.period }}</td><td :title="task.phase"><span class="phase-tag">{{ task.phase }}</span></td><td><div class="progress-cell"><span>{{ task.progress }}%</span><i><em :style="{ width: `${task.progress}%` }"></em></i></div></td><td :class="{ risky: task.riskCount }">{{ task.riskCount }}</td><td :title="task.creator">{{ task.creator }}</td><td :title="task.updatedAt">{{ task.updatedAt }}</td><td><span class="status-badge" :class="task.statusKey">{{ task.status }}</span></td><td class="operation-cell"><span class="operation-actions"><RouterLink :to="detailRoute(task)">查看详情</RouterLink><RouterLink :to="actionRoute(task)">{{ task.action }}</RouterLink></span></td></tr></tbody>
-            <tbody v-else><tr><td colspan="12"><div class="task-empty-state"><span class="empty-icon">▱</span><h3>{{ isDataMode ? '未找到匹配任务' : '暂无审计任务' }}</h3><p>{{ isDataMode ? '请调整筛选条件后重试。' : '创建首个任务后，可在此集中跟踪执行进度、风险项和归档状态。' }}</p><div v-if="!isDataMode"><RouterLink class="task-button primary" to="/tasks/create">创建审计任务</RouterLink><button class="task-button" type="button" @click="store.setDemoDataMode('data')">导入模拟任务</button></div></div></td></tr></tbody>
+            <tbody v-if="isDataMode && paged.rows.length"><tr v-for="task in paged.rows" :key="task.id"><td :title="task.id">{{ task.id }}</td><td :title="task.name"><b>{{ task.name }}</b></td><td :title="task.type">{{ task.type }}</td><td :title="task.organization">{{ task.organization }}</td><td>{{ task.period }}</td><td :title="task.phase"><span class="phase-tag">{{ task.phase }}</span></td><td><div class="progress-cell"><span>{{ task.progress }}%</span><i><em :style="{ width: `${task.progress}%` }"></em></i></div></td><td :class="{ risky: task.riskCount }">{{ task.riskCount }}</td><td :title="task.creator">{{ task.creator }}</td><td :title="task.updatedAt">{{ task.updatedAt }}</td><td><span class="status-badge" :class="task.statusKey">{{ task.status }}</span></td><td class="operation-cell"><span class="operation-actions"><RouterLink :to="detailRoute(task)">查看详情</RouterLink><RouterLink v-if="task.action !== '查看详情'" :to="actionRoute(task)">{{ task.action }}</RouterLink></span></td></tr></tbody>
+            <tbody v-else><tr><td colspan="12"><div class="task-empty-state"><span class="empty-icon">▱</span><h3>{{ isDataMode ? '未找到匹配任务' : '暂无审计任务' }}</h3><p>{{ isDataMode ? '请调整筛选条件后重试。' : '创建首个任务后，可在此集中跟踪执行进度、风险项和归档状态。' }}</p><div v-if="!isDataMode"><RouterLink class="task-button primary" to="/tasks/create">创建审计任务</RouterLink><button class="task-button" type="button" @click="store.setDemoDataMode('data')">查看已有任务</button></div></div></td></tr></tbody>
           </table>
         </div>
         <footer class="pagination"><span>共 {{ isDataMode ? filteredRows.length : 0 }} 条</span><div class="pagination-controls"><label class="page-size"><select v-model.number="pageSize"><option :value="10">10条/页</option><option :value="20">20条/页</option></select></label><button :disabled="page === 1" aria-label="上一页" @click="goToPage(page - 1)">‹</button><button v-for="item in pageNumbers" :key="item" :class="{ current: page === item }" type="button" @click="goToPage(item)">{{ item }}</button><button :disabled="page === paged.totalPages" aria-label="下一页" @click="goToPage(page + 1)">›</button><label class="jump-page">前往 <input :value="page" type="number" min="1" :max="paged.totalPages" @change="goToPage($event.target.value)" /> 页</label></div></footer>
@@ -48,7 +48,7 @@ import { computed, inject, reactive, ref, watch } from 'vue';
 import TaskIcon from './TaskIcon.vue';
 import TaskCenterEmptyState from './TaskCenterEmptyState.vue';
 import { getTaskCenterRows, paginateTaskRows } from '../../domain/taskCenter/taskListState.js';
-import { metricDefinitions, organizations, taskRows, taskTypes } from './taskCenterData.js';
+import { metricDefinitions as baseMetricDefinitions, organizations, taskRows, taskTypes } from './taskCenterData.js';
 
 const store = inject('store');
 const activeTab = ref('all');
@@ -59,10 +59,20 @@ const tabs = [{ key: 'all', label: '全部任务' }, { key: 'running', label: '�
 const periods = ['2025Q1', '2024Q4'];
 const taskStatuses = ['全部', '执行中', '待确认', '已归档', '失败/异常'];
 const isDataMode = computed(() => store.demoDataMode === 'data');
-const normalizedStatus = computed(() => filters.status === '执行中' ? '生成中' : filters.status === '失败/异常' ? '失败' : filters.status);
-const filteredRows = computed(() => getTaskCenterRows(taskRows, { ...filters, status: normalizedStatus.value }, activeTab.value).filter((row) => row.period === filters.period));
+const allTaskRows = computed(() => [...(store.db.createdTasks || []), ...taskRows]);
+const normalizedStatus = computed(() => normalizeTaskStatus(filters.status));
+const filteredRows = computed(() => getTaskCenterRows(allTaskRows.value, { ...filters, status: normalizedStatus.value }, activeTab.value).filter((row) => row.period === filters.period));
 const paged = computed(() => paginateTaskRows(filteredRows.value, page.value, pageSize.value));
 const pageNumbers = computed(() => Array.from({ length: paged.value.totalPages }, (_, index) => index + 1));
+const metricDefinitions = computed(() => baseMetricDefinitions.map((metric) => ({
+  ...metric,
+  count: getTaskCenterRows(allTaskRows.value, {
+    keyword: '',
+    organization: '全部',
+    type: '全部',
+    status: normalizeTaskStatus(metric.filter)
+  }, statusToTab(metric.filter)).length
+})));
 
 watch([() => store.demoDataMode, () => activeTab.value, () => filters.keyword, () => filters.organization, () => filters.type, () => filters.period, () => filters.status, pageSize], () => { page.value = 1; });
 
@@ -72,11 +82,12 @@ function selectTab(tab) { activeTab.value = tab; filters.status = '全部'; }
 function syncTabFromStatus() { activeTab.value = statusToTab(filters.status); }
 function applyQuery() { page.value = 1; }
 function resetFilters() { Object.assign(filters, { keyword: '', organization: '上海分公司', type: '全部', period: '2025Q1', status: '全部' }); activeTab.value = 'all'; }
-function tabCount(tab) { return getTaskCenterRows(taskRows, { ...filters, status: '全部' }, tab).filter((row) => row.period === filters.period).length; }
+function tabCount(tab) { return getTaskCenterRows(allTaskRows.value, { ...filters, status: '全部' }, tab).filter((row) => row.period === filters.period).length; }
 function goToPage(value) { const next = Number(value); page.value = Number.isFinite(next) ? Math.min(Math.max(next, 1), paged.value.totalPages) : 1; }
 function metricTrend(label) { return label === '全部任务' ? '+4' : label === '待确认' ? '+2' : label === '失败/异常' ? '-1' : '+1'; }
-function detailRoute(task) { return { path: '/tasks/detail', query: { taskId: task.id } }; }
-function actionRoute(task) { return task.action === '查看日志' ? { path: '/records', query: { taskId: task.id } } : { path: '/tasks/detail', query: { taskId: task.id, tab: task.statusKey === 'confirming' ? 'reviews' : task.statusKey === 'failed' ? 'results' : 'analysis', action: task.action } }; }
+function normalizeTaskStatus(status) { return status === '执行中' ? '生成中' : status === '失败/异常' ? '失败' : status; }
+function detailRoute(task) { return { path: '/tasks/detail', query: { taskId: task.id, ...(task.statusKey === 'generating' ? { state: 'generating' } : {}) } }; }
+function actionRoute(task) { return task.action === '查看日志' ? { path: '/records', query: { taskId: task.id } } : { path: '/tasks/detail', query: { taskId: task.id, ...(task.statusKey === 'generating' ? { state: 'generating' } : {}), tab: task.statusKey === 'confirming' ? 'reviews' : task.statusKey === 'failed' ? 'results' : 'analysis', action: task.action } }; }
 </script>
 
 <style scoped>

@@ -109,7 +109,7 @@ test('补齐资料不会变异原始资料清单', () => {
   const updated = applyMaterialSource(rows, ['financial-statement'], 'simulation');
 
   assert.equal(rows[0].uploadStatus, '未上传');
-  assert.equal(updated[0].source, '系统模拟数据');
+  assert.equal(updated[0].source, '平台资料复用');
   assert.equal(updated[0].uploadStatus, '已上传');
   assert.equal(updated[0].parseStatus, '待解析');
 });

@@ -25,7 +25,6 @@ const requiredFiles = [
   'src/views/tasks/TaskCreate.vue',
   'src/views/files/FileCenter.vue',
   'src/views/files/FileDetail.vue',
-  'src/views/demo-guide/DemoGuide.vue',
   'src/views/audit-report/AuditReportWorkbench.vue',
   'src/views/audit-report/AuditReportCheckResult.vue',
   'src/domain/lifecycle/reportActionGuard.js',
@@ -84,9 +83,8 @@ for (const marker of [
   '创建常规审计任务',
   '从文件中心导入资料',
   '体验知识库智能体',
-  '查看系统配置',
-  '快速引导',
-  '系统初始化状态',
+  '维护模板与规则',
+  '办理路径',
   'demoDataMode',
   'setDemoDataMode',
   '我的待办',
@@ -182,7 +180,6 @@ for (const marker of [
   '待确认',
   '已归档',
   '失败/异常',
-  '导入模拟任务',
   'paginateTaskRows',
   '全部任务',
   '创建审计任务'
@@ -211,7 +208,6 @@ for (const marker of [
   '已完成',
   '任务列表',
   '暂无审计任务',
-  '推荐演示路径',
   '任务状态说明',
   "setDemoDataMode('data')",
   'auditPersonnel',
@@ -262,7 +258,8 @@ for (const forbidden of ['门禁', '办理门禁', '资料门禁', '能力门禁
 }
 
 const auditReportWorkbenchText = read('src/views/audit-report/AuditReportWorkbench.vue');
-assert(auditReportWorkbenchText.includes('/materials/import?scene=audit-report'), '审计报告资料导入入口必须指向合并后的资料导入工作区并带审计报告场景');
+assert(routerText.includes('/audit-report/material/import') && routerText.includes("scene: 'audit-report'"), '审计报告资料旧路由必须重定向到合并后的资料导入工作区并带审计报告场景');
+assert(!auditReportWorkbenchText.includes('/materials/import?scene=audit-report'), '审计报告入口页不应再暴露额外的资料导入子入口');
 assert(!auditReportWorkbenchText.includes('/supervision/import/upload'), '审计报告资料导入入口不得跳转监督共享文件导入');
 
 const reportCheckFiles = [];

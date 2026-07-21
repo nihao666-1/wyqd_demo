@@ -36,12 +36,12 @@
             <div class="empty-illustration" aria-hidden="true"><FontAwesomeIcon class="empty-shadow" :icon="faCircle" /><FontAwesomeIcon class="empty-plant left" :icon="faSeedling" /><FontAwesomeIcon class="empty-plant right" :icon="faSeedling" /><FontAwesomeIcon class="empty-inbox" :icon="faInbox" /><FontAwesomeIcon class="empty-message" :icon="faCommentDots" /></div>
             <h3>暂无审计任务</h3>
             <p>创建首个任务后，可在这里跟踪资料准备、模型生成、人工确认、复核导出和归档状态。</p>
-            <div><RouterLink class="empty-btn primary wide" to="/tasks/create">创建审计任务</RouterLink><button class="empty-btn wide" type="button" @click="importDemoTasks">导入模拟任务</button></div>
+            <div><RouterLink class="empty-btn primary wide" to="/tasks/create">创建审计任务</RouterLink><button class="empty-btn wide" type="button" @click="importDemoTasks">查看已有任务</button></div>
           </div>
         </section>
 
         <section class="demo-path-card" aria-labelledby="demo-path-title">
-          <h3 id="demo-path-title">推荐演示路径</h3>
+          <h3 id="demo-path-title">任务流转节点</h3>
           <div class="demo-path-grid">
             <template v-for="(item, index) in emptyFlow" :key="item.title">
               <article><span class="flow-icon" :class="item.tone"><FontAwesomeIcon :icon="item.icon" /></span><div><b>{{ item.title }}</b><p v-for="line in item.detail" :key="line">{{ line }}</p></div></article>

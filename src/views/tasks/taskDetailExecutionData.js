@@ -115,9 +115,9 @@ export const taskDetailExecutionSnapshot = {
   ]
 };
 
-export function getTaskDetailExecutionSnapshot(taskId) {
+export function getTaskDetailExecutionSnapshot(taskId, rows = taskRows) {
   const snapshot = structuredClone(taskDetailExecutionSnapshot);
-  const task = taskRows.find((row) => row.id === taskId && row.statusKey === 'generating');
+  const task = rows.find((row) => row.id === taskId && row.statusKey === 'generating');
 
   if (!task) return snapshot;
 

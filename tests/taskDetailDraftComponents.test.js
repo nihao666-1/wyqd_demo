@@ -119,7 +119,10 @@ test('TaskDetail按草稿生成中待确认归档分派且保留现有实现', (
   const content = source('TaskDetail.vue');
 
   assert.match(content, /import TaskDetailDraft from '\.\/TaskDetailDraft\.vue'/);
+  assert.match(content, /import \{ computed, inject, onBeforeUnmount, onMounted, ref \} from 'vue'/);
   assert.match(content, /import \{ resolveTaskDetailMode \} from '\.\.\/\.\.\/domain\/taskDetail\/draftTaskDetail\.js'/);
+  assert.match(content, /const allTaskRows = computed\(\(\) => \[\.\.\.\(store\?\.db\.createdTasks \|\| \[\]\), \.\.\.taskRows\]\)/);
+  assert.match(content, /allTaskRows\.value\.find\(\(task\) => task\.id === route\.query\.taskId\)/);
   assert.match(content, /const detailMode = computed/);
   assert.match(content, /const showDraftState = computed\(\(\) => detailMode\.value === 'draft'\)/);
   assert.match(content, /explicitState: String\(route\.query\.state \|\| ''\)/);

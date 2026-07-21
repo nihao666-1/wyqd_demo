@@ -112,7 +112,7 @@
             <span class="source-badge" :class="{ optional: source.optional }">{{ source.badge }}</span>
           </div>
         </article>
-        <RouterLink v-if="showDemoControls" class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
+        <RouterLink class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faFolderOpen" />数据接入指引</RouterLink>
       </aside>
     </div>
   </div>
@@ -146,7 +146,7 @@
             </svg>
             <div>
               <h1 id="expense-data-title">费用审计分析</h1>
-              <p>已载入模拟费用、预算、审批和凭证数据，可进入总览、异常监控和趋势分析继续演示。</p>
+              <p>已同步费用、预算、审批和凭证数据，可进入总览、异常监控和趋势分析继续处理。</p>
             </div>
           </section>
 
@@ -222,7 +222,7 @@
               <span class="source-badge" :class="{ optional: source.optional }">{{ source.badge }}</span>
             </div>
           </article>
-          <RouterLink v-if="showDemoControls" class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faBookOpen" />数据接入指引</RouterLink>
+          <RouterLink class="source-guide" to="/demo-guide"><FontAwesomeIcon :icon="faFolderOpen" />数据接入指引</RouterLink>
         </aside>
       </div>
     </div>
@@ -231,10 +231,9 @@
 
 <script setup>
 import { computed, inject } from 'vue';
-import { useRoute } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  faBookOpen,
   faChartColumn,
   faChartLine,
   faClipboardCheck,
@@ -250,7 +249,6 @@ import {
 const store = inject('store');
 const route = useRoute();
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
-const showDemoControls = computed(() => import.meta.env.DEV || route.query.demo === '1');
 
 const metrics = [
   { label: '费用数据快照', unit: '个', tone: 'red', icon: faDatabase },
@@ -265,7 +263,7 @@ const entries = [
     title: '费用综合分析',
     description: '对费用数据进行结构分析与统计汇总。',
     action: '新建综合分析',
-    to: '/expense/workbench?action=create-usage',
+    to: { path: '/tasks/create', query: { capability: 'expense' } },
     tone: 'red',
     icon: faChartColumn,
     steps: ['选择数据快照', '预算执行分析', '汇总统计']
@@ -274,7 +272,7 @@ const entries = [
     title: '费用异常监控',
     description: '识别异常交易与合规风险点。',
     action: '新建异常监控',
-    to: '/expense/anomaly/dashboard',
+    to: { path: '/tasks/create', query: { capability: 'expense' } },
     tone: 'orange',
     icon: faShieldHalved,
     steps: ['选择规则版本', '识别异常', '确认/排除']
@@ -283,7 +281,7 @@ const entries = [
     title: '费用趋势分析',
     description: '分析费用趋势与预测变化。',
     action: '新建趋势分析',
-    to: '/expense/usage/dashboard',
+    to: { path: '/tasks/create', query: { capability: 'expense' } },
     tone: 'blue',
     icon: faChartLine,
     steps: ['设置对比周期', '趋势预测', '加入报告']

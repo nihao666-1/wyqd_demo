@@ -23,7 +23,7 @@
             <span class="task-detail-draft-action-icon" aria-hidden="true"><AuditIcon name="files" /></span>从文件中心选择
           </button>
           <button type="button" class="task-detail-draft-action" data-source="simulation" @click="emit('open-material-source', 'simulation')">
-            <span class="task-detail-draft-action-icon" aria-hidden="true"><FontAwesomeIcon :icon="faDatabase" /></span>使用模拟数据
+            <span class="task-detail-draft-action-icon" aria-hidden="true"><FontAwesomeIcon :icon="faDatabase" /></span>使用平台资料
           </button>
         </div>
       </div>

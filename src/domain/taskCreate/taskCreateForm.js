@@ -82,7 +82,7 @@ const materialSourceLabels = {
   local: '本地上传',
   fileCenter: '文件中心',
   history: '历史任务复用',
-  simulation: '系统模拟数据'
+  simulation: '平台资料复用'
 };
 
 const requiredFieldMessages = {

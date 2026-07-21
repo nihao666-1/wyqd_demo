@@ -266,7 +266,7 @@ const emptyAbilities = [
     title: '监管案例舆情分析',
     tone: 'purple',
     icon: faMessage,
-    to: '/regulatory/result',
+    to: { path: '/tasks/create', query: { capability: 'regulatory' } },
     action: '新建案例舆情分析',
     steps: [{ text: '输入单位/业务', icon: faFileLines }, { text: '获取案例舆情', icon: faDatabase }, { text: '加入审计重点', icon: faUser }]
   },
@@ -274,7 +274,7 @@ const emptyAbilities = [
     title: '监督共享信息分析',
     tone: 'green',
     icon: faFolder,
-    to: '/tasks/detail/supervision-share',
+    to: { path: '/tasks/create', query: { capability: 'supervision' } },
     action: '新建共享信息分析',
     steps: [{ text: '选择共享文件', icon: faFileLines }, { text: '提取标签', icon: faTag }, { text: '生成汇总报告', icon: faClipboardList }]
   }
@@ -285,7 +285,7 @@ const emptyMaterials = [
   { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments },
   { title: '合规/风险/审计共享文件', desc: '来自合规、风险、审计条线的共享文档与数据。', tone: 'green', icon: faFolder },
   { title: '数据标签', desc: '基于业务、风险、监管主题的标准标签体系。', tone: 'blue', icon: faTag },
-  { title: '使用提示', desc: '可按照组合两类分析能力使用；分析结果可引用到审计报告；所有过程留痕，支持追溯与复核。', tone: 'orange', icon: faLightbulb }
+  { title: '结果引用规则', desc: '分析结果可引用到审计报告；引用、复核和导出过程均写入操作留痕。', tone: 'orange', icon: faLightbulb }
 ];
 
 const metrics = [
@@ -302,7 +302,7 @@ const abilities = [
     desc: '分析监管案例与舆情信息，识别监管关注点与舆情风险。',
     tone: 'purple',
     icon: faMessage,
-    to: '/regulatory/result',
+    to: { path: '/tasks/create', query: { capability: 'regulatory' } },
     action: '新建案例舆情分析',
     steps: [{ text: '输入单位/业务', icon: faUser }, { text: '获取案例舆情', icon: faFileLines }, { text: '加入审计重点', icon: faWandMagicSparkles }],
     stats: [{ label: '监管案例', value: '58', unit: '条' }, { label: '舆情风险', value: '24', unit: '条' }, { label: '审计建议', value: '12', unit: '条' }, { label: '最新分析', value: '2025-04-28 10:21' }]
@@ -312,7 +312,7 @@ const abilities = [
     desc: '整合监督共享信息，提取标签并生成汇总分析报告。',
     tone: 'green',
     icon: faClipboardList,
-    to: '/tasks/detail/supervision-share',
+    to: { path: '/tasks/create', query: { capability: 'supervision' } },
     action: '新建共享信息分析',
     steps: [{ text: '选择共享文件', icon: faFileLines }, { text: '提取标签', icon: faTag }, { text: '生成汇总报告', icon: faClipboardList }],
     stats: [{ label: '共享文件', value: '384', unit: '份' }, { label: '标签命中', value: '1,268', unit: '条' }, { label: '汇总报告', value: '16', unit: '份' }, { label: '最新生成', value: '2025-04-28 09:52' }]
@@ -351,7 +351,7 @@ const materials = [
   { title: '舆情动态', desc: '监测媒体报道、网络舆情、公告信息等动态内容。', tone: 'orange', icon: faComments, to: '/regulatory/result?tab=history' },
   { title: '合规/风险/审计共享文件', desc: '来自合规、风险、审计条线的共享文档与数据。', tone: 'green', icon: faFolder, to: '/supervision/workbench' },
   { title: '数据标签', desc: '基于业务、风险、监管主题的标准标签体系。', tone: 'blue', icon: faTag, to: '/audit-standard/policy' },
-  { title: '使用提示', desc: '分析结果可引用到审计报告，所有过程留痕，支持追溯。', tone: 'orange', icon: faLightbulb }
+  { title: '结果引用规则', desc: '分析结果可引用到审计报告，引用和导出过程支持追溯。', tone: 'orange', icon: faLightbulb }
 ];
 const pendingItems = [
   { label: '待确认关注点', value: '8 条', tone: 'red', icon: faComments },

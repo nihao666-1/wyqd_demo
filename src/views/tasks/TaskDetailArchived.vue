@@ -74,7 +74,7 @@ const sidebarOpen = ref(true);
 
 function performAction(label) {
   if (!isArchivedReadAction(label)) return;
-  feedback.value = `${label}：归档任务保持只读，演示操作已记录。`;
+  feedback.value = `${label}：归档任务保持只读，操作已记录。`;
 }
 </script>
 

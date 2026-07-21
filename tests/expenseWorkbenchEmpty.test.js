@@ -5,6 +5,7 @@ import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc';
 
 const workbenchUrl = new URL('../src/views/expense/ExpenseWorkbench.vue', import.meta.url);
 const layoutUrl = new URL('../src/components/layout/AppLayout.vue', import.meta.url);
+const routerUrl = new URL('../src/router/index.js', import.meta.url);
 
 function read(url) {
   return readFileSync(url, 'utf8');
@@ -131,5 +132,13 @@ test('布局为费用空白页提供专用壳层面包屑和二级导航', () =>
   assert.match(content, /费用趋势分析/);
   assert.match(content, /class="global-data-mode"/);
   compileVue(layoutUrl);
+});
+
+test('费用审计新建类入口进入创建审计任务并预选费用审计', () => {
+  const content = read(workbenchUrl);
+  const router = read(routerUrl);
+
+  assert.equal((content.match(/path:\s*'\/tasks\/create', query: \{ capability: 'expense' \}/g) || []).length, 3);
+  assert.match(router, /path:\s*['"]\/expense\/usage\/new['"][\s\S]*redirect:\s*\{\s*path:\s*['"]\/tasks\/create['"],\s*query:\s*\{\s*capability:\s*['"]expense['"]\s*\}\s*\}/);
 });
 

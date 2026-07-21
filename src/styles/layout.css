@@ -1449,6 +1449,151 @@
   box-shadow: var(--shadow-subtle);
 }
 
+.global-upload-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.32);
+}
+
+.global-upload-modal {
+  width: min(560px, calc(100vw - 48px));
+  max-height: calc(100vh - 56px);
+  overflow: auto;
+  border: 1px solid #dce3ec;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 20px 56px rgba(15, 23, 42, 0.22);
+}
+
+.global-upload-modal > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.global-upload-modal > header span {
+  display: block;
+  margin-bottom: 4px;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.global-upload-modal h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 18px;
+}
+
+.global-upload-modal > header button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: #fff;
+  color: #344054;
+  font-size: 20px;
+}
+
+.global-upload-drop {
+  min-height: 132px;
+  margin: 16px 18px 12px;
+  border: 1px dashed #b8c4d4;
+  border-radius: 6px;
+  background: #f8fafc;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.global-upload-drop input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.global-upload-drop strong {
+  font-size: 14px;
+}
+
+.global-upload-drop span {
+  color: #667085;
+  font-size: 12px;
+}
+
+.global-upload-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 18px 16px;
+}
+
+.global-upload-form label {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.global-upload-form select,
+.global-upload-form textarea {
+  border: 1px solid #d7dee9;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.global-upload-form select {
+  height: 34px;
+  padding: 0 10px;
+}
+
+.global-upload-form textarea {
+  min-height: 76px;
+  padding: 10px;
+  resize: none;
+}
+
+.global-upload-form .upload-note {
+  grid-column: 1 / -1;
+}
+
+.global-upload-modal > footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 18px;
+  border-top: 1px solid #edf1f5;
+}
+
+.global-upload-modal > footer button {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid #d7dee9;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.global-upload-modal > footer .primary {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
 /* Unified shell rules: keep route-level pages inside one stable app frame. */
 .app-shell,
 .task-detail-shell,

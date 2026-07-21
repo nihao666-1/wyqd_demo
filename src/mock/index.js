@@ -617,7 +617,7 @@ export const taskDetailTabs = [
 ];
 
 export const pageStates = {
-  workbench: { state: 'empty', title: '暂无新的待办任务', description: '新员工或新系统上线时，可先创建审计任务，也可查看示例任务理解资料准备、分析确认和报告锁定路径。' },
+  workbench: { state: 'empty', title: '暂无新的待办任务', description: '可先创建审计任务，系统将按资料准备、分析确认和报告锁定路径推进。' },
   taskList: { state: 'empty', title: '当前筛选条件下无任务', description: '请调整覆盖部门、创建人或任务状态；无权限任务不会出现在列表中。' },
   taskDetail: { state: 'running', title: '任务正在办理中', description: '费用异常待确认、报告草稿待审核，所有资料和结果均沉淀在任务台账中。' },
   fileCenter: { state: 'locked', title: '存在引用锁定文件', description: '已被报告或规范引用的文件不能直接修改、失效或删除，只能申请解锁并回退草稿。' },
@@ -716,9 +716,9 @@ export const roleJourneys = [
 export const emptyStates = {
   newUser: {
     title: '当前暂无待办任务',
-    description: '可先创建审计任务，或查看示例任务了解资料准备、分析确认和报告锁定流程。',
+    description: '可先创建审计任务，任务创建后将在此跟踪资料准备、分析确认和报告锁定流程。',
     primaryAction: '创建第一个审计任务',
-    secondaryAction: '查看示例任务'
+    secondaryAction: '查看已有任务'
   }
 };
 

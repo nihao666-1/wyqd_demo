@@ -4,6 +4,7 @@ import { guardAssetAction } from '../domain/lifecycle/assetReferenceGuard.js';
 import { guardReportAction } from '../domain/lifecycle/reportActionGuard.js';
 import { reportStates } from '../domain/stateMachines/reportState.js';
 import { applyExpenseDecision } from '../domain/expense/expenseAnomalyState.js';
+import { advanceSubmittedTaskRow, buildSubmittedTaskRow } from '../domain/taskCreate/taskSubmission.js';
 
 const storageKey = 'audit-lifecycle-demo-state-v10';
 const canUseStorage = typeof window !== 'undefined' && !!window.localStorage;
@@ -26,6 +27,7 @@ export function mergePersistedExpenseAnomalies(baseRows, persistedRows) {
 }
 
 const mergedExpenseAnomalies = mergePersistedExpenseAnomalies(mockDb.expenseAnomalies, persistedDb.expenseAnomalies);
+let createdTaskProgressTimer = null;
 
 export const store = reactive({
   db: { ...mockDb, ...persistedDb, expenseAnomalies: mergedExpenseAnomalies },
@@ -37,12 +39,13 @@ export const store = reactive({
   activeRecordTab: persisted?.activeRecordTab || 'operation',
   activeDrawer: persisted?.activeDrawer || '',
   drawerPayload: persisted?.drawerPayload || null,
+  createdTaskProgressIntervalMs: 3000,
   setNotice(message) {
     this.notice = message;
   },
   setDemoDataMode(mode) {
     this.demoDataMode = mode;
-    this.setNotice(mode === 'empty' ? '已切换为空状态，可演示新系统首次使用。' : '已切换为有数据状态，可演示任务办理和资产查询。');
+    this.setNotice(mode === 'empty' ? '已切换为空状态。' : '已切换为有数据状态。');
   },
   resetDemoState() {
     this.demoDataMode = 'empty';
@@ -50,7 +53,7 @@ export const store = reactive({
     this.activeRecordTab = 'operation';
     this.activeDrawer = '';
     this.drawerPayload = null;
-    this.setNotice('已重置为空状态，可从工作台重新开始演示。');
+    this.setNotice('已重置为空状态。');
   },
   setTaskTab(tab) {
     this.activeTaskTab = tab;
@@ -147,6 +150,48 @@ export const store = reactive({
     });
     this.addLog('暂存任务配置', '任务', 'TASK-2026-NEW');
     this.setNotice('任务配置已暂存，已写入任务办理记录。');
+  },
+  submitCreatedTask(payload = {}) {
+    const createdTasks = this.ensureCollection('createdTasks', []);
+    const now = this.now();
+    const row = buildSubmittedTaskRow(payload, {
+      now,
+      createdCount: createdTasks.length,
+      currentUser: this.db.currentUser.name
+    });
+    createdTasks.unshift(row);
+    this.db.latestCreatedTaskId = row.id;
+    this.addLog('提交审计任务', '任务', row.id);
+    this.setNotice(`任务 ${row.id} 已创建，当前状态：生成中，可在任务中心继续执行。`);
+    this.startCreatedTaskProgressSimulation();
+    return row;
+  },
+  advanceCreatedTaskProgress() {
+    const createdTasks = this.ensureCollection('createdTasks', []);
+    let hasGeneratingTask = false;
+    let completedTaskId = '';
+    createdTasks.forEach((task, index) => {
+      const nextTask = advanceSubmittedTaskRow(task, { now: this.now() });
+      createdTasks[index] = nextTask;
+      if (nextTask.source === 'created' && nextTask.statusKey === 'generating') hasGeneratingTask = true;
+      if (task.statusKey === 'generating' && nextTask.statusKey === 'confirming') completedTaskId = nextTask.id;
+    });
+    if (completedTaskId) {
+      this.addLog('后台生成完成', '任务', completedTaskId);
+      this.setNotice(`任务 ${completedTaskId} 已生成完成，当前状态：待确认，请进入任务中心处理。`);
+    }
+    if (!hasGeneratingTask) this.stopCreatedTaskProgressSimulation();
+  },
+  startCreatedTaskProgressSimulation() {
+    if (typeof window === 'undefined' || createdTaskProgressTimer) return;
+    const hasGeneratingTask = this.ensureCollection('createdTasks', []).some((task) => task.source === 'created' && task.statusKey === 'generating');
+    if (!hasGeneratingTask) return;
+    createdTaskProgressTimer = setInterval(() => this.advanceCreatedTaskProgress(), this.createdTaskProgressIntervalMs);
+  },
+  stopCreatedTaskProgressSimulation() {
+    if (!createdTaskProgressTimer) return;
+    clearInterval(createdTaskProgressTimer);
+    createdTaskProgressTimer = null;
   },
   openCapabilityGate(row) {
     this.openDrawer('capability-gate', row);
