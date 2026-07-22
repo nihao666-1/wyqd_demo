@@ -124,9 +124,10 @@ test('task special audit and expense shells inherit the same viewport-scaled she
 
   assert.match(css, /--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/);
   assert.match(css, /--shell-page-gutter:\s*var\(--ui-page-gutter\)/);
-  assert.match(css, /\.app-shell \.sidebar\s*\{[^}]*width:\s*var\(--shell-sidebar-width\)[^}]*flex-basis:\s*var\(--shell-sidebar-width\)/s);
+  assert.match(css, /\.app-shell:not\(\.sidebar-collapsed\)\s*\{[^}]*--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/s);
+  assert.match(css, /\.app-shell \.sidebar\s*\{[^}]*width:\s*var\(--ui-sidebar-width\)[^}]*flex:\s*0 0 var\(--ui-sidebar-width\)/s);
   assert.match(css, /\.app-shell \.brand\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
-  assert.match(css, /\.app-shell \.sidebar a\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
+  assert.match(css, /\.app-shell \.sidebar a,\s*\.app-shell \.bottom-nav button\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
   assert.match(css, /\.app-shell \.topbar\s*\{[^}]*height:\s*var\(--ui-topbar-height\)/s);
   assert.match(css, /\.expense-section-shell \.bottom-nav,\s*\.expense-empty-shell \.bottom-nav,\s*\.expense-audit-result-shell \.bottom-nav,\s*\.expense-trend-shell \.bottom-nav\s*\{[^}]*min-height:\s*auto;[^}]*margin:\s*0 -8px -16px;[^}]*padding:\s*10px 12px 14px;/s);
   assert.doesNotMatch(components, /\.sidebar\s*\{\s*width:\s*(64|210)px/);
@@ -134,6 +135,17 @@ test('task special audit and expense shells inherit the same viewport-scaled she
   assert.match(expenseWorkbench, /expense-empty-layout\{display:grid;grid-template-columns:minmax\(0,1fr\) 320px;gap:32px/);
   assert.match(expenseWorkbench, /expense-empty-page\{[^}]*box-sizing:border-box;width:100%;[^}]*padding:16px 56px 12px 8px/s);
   assert.match(expenseWorkbench, /@media \(max-width: 1700px\)\{\.expense-empty-layout\{grid-template-columns:1fr\}/);
+});
+
+test('left navigation keeps fixed sizing across route-specific shells', () => {
+  const css = read(layoutCssUrl);
+
+  assert.match(css, /\/\* Keep the left navigation visually stable across route-specific shells\. \*\//);
+  assert.match(css, /\.app-shell:not\(\.sidebar-collapsed\)\s*\{[^}]*--shell-sidebar-width:\s*var\(--ui-sidebar-width\)/s);
+  assert.match(css, /\.app-shell \.sidebar\s*\{[^}]*width:\s*var\(--ui-sidebar-width\)[^}]*flex:\s*0 0 var\(--ui-sidebar-width\)/s);
+  assert.match(css, /\.app-shell \.brand strong\s*\{[^}]*font-size:\s*var\(--ui-font-xl\)/s);
+  assert.match(css, /\.app-shell \.sidebar a,\s*\.app-shell \.bottom-nav button\s*\{[^}]*font-size:\s*var\(--ui-font-sm\)/s);
+  assert.match(css, /\.app-shell \.nav-children \.nav-child\s*\{[^}]*font-size:\s*var\(--ui-font-xs\)/s);
 });
 
 test('expense detail and anomaly drawers avoid duplicate vertical scrollbars and overlap', () => {

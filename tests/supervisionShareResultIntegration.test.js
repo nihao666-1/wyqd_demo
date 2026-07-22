@@ -26,7 +26,7 @@ test('监督共享结果页注册精确路由并编译完整父页', () => {
 });
 
 test('监督共享能力查看结果跳转独立页面且其他能力仍打开抽屉', () => {
-  assert.match(taskDetail, /if \(capability\.id === ['"]supervision-share['"]\)\s*{\s*router\.push\(\{\s*path:\s*['"]\/tasks\/detail\/supervision-share['"],\s*query:\s*\{\s*taskId:\s*snapshot\.task\.id\s*}\s*}\);\s*return;\s*}/s);
+  assert.match(taskDetail, /if \(capability\.id === ['"]supervision-share['"]\)\s*{\s*router\.push\(\{\s*path:\s*['"]\/tasks\/detail\/supervision-share['"],\s*query:\s*\{\s*taskId:\s*snapshot\.value\.task\.id\s*}\s*}\);\s*return;\s*}/s);
   assert.match(taskDetail, /return;\s*}\s*openDrawer\(['"]生成结果['"]/s);
 });
 

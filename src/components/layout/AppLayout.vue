@@ -7,13 +7,13 @@
 
       <nav class="main-nav">
         <template v-for="item in businessNavItems" :key="item.path">
-          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || (isExpenseSection && item.path === '/expense/workbench') || ((isAuditReportGeneration || isReportReviewRoute) && item.path === '/audit-report/workbench') }">
+          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || (isExpenseSection && item.path === '/expense/workbench') || ((isAuditReportGeneration || isReportReviewRoute) && item.path === '/audit-report/workbench') || isNavParentActive(item) }">
             <span class="nav-icon"><AuditIcon :name="item.icon" /></span>
             <span class="nav-label">{{ item.label }}</span>
             <span v-if="item.children && shouldShowChildren(item)" class="nav-caret">⌄</span>
           </RouterLink>
           <div v-if="item.children && shouldShowChildren(item)" class="nav-children">
-            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="router-link-active" :class="{ 'sub-active': isNavChildActive(child) }">
+            <RouterLink v-for="child in item.children" :key="child.path" :to="child.path" class="nav-child" active-class="route-active-disabled" :class="{ 'sub-active': isNavChildActive(child) }">
               <span class="nav-child-dot"></span>
               <span>{{ child.label }}</span>
             </RouterLink>
@@ -254,8 +254,22 @@ function toggleSidebar() {
 }
 
 function isNavChildActive(child) {
-  if (child.mode) return route.path === '/audit-report/workbench' && String(route.query.mode || 'generate') === child.mode;
-  return route.path === child.path;
+  const targetPath = child.path.split('?')[0];
+  if (route.path !== targetPath) return false;
+  const defaultMode = targetPath === '/audit-report/workbench' ? 'generate' : '';
+  if (child.mode) return String(route.query.mode || defaultMode) === child.mode;
+  if (route.query.mode) return false;
+  return true;
+}
+
+function isNavParentActive(item) {
+  if (!item.children) return false;
+  return item.children.some((child) => isNavChildActive(child)) ||
+    (item.path === '/audit-standard/policy' && isAuditStandardSection.value) ||
+    (item.path === '/regulatory/workbench' && isSpecialAuditSection.value) ||
+    (item.path === '/expense/workbench' && isExpenseSection.value) ||
+    (item.path === '/audit-report/workbench' && isAuditReportSection.value) ||
+    (item.path === '/config' && route.path === '/config');
 }
 
 function handleGlobalUploadClick(event) {

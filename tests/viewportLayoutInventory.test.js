@@ -33,7 +33,6 @@ const fillRoutes = [
 ];
 
 const naturalRoutes = [
-  '/demo-guide',
   '/audit-standard/generate',
   '/supervision/report/source-select',
   '/audit-report/source-select',
@@ -49,7 +48,7 @@ test('every component route has exactly one viewport layout classification', () 
   );
   const classifiedRoutes = [...fillRoutes, ...naturalRoutes, ...conditionalRoutes];
 
-  assert.equal(componentRoutes.length, 31);
+  assert.equal(componentRoutes.length, 30);
   assert.equal(new Set(classifiedRoutes).size, classifiedRoutes.length);
   assert.deepEqual([...classifiedRoutes].sort(), [...componentRoutes].sort());
   assert.equal(classifiedRoutes.some((route) => redirectRoutes.has(route)), false);

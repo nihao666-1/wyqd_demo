@@ -43,7 +43,7 @@ test('shared shell uses native responsive sizing without whole-page scaling', ()
   assert.match(layoutCss, /\.sidebar\s*\{[^}]*width:\s*var\(--shell-sidebar-width\)[^}]*height:\s*var\(--shell-viewport-height\)/s);
   assert.match(layoutCss, /\.brand\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
   assert.match(layoutCss, /\.topbar\s*\{[^}]*min-height:\s*var\(--ui-topbar-height\)/s);
-  assert.match(layoutCss, /\.sidebar a\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
+  assert.match(layoutCss, /\.sidebar a,\s*\.bottom-nav button\s*\{[^}]*min-height:\s*var\(--ui-control-md\)[^}]*font-size:\s*var\(--ui-font-sm\)/s);
   assert.match(layoutCss, /\.nav-icon\s*\{[^}]*width:\s*var\(--ui-icon-md\)[^}]*font-size:\s*var\(--ui-icon-sm\)/s);
   assert.doesNotMatch(layoutCss, /--shell-sidebar-width:\s*clamp\(/);
   assert.doesNotMatch(layoutCss, /@media \(max-width: 1599px\)[\s\S]*?width:\s*220px/);

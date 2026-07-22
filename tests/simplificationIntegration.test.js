@@ -182,3 +182,17 @@ test('config center removes duplicated records mode and keeps records in record 
   assert.match(config, /系统参数/);
   compileVue(configUrl);
 });
+
+test('grouped navigation highlights matching parent and query-specific child only', () => {
+  const layout = read(layoutUrl);
+
+  assert.match(layout, /'manual-active':[\s\S]*isNavParentActive\(item\)/);
+  assert.match(layout, /active-class="route-active-disabled"[\s\S]*:class="\{ 'sub-active': isNavChildActive\(child\) \}"/);
+  assert.match(layout, /function isNavParentActive\(item\)/);
+  assert.match(layout, /item\.path === '\/audit-standard\/policy' && isAuditStandardSection\.value/);
+  assert.match(layout, /item\.path === '\/config' && route\.path === '\/config'/);
+  assert.match(layout, /function isNavChildActive\(child\)[\s\S]*const targetPath = child\.path\.split\('\?'\)\[0\]/);
+  assert.match(layout, /const defaultMode = targetPath === '\/audit-report\/workbench' \? 'generate' : ''/);
+  assert.match(layout, /if \(child\.mode\) return String\(route\.query\.mode \|\| defaultMode\) === child\.mode/);
+  assert.match(layout, /if \(route\.query\.mode\) return false/);
+});

@@ -2097,12 +2097,20 @@
   }
 }
 
-/* Approved viewport scale tokens are the single sizing source for the shell. */
+/* Keep the left navigation visually stable across route-specific shells. */
+.app-shell:not(.sidebar-collapsed) {
+  --shell-sidebar-width: var(--ui-sidebar-width);
+}
+
 .app-shell .sidebar {
-  width: var(--shell-sidebar-width);
-  flex-basis: var(--shell-sidebar-width);
+  width: var(--ui-sidebar-width);
+  flex: 0 0 var(--ui-sidebar-width);
+  flex-basis: var(--ui-sidebar-width);
+  padding-top: 0;
   padding-right: var(--ui-space-3);
+  padding-bottom: var(--ui-space-6);
   padding-left: var(--ui-space-3);
+  box-shadow: 4px 0 18px rgba(22, 32, 51, 0.05);
 }
 
 .app-shell .brand {
@@ -2114,10 +2122,11 @@
 }
 
 .app-shell .brand strong {
-  font-size: var(--ui-font-lg);
+  font-size: var(--ui-font-xl);
 }
 
-.app-shell .sidebar a {
+.app-shell .sidebar a,
+.app-shell .bottom-nav button {
   min-height: var(--ui-control-md);
   gap: var(--ui-space-4);
   padding: var(--ui-space-3) var(--ui-space-4);
@@ -2134,6 +2143,48 @@
   gap: var(--ui-space-3);
   padding: var(--ui-space-2) var(--ui-space-4) var(--ui-space-2) calc(var(--ui-space-6) + var(--ui-space-5));
   font-size: var(--ui-font-xs);
+}
+
+.app-shell.sidebar-collapsed .sidebar {
+  width: var(--shell-sidebar-width);
+  flex: 0 0 var(--shell-sidebar-width);
+  flex-basis: var(--shell-sidebar-width);
+}
+
+.app-shell.sidebar-collapsed .brand {
+  justify-items: center;
+  padding: 0;
+}
+
+.app-shell.sidebar-collapsed .brand strong {
+  overflow: hidden;
+  width: 28px;
+  color: transparent;
+  font-size: 0;
+  white-space: nowrap;
+}
+
+.app-shell.sidebar-collapsed .brand strong::after {
+  content: "审";
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.app-shell.sidebar-collapsed .sidebar a,
+.app-shell.sidebar-collapsed .bottom-nav button {
+  justify-content: center;
+  gap: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.app-shell.sidebar-collapsed .nav-label,
+.app-shell.sidebar-collapsed .nav-caret,
+.app-shell.sidebar-collapsed .nav-children {
+  overflow: hidden;
+  color: transparent;
+  font-size: 0;
 }
 
 .app-shell .nav-icon {
