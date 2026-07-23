@@ -33,15 +33,15 @@
 
           <section class="panel welcome-panel">
             <div class="welcome-copy">
-              <span class="eyebrow">首次使用</span>
+              <span class="eyebrow">审计工作台</span>
               <h2>欢迎使用审计大模型系统</h2>
-              <strong>当前暂无审计任务</strong>
+              <strong>当前暂无需要你处理的事项</strong>
               <p>
-                从创建任务开始，按资料准备、智能分析、人工确认、报告生成和归档追溯推进。需要查看已有任务时，可切换到有数据视图。
+                审计工作台用于展示当前登录用户可使用的能力、本人待办、最近任务和近期成果；统一任务查询和完整筛选仍在任务中心完成。
               </p>
               <div class="head-actions">
                 <RouterLink class="btn primary" to="/tasks/create">创建审计任务</RouterLink>
-                <button class="btn" type="button" @click="store.setDemoDataMode('data')">查看已有任务</button>
+                <button class="btn" type="button" @click="store.setDemoDataMode('data')">查看个人工作概况</button>
               </div>
             </div>
             <div class="welcome-preview" aria-hidden="true">
@@ -60,7 +60,7 @@
             <div class="panel-title">
               <div>
                 <h3>推荐开始方式</h3>
-                <p>选择业务入口完成任务发起、资料准备或规则维护。</p>
+                <p>从统一任务流程、文件上传和一期基础配置入口开始。</p>
               </div>
             </div>
             <div class="start-card-grid">
@@ -121,7 +121,7 @@
         <section class="panel todo-panel">
           <div class="panel-title">
             <h3>我的待办</h3>
-            <RouterLink class="btn" to="/tasks">查看全部</RouterLink>
+            <RouterLink class="btn" :to="{ path: '/tasks', query: { view: 'todo', scope: 'mine' } }">查看全部</RouterLink>
           </div>
           <div class="todo-tabs" role="list" aria-label="待办分类">
             <span v-for="tab in todoTabs" :key="tab.label" :class="{ active: tab.active }" role="listitem">
@@ -130,17 +130,14 @@
           </div>
           <div class="todo-list">
             <article v-for="item in todoItems" :key="item.id" class="todo-item">
-              <div class="todo-heading">
-                <strong>{{ item.title }}</strong>
-                <span class="status-tag" :class="item.statusClass">{{ item.status }}</span>
-              </div>
-              <div class="todo-support">
-                <p>{{ item.meta }}</p>
-                <div class="row-actions">
-                  <RouterLink class="btn primary" :to="item.primaryTo">去处理</RouterLink>
-                  <RouterLink class="btn todo-detail-link" :to="item.detailTo">查看详情</RouterLink>
+              <div class="todo-copy">
+                <div class="todo-heading">
+                  <strong>{{ item.title }}</strong>
+                  <span class="status-tag" :class="item.statusClass">{{ item.status }}</span>
                 </div>
+                <p>{{ item.meta }}</p>
               </div>
+              <RouterLink class="btn primary" :to="item.primaryTo">去处理</RouterLink>
             </article>
           </div>
         </section>
@@ -148,7 +145,10 @@
         <section class="panel recent-task-panel">
           <div class="panel-title">
             <h3>最近审计任务</h3>
-            <RouterLink class="btn" to="/tasks">任务列表</RouterLink>
+            <div class="panel-actions">
+              <RouterLink class="btn primary" to="/tasks/create">创建审计任务</RouterLink>
+              <RouterLink class="btn" to="/tasks">任务列表</RouterLink>
+            </div>
           </div>
           <div class="compact-table">
             <table class="recent-task-table">
@@ -157,8 +157,8 @@
                 <col class="unit-col" />
                 <col class="period-col" />
                 <col class="stage-col" />
-                <col class="progress-col" />
                 <col class="status-col" />
+                <col class="next-action-col" />
                 <col class="action-col" />
               </colgroup>
               <thead>
@@ -167,8 +167,8 @@
                   <th>审计单位</th>
                   <th>审计期间</th>
                   <th>当前阶段</th>
-                  <th>进度</th>
                   <th>状态</th>
+                  <th>下一步</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -178,13 +178,8 @@
                   <td>{{ task.unit }}</td>
                   <td>{{ task.period }}</td>
                   <td>{{ task.stage }}</td>
-                  <td>
-                    <div class="progress-cell">
-                      <span><i :style="{ width: `${task.progress}%` }"></i></span>
-                      <b>{{ task.progress }}%</b>
-                    </div>
-                  </td>
                   <td><span class="status-tag" :class="task.statusClass">{{ task.status }}</span></td>
+                  <td>{{ task.nextAction }}</td>
                   <td><RouterLink class="table-link" :to="task.to">进入</RouterLink></td>
                 </tr>
               </tbody>
@@ -202,12 +197,14 @@
           </div>
           <div class="risk-list">
             <article v-for="risk in riskAlerts" :key="risk.title" class="risk-item">
-              <span class="risk-level" :class="risk.className">{{ risk.level }}</span>
               <div>
-                <strong>{{ risk.title }}</strong>
+                <div class="risk-heading">
+                  <strong>{{ risk.title }}</strong>
+                  <span class="status-tag" :class="risk.className">{{ risk.status }}</span>
+                </div>
                 <p>{{ risk.unit }} / {{ risk.time }}</p>
               </div>
-              <RouterLink :to="risk.to">查看依据</RouterLink>
+              <button class="table-link" type="button" @click="openWorkbenchDrawer('依据详情', risk.title, risk.drawerDetail)">查看依据</button>
             </article>
           </div>
         </section>
@@ -222,23 +219,43 @@
               </div>
               <div class="row-actions">
                 <RouterLink class="btn" :to="result.viewTo">查看</RouterLink>
-                <RouterLink class="btn" :to="result.downloadTo">下载</RouterLink>
+                <button class="btn" type="button" @click="openWorkbenchDrawer('成果详情', result.name, result.drawerDetail)">详情</button>
               </div>
             </article>
           </div>
         </section>
       </section>
+
+      <div v-if="drawer.open" class="workbench-drawer-layer">
+        <button class="workbench-drawer-backdrop" type="button" aria-label="关闭详情抽屉" @click="closeWorkbenchDrawer"></button>
+        <aside class="workbench-drawer" role="dialog" aria-modal="true" aria-labelledby="workbench-drawer-title">
+          <header>
+            <div>
+              <span>{{ drawer.eyebrow }}</span>
+              <h2 id="workbench-drawer-title">{{ drawer.title }}</h2>
+            </div>
+            <button type="button" aria-label="关闭" @click="closeWorkbenchDrawer">×</button>
+          </header>
+          <dl>
+            <div v-for="item in drawer.details" :key="item.label">
+              <dt>{{ item.label }}</dt>
+              <dd>{{ item.value }}</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { computed, inject } from 'vue';
+import { computed, inject, reactive } from 'vue';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 
 const store = inject('store');
 
 const isEmptyMode = computed(() => store.demoDataMode === 'empty');
+const drawer = reactive({ open: false, eyebrow: '', title: '', details: [] });
 
 const legacyWorkbenchMetricLabels = ['进行中任务', '待确认异常', '待复核报告', '失败任务'];
 
@@ -310,29 +327,29 @@ const capabilityMetrics = computed(() => buildCapabilityMetrics(false));
 const startCards = [
   {
     icon: 'create',
-    title: '创建常规审计任务',
-    description: '填写审计对象、期间和能力范围，生成首个任务。',
-    steps: ['选择能力', '填写基础信息', '提交任务'],
+    title: '创建审计任务',
+    description: '进入统一创建流程，只选择一期已开放的任务类能力。',
+    steps: ['选择能力', '上传资料', '提交任务'],
     to: '/tasks/create'
   },
   {
     icon: 'upload',
-    title: '从文件中心导入资料',
-    description: '上传审计资料，完成解析、补字段和引用准备。',
-    steps: ['上传资料', '解析资料', '建立引用'],
+    title: '上传基础资料',
+    description: '优先完成文件上传、多文件上传和基础查看。',
+    steps: ['上传文件', '解析状态', '查看文件'],
     to: '/files'
   },
   {
-    icon: 'qa',
-    title: '体验知识库智能体',
-    description: '查询制度、识别变更，辅助形成审计依据。',
-    steps: ['制度查询', '制度比对', '引用条款'],
-    to: '/audit-standard/policy'
+    icon: 'tasks',
+    title: '查看任务中心',
+    description: '统一查询本人、本部门和权限范围内的审计任务。',
+    steps: ['筛选任务', '进入详情', '查看时间线'],
+    to: '/tasks'
   },
   {
     icon: 'config',
-    title: '维护模板与规则',
-    description: '维护模板、规则、权限和数据源连接状态。',
+    title: '维护一期配置',
+    description: '维护报告模板、规范模板、费用规则、标签和权限菜单。',
     steps: ['模板配置', '规则配置', '权限配置'],
     to: '/config'
   }
@@ -348,17 +365,17 @@ const beginnerGuide = [
 ];
 
 const todoTabs = [
-  { label: '全部', count: 12, active: true },
-  { label: '异常确认', count: 5, active: false },
-  { label: '报告复核', count: 3, active: false },
-  { label: '失败重试', count: 4, active: false }
+  { label: '全部', count: 5, active: true },
+  { label: '待确认', count: 2, active: false },
+  { label: '待复核', count: 1, active: false },
+  { label: '执行异常', count: 2, active: false }
 ];
 
 const todoItems = [
   {
     id: 'TODO-001',
     title: '费用异常 AN-001 待确认',
-    meta: '上海分公司 / 经纪业务部 / 高风险',
+    meta: '上海分公司二季度费用异常审计 / 候选异常确认',
     status: '待确认',
     statusClass: 'warning',
     primaryTo: '/expense/anomaly/candidates',
@@ -367,7 +384,7 @@ const todoItems = [
   {
     id: 'TODO-002',
     title: '营业部常规审计报告待复核',
-    meta: '审计报告草稿 / 来源依据部分缺失',
+    meta: '营业部常规审计报告 / 报告审核',
     status: '待复核',
     statusClass: 'warning',
     primaryTo: '/audit-report/draft',
@@ -376,7 +393,7 @@ const todoItems = [
   {
     id: 'TODO-003',
     title: '监督共享资料入库预检',
-    meta: '风险事项台账.xlsx / 三字段待确认',
+    meta: '监督共享资料汇总分析 / 文件解析异常待处理',
     status: '待预检',
     statusClass: 'warning',
     primaryTo: '/materials/import?scene=supervision&step=precheck',
@@ -385,8 +402,8 @@ const todoItems = [
   {
     id: 'TODO-004',
     title: '制度差异清单待采纳',
-    meta: '费用报销管理办法 V2.1 / 3 项差异',
-    status: '待处理',
+    meta: '制度差异复核任务 / 生成结果待确认',
+    status: '待确认',
     statusClass: 'success',
     primaryTo: '/audit-standard/library?panel=diff',
     detailTo: '/audit-standard/library'
@@ -394,19 +411,19 @@ const todoItems = [
   {
     id: 'TODO-005',
     title: '失败任务重试确认',
-    meta: '发票 OCR 快照同步失败 / 需重新执行',
-    status: '失败重试',
+    meta: '费用异常核查任务 / 模型调用异常',
+    status: '执行异常',
     statusClass: 'danger',
     primaryTo: '/tasks/detail',
-    detailTo: '/records'
+    detailTo: '/tasks/detail'
   }
 ];
 
 const recentAuditTasks = [
-  { id: 'TASK-2026-001', name: '上海分公司二季度费用异常审计', unit: '上海分公司', period: '2026Q2', stage: '候选异常确认', progress: 72, status: '处理中', statusClass: 'warning', to: '/tasks/detail' },
-  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', period: '2026Q1', stage: '入库预检', progress: 48, status: '待预检', statusClass: 'warning', to: '/materials/import?scene=supervision&step=precheck' },
-  { id: 'TASK-2026-003', name: '营业部常规审计报告', unit: '审计部', period: '2026H1', stage: '报告复核', progress: 86, status: '待复核', statusClass: 'success', to: '/audit-report/draft' },
-  { id: 'TASK-2026-004', name: '监管案例舆情分析', unit: '经纪业务部', period: '2026Q2', stage: '数据获取', progress: 35, status: '进行中', statusClass: 'warning', to: '/regulatory/workbench' }
+  { id: 'TASK-2026-001', name: '上海分公司二季度费用异常审计', unit: '上海分公司', period: '2026Q2', stage: '候选异常确认', status: '待确认', statusClass: 'warning', nextAction: '确认或排除异常', to: '/tasks/detail' },
+  { id: 'TASK-2026-002', name: '监督共享资料汇总分析', unit: '上海分公司', period: '2026Q1', stage: '文件解析异常', status: '执行异常', statusClass: 'danger', nextAction: '处理解析异常', to: '/materials/import?scene=supervision&step=precheck' },
+  { id: 'TASK-2026-003', name: '营业部常规审计报告', unit: '审计部', period: '2026H1', stage: '报告复核', status: '待复核', statusClass: 'success', nextAction: '处理审核建议', to: '/audit-report/draft' },
+  { id: 'TASK-2026-004', name: '监管案例舆情分析', unit: '经纪业务部', period: '2026Q2', stage: '结果生成中', status: '执行中', statusClass: 'warning', nextAction: '查看阶段日志', to: '/regulatory/workbench' }
 ];
 
 const quickEntries = [
@@ -418,45 +435,91 @@ const quickEntries = [
   { icon: 'report-generate', title: '报告生成', to: '/audit-report/source-select' }
 ];
 
-const progressOverview = [
-  { label: '进行中', value: 18, rate: 63 },
-  { label: '待确认', value: 36, rate: 52 },
-  { label: '已完成', value: 52, rate: 87 },
-  { label: '失败', value: 3, rate: 12 },
-  { label: '已归档', value: 21, rate: 58 }
-];
-
-const progressChartItems = computed(() => {
-  const plotBottom = 182;
-  const plotHeight = 140;
-  const maxValue = 60;
-
-  return progressOverview.map((item, index) => {
-    const x = 56 + index * 52;
-    const barHeight = Math.max(6, Math.round((item.value / maxValue) * plotHeight));
-    const barY = plotBottom - barHeight;
-    const lineY = plotBottom - Math.round((item.rate / 100) * plotHeight);
-    const valueInside = barHeight >= 30;
-    const valueY = valueInside ? barY + 17 : barY - 8;
-    const rateY = item.rate >= 80 ? lineY - 18 : lineY - 10;
-    const rateDx = item.rate >= 80 ? 8 : 0;
-    return { ...item, x, barHeight, barY, lineY, valueInside, valueY, rateY, rateDx };
-  });
-});
-
-const progressLinePoints = computed(() => progressChartItems.value.map((item) => `${item.x},${item.lineY}`).join(' '));
-
 const riskAlerts = [
-  { level: '高', title: '招待人均超标准', unit: '经纪业务部', time: '10:42', className: 'danger', to: '/expense/anomaly/candidates' },
-  { level: '高', title: '合同付款节点不一致', unit: '计划财务部', time: '10:15', className: 'danger', to: '/expense/anomaly/candidates' },
-  { level: '中', title: '报告整改建议依据不足', unit: '审计部', time: '09:58', className: 'warning', to: '/audit-report/gap-list' },
-  { level: '中', title: '制度版本引用待确认', unit: '配置管理员', time: '09:30', className: 'warning', to: '/audit-standard/library' }
+  {
+    title: '招待人均超标准',
+    unit: '经纪业务部',
+    time: '10:42',
+    status: '高风险',
+    className: 'danger',
+    drawerDetail: [
+      { label: '关联任务', value: '上海分公司二季度费用异常审计' },
+      { label: '依据来源', value: '费用报销管理办法 V2.1 第 15 条' },
+      { label: '处理建议', value: '进入任务详情确认异常、排除或补充说明。' }
+    ]
+  },
+  {
+    title: '合同付款节点不一致',
+    unit: '计划财务部',
+    time: '10:15',
+    status: '高风险',
+    className: 'danger',
+    drawerDetail: [
+      { label: '关联任务', value: '合同合规性专项审计' },
+      { label: '依据来源', value: '合同付款管理细则第 8 条' },
+      { label: '处理建议', value: '核验付款凭证和审批链后形成确认意见。' }
+    ]
+  },
+  {
+    title: '报告整改建议依据不足',
+    unit: '审计部',
+    time: '09:58',
+    status: '中风险',
+    className: 'warning',
+    drawerDetail: [
+      { label: '关联任务', value: '营业部常规审计报告' },
+      { label: '依据来源', value: '报告审核规则 / 整改建议章节' },
+      { label: '处理建议', value: '补充来源材料或将问题标记为忽略。' }
+    ]
+  },
+  {
+    title: '制度版本引用待确认',
+    unit: '审计部',
+    time: '09:30',
+    status: '中风险',
+    className: 'warning',
+    drawerDetail: [
+      { label: '关联任务', value: '制度差异复核任务' },
+      { label: '依据来源', value: '费用报销管理办法 V2.1 / 历史版本 V1.8' },
+      { label: '处理建议', value: '进入任务详情确认引用版本。' }
+    ]
+  }
 ];
 
 const generatedResults = [
-  { name: '制度差异清单', type: '制度比对', time: '10:20', viewTo: '/audit-standard/library?panel=diff', downloadTo: '/audit-standard/library' },
-  { name: '费用异常汇总', type: '费用审计', time: '10:12', viewTo: '/expense/anomaly/dashboard', downloadTo: '/expense/usage/dashboard?panel=report' },
-  { name: '审计报告草稿', type: '报告生成', time: '09:48', viewTo: '/audit-report/draft', downloadTo: '/audit-report/draft' }
+  {
+    name: '制度差异清单',
+    type: '制度比对',
+    time: '10:20',
+    viewTo: '/audit-standard/library?panel=diff',
+    drawerDetail: [
+      { label: '来源任务', value: '制度差异复核任务' },
+      { label: '输出文件', value: '制度差异清单.xlsx' },
+      { label: '当前状态', value: '待确认差异 3 项' }
+    ]
+  },
+  {
+    name: '费用异常汇总',
+    type: '费用审计',
+    time: '10:12',
+    viewTo: '/expense/anomaly/dashboard',
+    drawerDetail: [
+      { label: '来源任务', value: '上海分公司二季度费用异常审计' },
+      { label: '输出文件', value: '费用异常汇总.xlsx' },
+      { label: '当前状态', value: '候选异常待人工确认' }
+    ]
+  },
+  {
+    name: '审计报告草稿',
+    type: '报告生成',
+    time: '09:48',
+    viewTo: '/audit-report/draft',
+    drawerDetail: [
+      { label: '来源任务', value: '营业部常规审计报告' },
+      { label: '输出文件', value: '审计报告草稿.docx' },
+      { label: '当前状态', value: '报告复核中' }
+    ]
+  }
 ];
 
 const notices = [
@@ -466,6 +529,20 @@ const notices = [
 ];
 
 const operationRows = computed(() => store.db.operationLogs);
+
+function openWorkbenchDrawer(eyebrow, title, details) {
+  drawer.open = true;
+  drawer.eyebrow = eyebrow;
+  drawer.title = title;
+  drawer.details = details;
+}
+
+function closeWorkbenchDrawer() {
+  drawer.open = false;
+  drawer.eyebrow = '';
+  drawer.title = '';
+  drawer.details = [];
+}
 </script>
 
 <style scoped>
@@ -485,8 +562,9 @@ const operationRows = computed(() => store.db.operationLogs);
 .workbench-page.has-data {
   grid-template-rows:
     auto
-    minmax(clamp(260px, 32vh, 360px), 0.7fr)
-    minmax(clamp(260px, 30vh, 340px), 0.6fr);
+    auto
+    auto;
+  align-content: start;
 }
 
 .workbench-page :deep(.panel),
@@ -514,6 +592,14 @@ const operationRows = computed(() => store.db.operationLogs);
   font-size: 15px;
 }
 
+.panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
 .workbench-page .btn {
   min-height: 28px;
   padding: 5px 10px;
@@ -526,7 +612,7 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .workbench-metrics {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 0;
 }
@@ -534,8 +620,8 @@ const operationRows = computed(() => store.db.operationLogs);
 .workbench-metric {
   display: flex;
   min-width: 0;
-  min-height: 158px;
-  padding: 14px 16px 10px;
+  min-height: 142px;
+  padding: 12px 12px 9px;
   color: var(--color-text);
   flex-direction: column;
   justify-content: space-between;
@@ -720,19 +806,20 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .workbench-metric .capability-card-head {
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
 }
 
 .workbench-metric .capability-title {
   color: #172033;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .workbench-metric .range-pill {
-  min-width: 70px;
-  height: 28px;
+  display: none;
+  min-width: 0;
+  height: 0;
   border-radius: 4px;
   background: #fff;
   color: #526173;
@@ -741,16 +828,16 @@ const operationRows = computed(() => store.db.operationLogs);
 .workbench-metric .capability-status-grid {
   border-top: 1px solid #e7ecf2;
   border-bottom: 1px solid #e7ecf2;
-  padding: 11px 0;
+  padding: 9px 0;
 }
 
 .workbench-metric .capability-status dt {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .workbench-metric .capability-status dd {
-  margin-top: 7px;
-  font-size: 21px;
+  margin-top: 6px;
+  font-size: 19px;
 }
 
 .workbench-metric .capability-card-foot {
@@ -1114,12 +1201,12 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .primary-row {
   grid-template-columns: minmax(330px, 0.9fr) minmax(500px, 1.45fr);
-  min-height: clamp(260px, 32vh, 360px);
+  min-height: 0;
 }
 
 .secondary-row {
   grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
-  min-height: clamp(260px, 30vh, 340px);
+  min-height: 0;
 }
 
 .primary-row > .panel,
@@ -1135,13 +1222,13 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .has-data .primary-row,
 .has-data .secondary-row {
-  height: 100%;
+  height: auto;
 }
 
 .has-data .primary-row > .panel,
 .has-data .secondary-row > .panel,
 .has-data .operation-panel {
-  height: 100%;
+  height: auto;
 }
 
 .todo-list,
@@ -1197,19 +1284,21 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .todo-item {
-  grid-template-rows: auto auto;
-  gap: 2px;
-  min-height: 44px;
-  padding: 2px 6px;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 12px;
 }
 
-.todo-heading,
-.todo-support {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 6px;
-  align-items: center;
+.todo-copy {
   min-width: 0;
+}
+
+.todo-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
 }
 
 .todo-item strong,
@@ -1221,41 +1310,34 @@ const operationRows = computed(() => store.db.operationLogs);
 
 .todo-item strong {
   display: block;
-  font-size: 12px;
-  line-height: 1.2;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .todo-item p {
-  font-size: 11px;
-  line-height: 1.2;
+  margin-top: 5px;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .todo-item .status-tag {
-  justify-self: end;
-}
-
-.todo-item .row-actions {
-  justify-self: end;
-  flex-wrap: nowrap;
-  gap: 4px;
+  flex: 0 0 auto;
 }
 
 .workbench-page .todo-item .btn {
-  min-height: 18px;
-  padding: 1px 6px;
-  line-height: 14px;
+  justify-self: end;
+  min-width: 72px;
+  min-height: 26px;
+  padding: 4px 10px;
+  line-height: 16px;
 }
 
 .todo-item .status-tag {
   min-height: 18px;
   padding: 0 5px;
   line-height: 16px;
-}
-
-.todo-item .todo-detail-link {
-  border-color: transparent;
-  background: transparent;
-  color: var(--color-muted);
 }
 
 .row-actions {
@@ -1287,15 +1369,15 @@ const operationRows = computed(() => store.db.operationLogs);
 }
 
 .recent-task-table .stage-col {
-  width: 16%;
-}
-
-.recent-task-table .progress-col {
   width: 15%;
 }
 
 .recent-task-table .status-col {
   width: 10%;
+}
+
+.recent-task-table .next-action-col {
+  width: 16%;
 }
 
 .recent-task-table .action-col {
@@ -1311,30 +1393,13 @@ const operationRows = computed(() => store.db.operationLogs);
   text-overflow: ellipsis;
 }
 
-.progress-cell {
-  display: grid;
-  grid-template-columns: minmax(80px, 1fr) 38px;
-  align-items: center;
-  gap: 8px;
-}
-
-.progress-cell span {
-  height: 8px;
-  border-radius: 999px;
-  background: #edf1f6;
-  overflow: hidden;
-}
-
-.progress-cell i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--color-primary);
-}
-
-.progress-cell b,
 .table-link {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--color-primary);
+  cursor: pointer;
   font-size: 12px;
   font-weight: 800;
 }
@@ -1360,120 +1425,26 @@ const operationRows = computed(() => store.db.operationLogs);
   text-align: center;
 }
 
-.chart-filter {
-  min-height: 24px;
-  padding: 3px 8px;
-  border: 1px solid var(--color-line);
-  border-radius: 6px;
-  color: var(--color-muted);
-  background: #fff;
-  font-size: 12px;
-}
-
-.progress-combo {
-  display: grid;
-  align-content: start;
-  min-height: 0;
-  height: calc(100% - 46px);
-}
-
-.progress-combo svg {
-  display: block;
-  width: 100%;
-  height: min(100%, clamp(250px, 30vh, 320px));
-}
-
-.grid-lines line {
-  stroke: #edf1f6;
-  stroke-width: 1;
-}
-
-.axis-text text {
-  fill: #8b97aa;
-  font-size: 9px;
-}
-
-.svg-legend text {
-  fill: var(--color-muted);
-  font-size: 9px;
-}
-
-.legend-bar-line,
-.legend-rate-line {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-
-.legend-bar-line {
-  stroke: #3f6fb7;
-}
-
-.legend-rate-line {
-  stroke: #d98a20;
-  stroke-width: 2;
-}
-
-.bar-bg {
-  fill: #edf1f6;
-}
-
-.bar-value {
-  fill: #3f6fb7;
-}
-
-.rate-line {
-  fill: none;
-  stroke: #d98a20;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.line-dot {
-  fill: #fff;
-  stroke: #d98a20;
-  stroke-width: 2;
-}
-
-.bar-label,
-.bar-value-text,
-.rate-text {
-  text-anchor: middle;
-  font-size: 10px;
-}
-
-.bar-label {
-  fill: var(--color-muted);
-}
-
-.bar-value-text {
-  fill: var(--color-text);
-  font-weight: 800;
-}
-
-.bar-value-text.inside {
-  fill: #fff;
-}
-
-.rate-text {
-  fill: #d98a20;
-  font-size: 9px;
-  font-weight: 800;
-}
-
 .risk-item {
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
-.risk-level {
-  width: 24px;
-  height: 24px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
+.risk-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.risk-heading strong {
+  min-width: 0;
+}
+
+.risk-heading .status-tag {
+  flex: 0 0 auto;
+  min-height: 18px;
+  padding: 0 5px;
+  line-height: 16px;
 }
 
 .secondary-row .risk-list,
@@ -1508,21 +1479,6 @@ const operationRows = computed(() => store.db.operationLogs);
 .secondary-row .result-item:last-child,
 .secondary-row .notice-item:last-child {
   border-bottom: 0;
-}
-
-.risk-level.danger {
-  background: #fff1f2;
-  color: var(--color-danger);
-}
-
-.risk-level.warning {
-  background: #fff7e8;
-  color: var(--color-warning);
-}
-
-.risk-level.success {
-  background: #f0fbf6;
-  color: var(--color-success);
 }
 
 .risk-item a {
@@ -1579,19 +1535,108 @@ const operationRows = computed(() => store.db.operationLogs);
   line-height: 1.35;
 }
 
+.workbench-drawer-layer {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+}
+
+.workbench-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgba(17, 24, 39, 0.22);
+}
+
+.workbench-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  width: min(390px, 92vw);
+  height: 100%;
+  box-sizing: border-box;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 18px;
+  border-left: 1px solid #dfe5ec;
+  background: #fff;
+  box-shadow: -8px 0 28px rgba(23, 31, 43, 0.16);
+}
+
+.workbench-drawer header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e4e9f0;
+}
+
+.workbench-drawer header span {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.workbench-drawer h2 {
+  margin: 5px 0 0;
+  color: #172033;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.workbench-drawer header button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid #dce3ec;
+  border-radius: 4px;
+  background: #fff;
+  color: #344054;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.workbench-drawer dl {
+  min-height: 0;
+  margin: 14px 0 0;
+  overflow: auto;
+}
+
+.workbench-drawer dl > div {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.workbench-drawer dt {
+  color: #667085;
+  font-size: 12px;
+}
+
+.workbench-drawer dd {
+  min-width: 0;
+  margin: 0;
+  color: #263548;
+  font-size: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 1500px) {
   .workbench-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 1200px) {
   .workbench-top {
     grid-template-columns: 1fr;
-  }
-
-  .workbench-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workbench-actions {
@@ -1621,6 +1666,10 @@ const operationRows = computed(() => store.db.operationLogs);
     height: auto;
   }
 
+  .workbench-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .primary-row > .panel,
   .secondary-row > .panel {
     height: auto;
@@ -1631,7 +1680,6 @@ const operationRows = computed(() => store.db.operationLogs);
 @media (max-width: 760px) {
   .flow-strip,
   .quick-grid,
-  .progress-overview,
   .start-card-grid,
   .todo-item,
   .result-item {
