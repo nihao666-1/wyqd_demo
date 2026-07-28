@@ -39,18 +39,21 @@ export const referenceMaterials = [
 
 const defaultSettings = {
   policyKnowledge: {
+    businessTemplate: '制度知识分析模板 V1.0',
     knowledgeScope: '全部制度库',
     effectiveTime: '最新有效',
     outputFormats: ['PDF', 'Excel'],
     citeToTask: true
   },
   policyCompare: {
+    businessTemplate: '制度比对业务模板 V1.0',
     externalScope: '证监会+自律规则',
     internalScope: '公司制度库（全量）',
     rules: ['缺失识别', '口径差异', '时限差异'],
     output: 'Excel（差异清单）'
   },
   regulatoryAnalysis: {
+    businessTemplate: '监管案例舆情分析模板 V1.0',
     caseSource: '证监会+交易所',
     sentimentSource: '新闻+监管通报',
     riskThreshold: '中风险及以上',
@@ -67,6 +70,7 @@ const defaultSettings = {
     outputFormats: ['Excel', 'Word 报告']
   },
   expenseAudit: {
+    businessTemplate: '费用审计业务模板 V2.1',
     ruleVersion: '费用规则库 V2.1',
     anomalyType: '全部异常类型',
     output: '异常汇总 Excel'
@@ -78,6 +82,7 @@ const defaultSettings = {
     outputFormats: ['Word', 'PDF']
   },
   reportReview: {
+    businessTemplate: '报告审核业务模板 V1.0',
     rules: ['字体规范', '格式规范', '标题编号', '文字优化'],
     output: '审核问题清单（Excel）'
   },
@@ -155,23 +160,15 @@ export function createPreSubmitSummary({
 }
 
 export function validateTemplateOutputSettings(settings, selectedCapabilityIds = []) {
-  const selected = new Set(selectedCapabilityIds);
   const errors = {};
-
-  if ((selected.has('policy-query') || selected.has('policy-change')) && !settings.policyKnowledge.outputFormats.length) {
-    errors['policyKnowledge.outputFormats'] = '请至少选择一种制度输出格式';
-  }
-  if (selected.has('report-generate')) {
-    if (!settings.reportGeneration.reportTemplate.trim()) {
-      errors['reportGeneration.reportTemplate'] = '请选择报告模板';
-    }
-    if (!settings.reportGeneration.outputFormats.length) {
-      errors['reportGeneration.outputFormats'] = '请至少选择一种报告输出格式';
-    }
-  }
-  if (selected.has('report-review') && !settings.reportReview.rules.length) {
-    errors['reportReview.rules'] = '请至少选择一项报告审核规则';
-  }
+  const visibleGroups = getVisibleSettingGroups(selectedCapabilityIds);
+  visibleGroups.forEach((group) => {
+    const groupSettings = settings[group.key] || {};
+    const templateValue = groupSettings.businessTemplate || groupSettings.template || groupSettings.framework || groupSettings.reportTemplate || '';
+    const outputValue = groupSettings.outputFormats || groupSettings.output || '';
+    if (!String(templateValue).trim()) errors[`${group.key}.businessTemplate`] = '请选择业务模板';
+    if (Array.isArray(outputValue) ? outputValue.length === 0 : !String(outputValue).trim()) errors[`${group.key}.output`] = '请至少选择一种输出格式';
+  });
 
   return errors;
 }

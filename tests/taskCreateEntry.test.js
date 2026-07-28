@@ -61,6 +61,18 @@ test('创建页由入口解析结果初始化并只自动补齐一次模拟资�
   assert.match(content, /const selectedIds = ref\(getInitialSelectedCapabilityIds\(taskCreateEntry\)\)/);
   assert.match(content, /if \(nextEntry\.taskType\) form\.taskType = nextEntry\.taskType/);
   assert.match(content, /shouldAutoFillSimulation\.value = false/);
+  for (const label of ['费用审计分析', '费用异常监控', '费用趋势分析']) assert.match(content, new RegExp(label));
+  assert.match(content, /selectedExpenseSubAbility = ref\(taskCreateEntry\.expenseSubAbility \|\| ''\)/);
+  assert.match(content, /selectedExpenseSubAbility\.value = nextEntry\.expenseSubAbility \|\| ''/);
+  assert.match(content, /<section v-if="step === 0 && showExpenseSubAbilityPanel" class="expense-sub-ability-panel"/);
+  assert.doesNotMatch(content, />费用审计方向<\/span>/);
+  assert.doesNotMatch(content, /请选择费用审计具体能力/);
+  assert.match(content, /\.expense-sub-ability-panel\{[^}]*border:1px solid #e0e5ec[^}]*background:#f3f6fa/s);
+  assert.match(content, /const showExpenseSubAbilityPanel = computed\(\(\) => selectedIds\.value\.includes\('expense'\)\)/);
+  assert.match(content, /<\/div>\s*<section v-if="step === 0 && showExpenseSubAbilityPanel" class="expense-sub-ability-panel"[\s\S]*<footer v-if="!\(step === 3 && stepFourStage === 'parsing'\)"/);
+  assert.doesNotMatch(content, /<div v-if="capability\.id === 'expense'/);
+  assert.match(content, /const canLeaveAbilityStep = computed\(\(\) => selectedIds\.value\[0\] !== 'expense' \|\| Boolean\(selectedExpenseSubAbility\.value\)\)/);
+  assert.match(content, /:disabled="\(step === 0 && !canLeaveAbilityStep\) \|\| \(step === 2 && !materialProgress\.canProceed\)"/);
 });
 
 test('专项和费用入口会进入选择能力并携带预选能力', () => {
@@ -84,5 +96,29 @@ test('专项和费用入口会进入选择能力并携带预选能力', () => {
     source: 'local',
     capabilityId: 'expense',
     taskType: '费用审计'
+  });
+  assert.deepEqual(resolveTaskCreateEntry({ capability: 'expense', expenseSubAbility: 'analysis' }), {
+    step: 0,
+    stage: 'ability',
+    source: 'local',
+    capabilityId: 'expense',
+    taskType: '费用审计',
+    expenseSubAbility: 'expense-analysis'
+  });
+  assert.deepEqual(resolveTaskCreateEntry({ capability: 'expense', expenseAbility: '费用异常监控' }), {
+    step: 0,
+    stage: 'ability',
+    source: 'local',
+    capabilityId: 'expense',
+    taskType: '费用审计',
+    expenseSubAbility: 'expense-anomaly'
+  });
+  assert.deepEqual(resolveTaskCreateEntry({ capability: 'expense', subAbility: 'trend' }), {
+    step: 0,
+    stage: 'ability',
+    source: 'local',
+    capabilityId: 'expense',
+    taskType: '费用审计',
+    expenseSubAbility: 'expense-trend'
   });
 });

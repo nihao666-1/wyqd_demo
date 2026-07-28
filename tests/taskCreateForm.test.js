@@ -111,5 +111,5 @@ test('补齐资料不会变异原始资料清单', () => {
   assert.equal(rows[0].uploadStatus, '未上传');
   assert.equal(updated[0].source, '平台资料复用');
   assert.equal(updated[0].uploadStatus, '已上传');
-  assert.equal(updated[0].parseStatus, '待解析');
+  assert.equal(updated[0].parseStatus, '待处理');
 });

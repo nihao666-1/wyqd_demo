@@ -142,10 +142,9 @@ import {
 
 const statusMeta = (value) => {
   const text = value || '—';
-  if (/(失败|异常|未通过|映射失败)/.test(text)) return { tone: 'danger', icon: faFileCircleXmark };
+  if (/(异常|未通过|映射失败)/.test(text)) return { tone: 'danger', icon: faFileCircleXmark };
   if (/(解析中|处理中|上传中)/.test(text)) return { tone: 'processing', icon: faCircleNotch, spin: true };
   if (/(成功|已上传|已映射|已完成|已引用|完整)/.test(text)) return { tone: 'success', icon: faCircleCheck };
-  if (/(重复)/.test(text)) return { tone: 'duplicate', icon: faClone };
   if (/(待|缺失|部分|未映射)/.test(text)) return { tone: 'warning', icon: faTriangleExclamation };
   if (/(未引用)/.test(text)) return { tone: 'muted', icon: faLinkSlash };
   if (/(引用)/.test(text)) return { tone: 'info', icon: faLink };
@@ -207,19 +206,19 @@ function showMapping(file) {
 }
 
 function showRetry(file) {
-  return /失败/.test(normalizedStatus(file));
+  return /异常/.test(normalizedStatus(file));
 }
 
 function showReplace(file) {
-  return /(失败|异常)/.test(normalizedStatus(file));
+  return /异常/.test(normalizedStatus(file));
 }
 
 function showSkip(file) {
-  return /(异常|重复)/.test(normalizedStatus(file));
+  return /异常/.test(normalizedStatus(file));
 }
 
 function isBlocking(file) {
-  return file.blocksSubmission === true && file.parseStatus !== '已跳过';
+  return file.blocksSubmission === true;
 }
 
 function blockingText(file) {
@@ -254,6 +253,9 @@ function fileTone(type) {
   --list-primary: var(--color-primary, var(--color-primary));
   --list-line: var(--color-line, #e4e7ed);
   display: grid;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -287,6 +289,9 @@ function fileTone(type) {
 }
 
 .desktop-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   min-width: 0;
   min-height: 0;
   overflow: auto;

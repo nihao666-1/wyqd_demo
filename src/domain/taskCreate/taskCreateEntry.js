@@ -1,4 +1,21 @@
 const validMaterialSources = new Set(['local', 'fileCenter', 'simulation']);
+const expenseSubAbilityMap = {
+  analysis: 'expense-analysis',
+  audit: 'expense-analysis',
+  overview: 'expense-analysis',
+  comprehensive: 'expense-analysis',
+  'expense-analysis': 'expense-analysis',
+  '费用审计分析': 'expense-analysis',
+  '费用综合分析': 'expense-analysis',
+  anomaly: 'expense-anomaly',
+  monitor: 'expense-anomaly',
+  'expense-anomaly': 'expense-anomaly',
+  '费用异常监控': 'expense-anomaly',
+  trend: 'expense-trend',
+  usage: 'expense-trend',
+  'expense-trend': 'expense-trend',
+  '费用趋势分析': 'expense-trend'
+};
 const capabilityEntryMap = {
   regulatory: { capabilityId: 'regulatory', taskType: '专项审计' },
   'regulatory-analysis': { capabilityId: 'regulatory', taskType: '专项审计' },
@@ -17,10 +34,18 @@ function resolveCapabilityEntry(query = {}) {
   return capabilityEntryMap[raw] || null;
 }
 
+function resolveExpenseSubAbility(query = {}) {
+  const raw = String(query.expenseSubAbility || query.subAbility || query.expenseAbility || '').trim();
+  return expenseSubAbilityMap[raw] || '';
+}
+
 export function resolveTaskCreateEntry(query = {}) {
   const source = validMaterialSources.has(query.source) ? query.source : 'local';
   const capabilityEntry = resolveCapabilityEntry(query);
-  const baseEntry = capabilityEntry ? { source, ...capabilityEntry } : { source };
+  const expenseSubAbility = capabilityEntry?.capabilityId === 'expense' ? resolveExpenseSubAbility(query) : '';
+  const baseEntry = capabilityEntry
+    ? { source, ...capabilityEntry, ...(expenseSubAbility ? { expenseSubAbility } : {}) }
+    : { source };
 
   if (query.phase === 'ability') return { step: 0, stage: 'ability', ...baseEntry };
   if (query.phase === 'basic') return { step: 1, stage: 'basic', ...baseEntry };

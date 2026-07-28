@@ -23,16 +23,6 @@
           </header>
 
           <TaskTemplateOutputCardGrid :model-value="modelValue" :visible-group-keys="visibleGroupKeys" :errors="validationErrors" @update:model-value="handleModelUpdate" />
-
-          <section class="step4-global-settings" aria-labelledby="global-setting-title">
-            <h3 id="global-setting-title">全局输出与过程设置</h3>
-            <div class="global-setting-grid">
-              <label v-for="item in globalSettingItems" :key="item.key" class="global-setting-item">
-                <span><b>{{ item.title }}</b><span class="global-switch"><input :checked="modelValue.global[item.key]" type="checkbox" @change="updateGlobal(item.key, $event.target.checked)" /><i></i><em>{{ modelValue.global[item.key] ? '启用' : '停用' }}</em></span></span>
-                <small>{{ item.description }}</small>
-              </label>
-            </div>
-          </section>
         </section>
 
         <footer class="step4-actions">
@@ -51,7 +41,7 @@ import { computed, ref } from 'vue';
 import AuditIcon from '../../components/common/AuditIcon.vue';
 import TaskTemplateOutputCardGrid from './TaskTemplateOutputCardGrid.vue';
 import TaskCreateConfirmationAside from './TaskCreateConfirmationAside.vue';
-import { capabilityDefinitions, cloneTemplateOutputSettings, createPreSubmitSummary, getVisibleSettingGroups, referenceMaterials, referenceTaskSummary, validateTemplateOutputSettings } from '../../domain/taskCreate/taskTemplateOutputSettings.js';
+import { capabilityDefinitions, createPreSubmitSummary, getVisibleSettingGroups, referenceMaterials, referenceTaskSummary, validateTemplateOutputSettings } from '../../domain/taskCreate/taskTemplateOutputSettings.js';
 
 const props = defineProps({
   modelValue: { type: Object, required: true },
@@ -68,18 +58,6 @@ const visibleGroupKeys = computed(() => getVisibleSettingGroups(selectedCapabili
 const summary = computed(() => createPreSubmitSummary({ taskSummary: props.taskSummary, selectedCapabilityIds: selectedCapabilityIds.value, materials: props.materials, settings: props.modelValue }));
 const validationErrors = ref({});
 const validationMessage = computed(() => Object.values(validationErrors.value)[0] || '');
-const globalSettingItems = [
-  { key: 'aiGeneratedLabel', title: '启用AI生成标识', description: '在生成内容中标识 AI 生成来源' },
-  { key: 'multiModelReview', title: '启用多模型复核', description: '使用多模型交叉复核关键结果' },
-  { key: 'saveProcessVersions', title: '保存过程版本', description: '按阶段保存过程版本与快照' },
-  { key: 'exportAuditTrail', title: '导出操作留痕', description: '导出文件包含操作日志与流转记录' }
-];
-
-function updateGlobal(key, value) {
-  const next = cloneTemplateOutputSettings(props.modelValue);
-  next.global[key] = value;
-  emit('update:modelValue', next);
-}
 function handleModelUpdate(next) {
   validationErrors.value = {};
   emit('update:modelValue', next);

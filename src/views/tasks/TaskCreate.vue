@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="task-create-page" :class="{ 'parsing-page': step === 3 && stepFourStage === 'parsing', 'template-output-page': step === 4 && stepFourStage === 'template' }" data-page="task-create">
     <header v-if="step <= 1" class="create-title-row">
       <RouterLink class="create-back" to="/tasks" aria-label="返回任务中心"><AuditIcon name="collapse" /></RouterLink>
@@ -75,7 +75,34 @@
    
       <nav class="wizard-steps compact" :class="{ 'parsing-stage': step === 3 && stepFourStage === 'parsing' }" aria-label="创建审计任务步骤"><template v-for="(item, index) in steps" :key="item"><button class="wizard-step" :class="{ active: step === index, done: step > index }" type="button" :disabled="index > step" @click="goStep(index)"><span class="step-number"><FontAwesomeIcon v-if="step > index && !(step === 3 && stepFourStage === 'parsing' && index === 2)" :icon="faCheck" /><template v-else>{{ index + 1 }}</template></span><span>{{ item }}</span></button><i v-if="index < steps.length - 1" class="step-connector" aria-hidden="true"></i></template></nav>
       <header v-if="step !== 2 && !(step === 3 && stepFourStage === 'parsing')"><p>步骤 {{ step + 1 }} / 5</p><h3>{{ steps[step] }}</h3><span>{{ stepHelp }}</span></header>
-      <div v-if="step === 0" class="ability-grid" role="radiogroup" aria-label="选择审计能力"><button v-for="capability in availableCapabilities" :key="capability.id" class="ability-card" :class="{ selected: selectedIds.includes(capability.id) }" type="button" role="radio" :aria-checked="selectedIds.includes(capability.id)" @click="selectCapability(capability.id)"><span class="ability-icon" :class="capability.colorClass">{{ capability.icon }}</span><span><b>{{ capability.name }}</b><small>{{ capability.description }}</small></span></button></div>
+      <div v-if="step === 0" class="ability-grid" role="radiogroup" aria-label="选择审计能力">
+        <article
+          v-for="capability in availableCapabilities"
+          :key="capability.id"
+          class="ability-card"
+          :class="{ selected: selectedIds.includes(capability.id) }"
+          role="radio"
+          tabindex="0"
+          :aria-checked="selectedIds.includes(capability.id)"
+          @click="selectCapability(capability.id)"
+          @keydown.enter.prevent="selectCapability(capability.id)"
+          @keydown.space.prevent="selectCapability(capability.id)"
+        >
+          <span class="ability-icon" :class="capability.colorClass">{{ capability.icon }}</span>
+          <span><b>{{ capability.name }}</b><small>{{ capability.description }}</small></span>
+        </article>
+      </div>
+      <section v-if="step === 0 && showExpenseSubAbilityPanel" class="expense-sub-ability-panel" aria-label="费用审计子能力">
+        <button
+          v-for="subAbility in expenseSubAbilities"
+          :key="subAbility.id"
+          type="button"
+          :class="{ active: selectedExpenseSubAbility === subAbility.id }"
+          @click="selectExpenseSubAbility(subAbility.id)"
+        >
+          {{ subAbility.label }}
+        </button>
+      </section>
       <div v-else-if="step === 2" class="materials-selection-page" data-step="material-selection">
         <div class="materials-workspace">
           <main class="materials-primary">
@@ -85,8 +112,8 @@
                 <button v-for="item in [{ key: 'local', label: '本地上传', icon: 'upload' }, { key: 'fileCenter', label: '文件中心选择', icon: 'files' }, { key: 'history', label: '历史任务复用', icon: 'records' }, { key: 'simulation', label: '平台资料复用', icon: 'report' }]" :key="item.key" :class="{ active: materialSource === item.key }" type="button" @click="selectMaterialSource(item.key)"><AuditIcon :name="item.icon" />{{ item.label }}</button>
               </nav>
               <div class="material-dropzone">
-                <span class="dropzone-icon"><AuditIcon name="upload" /></span><h3>拖拽文件或文件夹到此处</h3>
-                <div><button class="btn primary" type="button" @click="uploadMaterialRows(materialProgress.blockingItems.slice(0, 2).map((item) => item.id))">上传文件</button><button class="btn" type="button" @click="uploadMaterialRows(materialProgress.blockingItems.map((item) => item.id))">上传文件夹</button></div>
+                <span class="dropzone-icon"><AuditIcon name="upload" /></span><h3>拖拽文件到此处</h3>
+                <div><button class="btn primary" type="button" @click="uploadMaterialRows(materialProgress.blockingItems.slice(0, 2).map((item) => item.id))">上传文件</button></div>
                 <p>支持 PDF、Word、Excel、ZIP 等格式，单个文件最大 500MB，单次最多上传 20 个文件</p>
               </div>
             </section>
@@ -109,7 +136,7 @@
         @continue="continueToConfirmation"
       />
       <div v-else class="submit-summary"><h3>任务配置已完成</h3><p>提交后进入资料准备和文件导入流程，所有操作写入任务记录。</p></div>
-      <footer v-if="!(step === 3 && stepFourStage === 'parsing')" class="create-footer" :class="{ 'materials-footer': step === 2 }"><p>当前步骤 <strong>{{ step + 1 }}</strong> / 5</p><div><button class="btn" type="button" @click="saveDraft">保存草稿</button><RouterLink v-if="step === 0" class="btn" to="/tasks">取消</RouterLink><button v-else class="btn" type="button" @click="goBack">上一步</button><button v-if="step < steps.length - 1" class="btn primary" type="button" :disabled="(step === 0 && !selectedIds.length) || (step === 2 && !materialProgress.canProceed)" @click="goNext">{{ nextStepButtonText }}</button><button v-else class="btn primary" type="button" @click="submitTaskAndReturn">提交任务</button></div></footer>
+      <footer v-if="!(step === 3 && stepFourStage === 'parsing')" class="create-footer" :class="{ 'materials-footer': step === 2 }"><p>当前步骤 <strong>{{ step + 1 }}</strong> / 5</p><div><button class="btn" type="button" @click="saveDraft">保存草稿</button><RouterLink v-if="step === 0" class="btn" to="/tasks">取消</RouterLink><button v-else class="btn" type="button" @click="goBack">上一步</button><button v-if="step < steps.length - 1" class="btn primary" type="button" :disabled="(step === 0 && !canLeaveAbilityStep) || (step === 2 && !materialProgress.canProceed)" @click="goNext">{{ nextStepButtonText }}</button><button v-else class="btn primary" type="button" @click="submitTaskAndReturn">提交任务</button></div></footer>
     </section>
   </section>
 </template>
@@ -147,6 +174,11 @@ const materialNotice = ref('');
 const materialRows = ref([]);
 const shouldAutoFillSimulation = ref(taskCreateEntry.stage === 'materials' && taskCreateEntry.source === 'simulation');
 const fieldRefs = {};
+const expenseSubAbilities = [
+  { id: 'expense-analysis', label: '费用审计分析' },
+  { id: 'expense-anomaly', label: '费用异常监控' },
+  { id: 'expense-trend', label: '费用趋势分析' }
+];
 const auditedUnits = ['上海分公司', '北京分公司', '深圳分公司', '总部经纪业务部'];
 const taskTypes = ['常规审计', '专项审计', '制度比对', '费用审计'];
 const dataScopeOptions = ['财务数据', '费用明细', '制度文件', '监管案例', '共享信息', '历史报告', '外部舆情'];
@@ -174,8 +206,12 @@ const requiredChecks = computed(() => [
   { label: '负责人', complete: Boolean(form.owner) },
   { label: '选择审计能力', complete: Boolean(selectedIds.value.length) }
 ]);
-const availableCapabilities = computed(() => capabilities);
+const hiddenCapabilityIds = new Set(['policy-query', 'policy-change', 'policy-compare']);
+const availableCapabilities = computed(() => capabilities.filter((item) => !hiddenCapabilityIds.has(item.id)));
 const selectedIds = ref(getInitialSelectedCapabilityIds(taskCreateEntry));
+const selectedExpenseSubAbility = ref(taskCreateEntry.expenseSubAbility || '');
+const showExpenseSubAbilityPanel = computed(() => selectedIds.value.includes('expense'));
+const canLeaveAbilityStep = computed(() => selectedIds.value[0] !== 'expense' || Boolean(selectedExpenseSubAbility.value));
 const selectedCapabilities = computed(() => availableCapabilities.value.filter((item) => selectedIds.value.includes(item.id)));
 const selectedAbilityNames = computed(() => selectedCapabilities.value.map((item) => item.name));
 const templateTaskSummary = computed(() => ({
@@ -197,7 +233,8 @@ const nextStepButtonText = computed(() => {
 
 function setFieldRef(name, element) { if (element) fieldRefs[name] = element; }
 function getInitialSelectedCapabilityIds(entry) {
-  return capabilities.some((item) => item.id === entry.capabilityId) ? [entry.capabilityId] : [capabilities[0].id];
+  const visibleCapabilities = capabilities.filter((item) => !hiddenCapabilityIds.has(item.id));
+  return visibleCapabilities.some((item) => item.id === entry.capabilityId) ? [entry.capabilityId] : [visibleCapabilities[0]?.id || capabilities[0].id];
 }
 function goStep(index) {
   if (index > step.value) return;
@@ -210,7 +247,14 @@ function goStep(index) {
   syncStepFourQuery('');
 }
 function removeParticipant(person) { form.participants = form.participants.filter((item) => item !== person); }
-function selectCapability(id) { selectedIds.value = [id]; }
+function selectCapability(id) {
+  selectedIds.value = [id];
+  if (id !== 'expense') selectedExpenseSubAbility.value = '';
+}
+function selectExpenseSubAbility(id) {
+  selectedIds.value = ['expense'];
+  selectedExpenseSubAbility.value = id;
+}
 function resetMaterialRows() {
   materialRows.value = createMaterialSelectionRows(form.taskType, selectedAbilityNames.value);
   materialNotice.value = '';
@@ -269,17 +313,23 @@ function goBack() {
   else if (step.value === 2) syncStepFourQuery('materials');
   else syncStepFourQuery('');
 }
-watch(() => [route.query.capability, route.query.ability, route.query.preselect], () => {
+watch(() => [route.query.capability, route.query.ability, route.query.preselect, route.query.expenseSubAbility, route.query.subAbility, route.query.expenseAbility], () => {
   const nextEntry = resolveTaskCreateEntry(route.query);
   const nextSelectedIds = getInitialSelectedCapabilityIds(nextEntry);
   selectedIds.value = nextSelectedIds;
+  selectedExpenseSubAbility.value = nextEntry.expenseSubAbility || '';
   if (nextEntry.taskType) form.taskType = nextEntry.taskType;
 });
 watch(() => form.taskType, () => { if (!selectedIds.value.length) selectedIds.value = [capabilities[0].id]; });
 watch(() => form.owner, () => { form.participants = form.participants.filter((person) => person !== form.owner); });
 watch([() => form.taskType, selectedAbilityNames], resetMaterialRows, { immediate: true });
 async function goNext() {
-  if (step.value === 0) { step.value = 1; syncStepFourQuery('basic'); return; }
+  if (step.value === 0) {
+    if (!canLeaveAbilityStep.value) return;
+    step.value = 1;
+    syncStepFourQuery('basic');
+    return;
+  }
   if (step.value === 1) {
     errors.value = validateTaskCreateForm(form);
     const firstInvalid = ['taskName', 'auditedUnit', 'auditPeriod', 'taskType', 'owner'].find((key) => errors.value[key]);
@@ -296,6 +346,7 @@ async function goNext() {
 
 <style scoped>
 .task-create-page{--create-red:var(--color-primary);--create-line:#dfe5ed;--create-soft:#f6f8fb;--create-muted:#778497;box-sizing:border-box;width:100%;max-width:none;margin:0;padding:12px 14px 22px;color:#202938}.create-title-row{display:flex;align-items:center;gap:16px;height:50px;padding:0 4px}.create-title-row h2{margin:0;font-size:24px;line-height:1.2}.create-back{display:grid;width:28px;height:28px;place-items:center;color:#273345}.create-back .audit-icon{width:22px;font-size:22px}.create-workspace{display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:10px;align-items:start}.create-primary-column{min-width:0}.task-create-card,.scope-risk-card,.create-footer,.guide-card,.materials-card,.downstream-panel{box-sizing:border-box;border:1px solid var(--create-line);border-radius:5px;background:#fff}.task-create-card{overflow:hidden}.wizard-steps{display:flex;align-items:center;min-width:0;min-height:78px;padding:0 38px;border-bottom:1px solid var(--create-line)}.wizard-step{display:inline-flex;flex:0 0 auto;align-items:center;gap:12px;border:0;background:transparent;color:#596577;font:600 15px/1 inherit;white-space:nowrap}.wizard-step:disabled{cursor:default}.wizard-step:not(:disabled){cursor:pointer}.step-number{display:grid;width:30px;height:30px;place-items:center;border:1px solid #b9c2cf;border-radius:50%;background:#fff;color:#374151;font-size:14px;font-weight:500}.wizard-step.active{color:var(--create-red)}.wizard-step.active .step-number,.wizard-step.done .step-number{border-color:var(--create-red);background:var(--create-red);color:#fff}.wizard-step.done{color:#283446}.step-connector{display:block;flex:1 1 32px;min-width:26px;max-width:68px;height:1px;margin:0 18px;background:#dce2eb}.basic-info-section{padding:18px 28px 20px}.basic-info-section h3,.scope-risk-card h3,.guide-card h3,.materials-card h3{margin:0;font-size:18px;line-height:1.35}.basic-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 46px;margin-top:14px}.form-field{display:grid;grid-template-columns:94px minmax(0,1fr);align-items:start;gap:16px;min-width:0;font-size:14px;line-height:38px}.form-field>span{font-weight:600;white-space:nowrap}.form-field b,.data-scope b,.risk-level b{color:var(--create-red)}.form-field>div{position:relative;min-width:0}.form-field input,.form-field select,.form-field textarea,.participant-picker{box-sizing:border-box;width:100%;border:1px solid #d7dee8;border-radius:5px;background:#fff;color:#2f3a4a;font:400 14px/1.45 inherit}.form-field input,.form-field select{height:38px;padding:0 11px}.form-field textarea{display:block;height:114px;padding:9px 11px;resize:vertical}.form-field input:focus,.form-field select:focus,.form-field textarea:focus,.participant-picker:focus-within{border-color:var(--create-red);outline:2px solid rgba(199,0,0,.1)}.form-field small{display:block;margin-top:6px;color:var(--create-muted);font-size:12px;line-height:1.45}.form-field em{position:absolute;right:10px;bottom:30px;color:#697789;font-size:12px;font-style:normal;line-height:1}.field-error{margin:5px 0 0;color:var(--create-red);font-size:12px;line-height:1.3}.date-range{display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);align-items:center;gap:6px}.date-range i{color:#667386;font-style:normal;text-align:center}.participant-picker{position:relative;min-height:38px;line-height:1.2}.participant-picker summary{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-height:36px;padding:5px 28px 5px 8px;cursor:pointer;list-style:none}.participant-picker summary::-webkit-details-marker{display:none}.participant-picker summary:after{position:absolute;right:10px;top:13px;width:7px;height:7px;border-right:1px solid #667386;border-bottom:1px solid #667386;content:"";transform:rotate(45deg)}.participant-placeholder{color:#8b96a5;font-size:13px}.participant-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 7px;border-radius:4px;background:#f1f3f6;color:#344054;font-size:12px}.participant-tag button{padding:0;border:0;background:none;color:#687588;font:inherit;cursor:pointer}.participant-options{position:absolute;z-index:2;top:42px;right:0;left:0;display:grid;gap:5px;padding:8px;border:1px solid #d7dee8;border-radius:5px;background:#fff;box-shadow:0 8px 18px rgba(22,32,51,.1)}.participant-options label{display:flex;align-items:center;gap:7px;padding:3px 4px;font-size:13px;line-height:1.4}.participant-options input,.scope-choice-list input,.risk-option-list input{width:14px;height:14px;margin:0;accent-color:var(--create-red)}.form-field-textarea{line-height:1.4}.scope-risk-card{margin-top:8px;padding:17px 28px 22px}.scope-risk-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:30px;margin-top:18px}.scope-risk-card fieldset{min-width:0;margin:0;padding:0;border:0}.scope-risk-card legend{padding:0;margin-bottom:10px;font-size:14px;font-weight:600}.scope-choice-list{display:flex;flex-wrap:wrap}.scope-choice-list label{display:flex;align-items:center;gap:7px;height:46px;padding:0 10px;border:1px solid #e1e6ed;margin:-1px 0 0 -1px;font-size:13px;white-space:nowrap}.data-scope p{margin:12px 0 0;color:var(--create-muted);font-size:12px}.risk-option-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.risk-option-list label{display:flex;gap:8px;min-height:70px;padding:12px;border:1px solid #e0e6ed;border-radius:5px;cursor:pointer}.risk-option-list label.selected{border-color:#e36a6a;background:#fffafa}.risk-option-list span{display:grid;gap:5px}.risk-option-list strong{font-size:14px}.risk-option-list small{color:var(--create-muted);font-size:12px;line-height:1.35}.create-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px;padding:18px 22px}.create-footer p{margin:0;font-size:14px}.create-footer p strong{padding:0 4px;color:var(--create-red);font-size:18px}.create-footer p span{margin-left:8px;color:#258554;font-size:12px}.create-footer>div{display:flex;gap:12px}.btn{display:inline-flex;min-width:136px;height:38px;align-items:center;justify-content:center;box-sizing:border-box;border:1px solid #d2d9e4;border-radius:5px;background:#fff;color:#344054;font:500 14px/1 inherit;text-decoration:none;cursor:pointer}.btn.primary{min-width:226px;border-color:var(--create-red);background:var(--create-red);color:#fff;font-weight:600}.create-guide-column{display:grid;gap:18px;min-width:0}.guide-card,.materials-card{padding:14px}.guide-card>h3,.materials-card>h3{margin-bottom:14px}.guide-callout{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;margin-top:12px;padding:12px;border:1px solid #e0e5ec;border-radius:5px;background:#fafbfd}.guide-callout>span{display:grid;width:32px;height:32px;place-items:center;border-radius:50%;font-size:18px}.guide-callout.blue>span{background:#eaf2ff;color:#2770e5}.guide-callout.green>span{background:#eaf9f0;color:#1da35a}.guide-callout.orange>span{background:#fff4e9;color:#ed811f}.guide-callout b{font-size:14px}.guide-callout p{margin:6px 0 0;color:#6f7d8f;font-size:12px;line-height:1.55}.required-checks{margin-top:12px;padding:0 12px 12px;border:1px solid #e0e5ec;border-radius:5px;background:#fafbfd}.required-checks .guide-callout{padding:12px 0 8px;margin:0;border:0;border-bottom:1px solid #e7ebf1;border-radius:0;background:transparent}.required-checks ul{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}.required-checks li{display:flex;align-items:center;gap:8px;color:#d85c1d;font-size:13px}.required-checks li.ready{color:#229953}.required-checks li .audit-icon{width:16px;font-size:16px}.materials-card ul{display:grid;gap:11px;margin:0;padding:0;list-style:none}.materials-card li{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px}.materials-card li>span{display:flex;align-items:center;gap:8px;min-width:0}.materials-card .audit-icon{width:16px;color:#5a6878;font-size:16px}.materials-card b{padding:3px 7px;border-radius:4px;background:#f1f4f8;color:#687587;font-size:12px;font-weight:500}.materials-card b.required{background:#fff0f0;color:var(--create-red)}.downstream-panel{padding:0 26px 18px}.downstream-panel>header{padding:20px 0;border-bottom:1px solid var(--create-line)}.downstream-panel>header p{margin:0;color:var(--create-red);font-size:12px;font-weight:600}.downstream-panel>header h3{margin:6px 0;font-size:20px}.downstream-panel>header span{color:var(--create-muted);font-size:13px}.wizard-steps.compact{min-height:64px;padding:0}.ability-grid,.summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:18px}.ability-card,.summary-grid article{min-height:96px;padding:13px;border:1px solid #e0e5ec;border-radius:5px;background:#fff;text-align:left}.ability-card{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;cursor:pointer}.ability-card.selected{border-color:var(--create-red);background:#fffafa}.ability-icon{display:grid;width:32px;height:32px;place-items:center;border-radius:5px;color:#fff;font-size:13px;font-weight:700}.blue{background:var(--color-info)}.orange{background:#e98723}.teal{background:#239c9d}.purple{background:#7b61b8}.green{background:#248a59}.red{background:#cf3038}.ability-card b,.summary-grid b{display:block;font-size:14px}.ability-card small,.summary-grid p{display:block;margin-top:5px;color:var(--create-muted);font-size:12px;line-height:1.5}.summary-grid p{margin-bottom:0}.submit-summary{padding:28px 0}.submit-summary h3{margin:0;font-size:18px}.submit-summary p{color:var(--create-muted);font-size:13px}
+.ability-card:focus-visible{outline:2px solid rgba(199,0,0,.24);outline-offset:2px}.expense-sub-ability-panel{display:flex;min-height:38px;align-items:center;gap:10px;margin:6px 0 2px;padding:5px 12px;border:1px solid #e0e5ec;border-radius:5px;background:#f3f6fa}.expense-sub-ability-panel button{height:28px;padding:0 13px;border:1px solid #d6dde7;border-radius:4px;background:#fff;color:#465364;font-size:12px;font-weight:600;cursor:pointer}.expense-sub-ability-panel button.active{border-color:var(--create-red);background:#fffafa;color:var(--create-red);box-shadow:inset 0 0 0 1px rgba(199,0,0,.08)}
 @media (max-width:1199px){.create-workspace{grid-template-columns:1fr}.create-guide-column{grid-template-columns:repeat(2,minmax(0,1fr));order:2}.basic-form-grid{gap:22px 28px}.scope-risk-grid{grid-template-columns:1fr}.create-title-row{height:46px}.wizard-steps{padding:0 22px}}
 @media (max-width:899px){.task-create-page{padding:8px 12px 18px}.create-title-row h2{font-size:21px}.wizard-steps{overflow-x:auto;padding:0 12px}.wizard-step{gap:8px;font-size:13px}.step-connector{flex:0 0 28px;min-width:28px;margin:0 8px}.basic-info-section,.scope-risk-card{padding:16px}.basic-form-grid{grid-template-columns:1fr;gap:18px}.form-field{grid-template-columns:86px minmax(0,1fr);gap:10px;font-size:13px}.form-field-textarea{grid-template-columns:1fr}.scope-risk-grid{gap:20px}.risk-option-list{grid-template-columns:1fr}.risk-option-list label{min-height:56px}.create-guide-column{grid-template-columns:1fr;gap:10px}.create-footer{align-items:stretch;flex-direction:column;padding:14px}.create-footer>div{display:grid;grid-template-columns:1fr;gap:8px}.btn,.btn.primary{width:100%;min-width:0}.downstream-panel{padding:0 14px 14px}.ability-grid,.summary-grid{grid-template-columns:1fr}.wizard-steps.compact{padding:0;overflow:auto}.wizard-steps.compact .wizard-step span:last-child{display:none}}
 @media (max-width:430px){.form-field{grid-template-columns:1fr;gap:6px}.form-field>span{line-height:1.3}.date-range{grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr);gap:4px}.date-range input{padding:0 4px;font-size:12px}.scope-choice-list label{height:40px;padding:0 8px;font-size:12px}.create-title-row{padding:0}.guide-card,.materials-card{padding:12px}}

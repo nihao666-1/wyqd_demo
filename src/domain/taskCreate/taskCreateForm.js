@@ -14,7 +14,7 @@ export const initialTaskCreateForm = {
 
 export const taskTypeProfiles = {
   '常规审计': {
-    abilities: ['制度查询', '制度变更', '制度比对', '监管案例舆情分析', '审计规范生成', '监督共享信息分析', '费用审计', '报告生成', '报告审核'],
+    abilities: ['监管案例舆情分析', '审计规范生成', '监督共享信息分析', '费用审计', '报告生成', '报告审核'],
     materials: ['审计通知书', '财务报表', '费用明细台账'],
     template: '常规审计报告模板'
   },
@@ -69,8 +69,8 @@ const materialRequirementsByTaskType = {
 const materialSelectionBlueprint = [
   { id: 'financial-statement', name: '财务报表（2025年Q1）', required: true, blocking: true, abilities: ['费用审计', '报告生成'] },
   { id: 'expense-ledger', name: '费用明细台账（2025年Q1）', required: true, blocking: true, abilities: ['费用审计'] },
-  { id: 'policy-files', name: '相关制度文件（最新版）', required: true, abilities: ['制度查询', '制度比对'], source: '文件中心', uploadStatus: '已上传', parseStatus: '待解析' },
-  { id: 'budget-execution', name: '预算执行情况表', required: true, abilities: ['费用审计'], source: '历史任务复用', uploadStatus: '已上传', parseStatus: '待解析' },
+  { id: 'policy-files', name: '相关制度文件（最新版）', required: true, abilities: ['制度文件'], source: '文件中心', uploadStatus: '已上传', parseStatus: '待处理' },
+  { id: 'budget-execution', name: '预算执行情况表', required: true, abilities: ['费用审计'], source: '历史任务复用', uploadStatus: '已上传', parseStatus: '待处理' },
   { id: 'regulatory-library', name: '监管案例与舆情库', required: true, abilities: ['监管案例舆情分析'] },
   { id: 'audit-workpapers', name: '审计底稿与工作底稿', required: false, abilities: ['报告生成', '报告审核'], source: '文件中心', uploadStatus: '已选择' },
   { id: 'fixed-assets', name: '固定资产明细表', required: false, abilities: ['费用审计'] },
@@ -135,7 +135,7 @@ export function applyMaterialSource(rows, ids, source) {
   const selected = new Set(ids);
   const label = materialSourceLabels[source] || materialSourceLabels.local;
   return rows.map((row) => selected.has(row.id)
-    ? { ...row, source: label, uploadStatus: '已上传', parseStatus: '待解析' }
+    ? { ...row, source: label, uploadStatus: '已上传', parseStatus: '待处理' }
     : { ...row }
   );
 }

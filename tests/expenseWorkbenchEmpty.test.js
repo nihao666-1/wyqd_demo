@@ -138,7 +138,9 @@ test('费用审计新建类入口进入创建审计任务并预选费用审计',
   const content = read(workbenchUrl);
   const router = read(routerUrl);
 
-  assert.equal((content.match(/path:\s*'\/tasks\/create', query: \{ capability: 'expense' \}/g) || []).length, 3);
-  assert.match(router, /path:\s*['"]\/expense\/usage\/new['"][\s\S]*redirect:\s*\{\s*path:\s*['"]\/tasks\/create['"],\s*query:\s*\{\s*capability:\s*['"]expense['"]\s*\}\s*\}/);
+  for (const subAbility of ['analysis', 'anomaly', 'trend']) {
+    assert.match(content, new RegExp(`path:\\s*'\\/tasks\\/create', query: \\{ capability: 'expense', expenseSubAbility: '${subAbility}' \\}`));
+  }
+  assert.match(router, /path:\s*['"]\/expense\/usage\/new['"][\s\S]*redirect:\s*\{\s*path:\s*['"]\/tasks\/create['"],\s*query:\s*\{\s*capability:\s*['"]expense['"],\s*expenseSubAbility:\s*['"]analysis['"]\s*\}\s*\}/);
 });
 

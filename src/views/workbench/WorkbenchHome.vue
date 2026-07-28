@@ -35,7 +35,7 @@
             <div class="welcome-copy">
               <span class="eyebrow">审计工作台</span>
               <h2>欢迎使用审计大模型系统</h2>
-              <strong>当前暂无需要你处理的事项</strong>
+              <strong>当前暂无审计任务</strong>
               <p>
                 审计工作台用于展示当前登录用户可使用的能力、本人待办、最近任务和近期成果；统一任务查询和完整筛选仍在任务中心完成。
               </p>
@@ -327,28 +327,28 @@ const capabilityMetrics = computed(() => buildCapabilityMetrics(false));
 const startCards = [
   {
     icon: 'create',
-    title: '创建审计任务',
+    title: '创建常规审计任务',
     description: '进入统一创建流程，只选择一期已开放的任务类能力。',
     steps: ['选择能力', '上传资料', '提交任务'],
     to: '/tasks/create'
   },
   {
     icon: 'upload',
-    title: '上传基础资料',
+    title: '从文件中心导入资料',
     description: '优先完成文件上传、多文件上传和基础查看。',
     steps: ['上传文件', '解析状态', '查看文件'],
     to: '/files'
   },
   {
     icon: 'tasks',
-    title: '查看任务中心',
-    description: '统一查询本人、本部门和权限范围内的审计任务。',
-    steps: ['筛选任务', '进入详情', '查看时间线'],
-    to: '/tasks'
+    title: '体验知识库智能体',
+    description: '进入制度知识与审计规范能力，体验一期智能检索和生成。',
+    steps: ['制度检索', '规范生成', '引用结果'],
+    to: '/audit-standard/policy'
   },
   {
     icon: 'config',
-    title: '维护一期配置',
+    title: '维护模板与规则',
     description: '维护报告模板、规范模板、费用规则、标签和权限菜单。',
     steps: ['模板配置', '规则配置', '权限配置'],
     to: '/config'

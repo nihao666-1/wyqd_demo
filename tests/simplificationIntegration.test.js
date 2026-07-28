@@ -38,7 +38,7 @@ test('legacy short-step routes redirect into consolidated workspaces', () => {
     ['/audit-standard/upload', "/audit-standard/library', query: { action: 'upload' }"],
     ['/audit-standard/diff', "/audit-standard/library', query: { panel: 'diff' }"],
     ['/audit-standard/precheck', "/audit-standard/generate', query: { step: 'precheck' }"],
-    ['/expense/usage/new', "/tasks/create', query: { capability: 'expense' }"],
+    ['/expense/usage/new', "/tasks/create', query: { capability: 'expense', expenseSubAbility: 'analysis' }"],
     ['/expense/usage/drilldown', "/expense/usage/dashboard', query: { panel: 'drilldown' }"],
     ['/expense/usage/report', "/expense/usage/dashboard', query: { panel: 'report' }"],
     ['/audit-report/template-upload', "/audit-report/template', query: { action: 'upload' }"],

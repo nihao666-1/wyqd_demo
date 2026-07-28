@@ -263,7 +263,7 @@ const entries = [
     title: '费用综合分析',
     description: '对费用数据进行结构分析与统计汇总。',
     action: '新建综合分析',
-    to: { path: '/tasks/create', query: { capability: 'expense' } },
+    to: { path: '/tasks/create', query: { capability: 'expense', expenseSubAbility: 'analysis' } },
     tone: 'red',
     icon: faChartColumn,
     steps: ['选择数据快照', '预算执行分析', '汇总统计']
@@ -272,7 +272,7 @@ const entries = [
     title: '费用异常监控',
     description: '识别异常交易与合规风险点。',
     action: '新建异常监控',
-    to: { path: '/tasks/create', query: { capability: 'expense' } },
+    to: { path: '/tasks/create', query: { capability: 'expense', expenseSubAbility: 'anomaly' } },
     tone: 'orange',
     icon: faShieldHalved,
     steps: ['选择规则版本', '识别异常', '确认/排除']
@@ -281,7 +281,7 @@ const entries = [
     title: '费用趋势分析',
     description: '分析费用趋势与预测变化。',
     action: '新建趋势分析',
-    to: { path: '/tasks/create', query: { capability: 'expense' } },
+    to: { path: '/tasks/create', query: { capability: 'expense', expenseSubAbility: 'trend' } },
     tone: 'blue',
     icon: faChartLine,
     steps: ['设置对比周期', '趋势预测', '加入报告']

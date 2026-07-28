@@ -1,10 +1,10 @@
 const SUCCESS = '解析成功';
 const PARSING = '解析中';
-const FAILED = '解析失败';
-const DUPLICATE = '重复文件';
-const ABNORMAL = '格式异常';
-const PENDING = '待解析';
-const SKIPPED = '已跳过';
+const ABNORMAL = '解析异常';
+const PENDING = '待处理';
+const FAILED = ABNORMAL;
+const DUPLICATE = ABNORMAL;
+const SKIPPED = PENDING;
 
 const batchBlueprint = [
   {
@@ -307,7 +307,6 @@ function markSkipped(file) {
   return {
     ...file,
     parseStatus: SKIPPED,
-    progress: 100,
     failureReason: '',
     blocksSubmission: false,
     blockers: [],
@@ -333,18 +332,13 @@ export function createMaterialParsingBatch(sourceMaterials = []) {
 
 export function getParsingSummary(files) {
   const count = (status) => files.filter((file) => file.parseStatus === status).length;
-  const processedStatuses = new Set([SUCCESS, FAILED, DUPLICATE, ABNORMAL, SKIPPED]);
-  const totalProgress = files.reduce((sum, file) => sum + (Number(file.progress) || 0), 0);
 
   return {
-    percentage: files.length ? Math.round(totalProgress / files.length) : 0,
-    processed: files.filter((file) => processedStatuses.has(file.parseStatus)).length,
     total: files.length,
     success: count(SUCCESS),
     parsing: count(PARSING),
-    failed: count(FAILED),
-    duplicate: count(DUPLICATE),
-    abnormal: count(ABNORMAL)
+    abnormal: count(ABNORMAL),
+    pending: count(PENDING)
   };
 }
 

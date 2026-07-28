@@ -7,6 +7,7 @@ const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const appLayout = read('../src/components/layout/AppLayout.vue');
 const layoutCss = read('../src/styles/layout.css');
 const materialParsing = read('../src/views/tasks/MaterialParsingWorkspace.vue');
+const materialFileTable = read('../src/views/tasks/MaterialFileTable.vue');
 const supervisionResult = read('../src/views/supervision-result/SupervisionShareResult.vue');
 const regulatoryResult = read('../src/views/regulatory/RegulatoryResult.vue');
 const reportDraft = read('../src/views/audit-report/AuditReportDraft.vue');
@@ -54,7 +55,21 @@ test('shared shell uses native responsive sizing without whole-page scaling', ()
 
 test('large workspaces are not capped to legacy screenshot heights', () => {
   assert.match(materialParsing, /\.workspace-grid\s*\{[^}]*height:\s*calc\(var\(--shell-viewport-height[^}]*max-height:\s*none/s);
-  assert.match(materialParsing, /\.center-stack\s*\{[^}]*grid-template-rows:\s*minmax\(417px,\s*1fr\)/s);
+  assert.match(materialParsing, /\.workspace-grid\s*\{[^}]*height:\s*calc\(var\(--shell-viewport-height,\s*100vh\)\s*-\s*240px\)/s);
+  assert.doesNotMatch(materialParsing, /\.workspace-grid\s*\{[^}]*min-height:\s*620px/s);
+  assert.match(materialParsing, /\.workspace-grid\.detail-visible\s*\{[^}]*grid-template-columns:\s*minmax\(0,1fr\)\s+358px/s);
+  assert.match(materialParsing, /\.workspace-main,\.center-stack\s*\{[^}]*overflow:\s*hidden/s);
+  assert.match(materialParsing, /\.files-layout\s*\{[^}]*overflow:\s*hidden/s);
+  assert.match(materialParsing, /\.center-stack\s*\{[^}]*grid-template-columns:\s*minmax\(0,1fr\)/s);
+  assert.match(materialFileTable, /\.material-file-list\s*\{[^}]*width:\s*100%[^}]*max-width:\s*100%/s);
+  assert.match(materialFileTable, /\.desktop-table\s*\{[^}]*width:\s*100%[^}]*max-width:\s*100%[^}]*overflow:\s*auto/s);
+  assert.match(materialParsing, /@media\(max-width:1199px\)\{[\s\S]*\.workspace-grid,\.workspace-grid\.detail-visible\{grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(materialParsing, /@media\(max-width:1199px\)\{[\s\S]*\.workspace-grid>:deep\(\.material-detail-rail\)\{[^}]*inset:58px 0 76px auto[^}]*height:auto/);
+  const desktopNarrowLayout = materialParsing.match(/@media\(max-width:1439px\)\{[^@]*\}/)?.[0] || '';
+  assert.doesNotMatch(desktopNarrowLayout, /position:fixed/);
+  assert.match(materialParsing, /\.center-stack\s*\{[^}]*grid-template-rows:\s*minmax\(0,1fr\)\s+minmax\(0,\.58fr\)\s+60px/s);
+  assert.match(materialParsing, /\.parsing-flow-footer\s*\{[^}]*min-height:\s*60px/s);
+  assert.match(materialParsing, /@media\(max-width:1439px\)\{[\s\S]*?\.workspace-grid\{[^}]*height:\s*calc\(var\(--shell-viewport-height,\s*100vh\)\s*-\s*328px\)/);
   assert.doesNotMatch(materialParsing, /(?:height|max-height):\s*711px/);
   assert.doesNotMatch(supervisionResult, /\.supervision-page\s*\{[^}]*height:\s*928px/s);
   assert.doesNotMatch(regulatoryResult, /\.reg-result-page\s*\{[^}]*height:\s*927px/s);

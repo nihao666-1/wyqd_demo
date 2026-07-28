@@ -21,21 +21,20 @@ function compileComponent(file) {
   assert.deepEqual(template.errors, []);
 }
 
-test('能力配置组件包含八个配置组和全部关键字段', () => {
+test('能力配置组件包含八个配置组且只开放业务模板和输出格式', () => {
   const content = source('TaskTemplateOutputCardGrid.vue');
   for (const marker of [
     'policyKnowledge', 'policyCompare', 'regulatoryAnalysis', 'auditStandard',
     'supervisionAnalysis', 'expenseAudit', 'reportGeneration', 'reportReview'
   ]) {
-    assert.match(content, new RegExp(`data-config-group="${marker}"`));
+    assert.match(content, new RegExp(`${marker}:`));
   }
-  for (const label of [
-    '知识库范围', '生效时间', '比对规则', '风险等级阈值', '审计规范模板',
-    '报告框架', '费用规则版本', '报告类型', '报告模板', '检查规则'
-  ]) {
+  for (const label of ['业务模板', '输出格式']) {
     assert.match(content, new RegExp(label));
   }
-  assert.match(content, /grid-template-columns:minmax\(0,45fr\) minmax\(0,55fr\)/);
+  for (const hiddenLabel of ['知识库范围', '生效时间', '比对规则', '风险等级阈值', '费用规则版本', '报告类型', '检查规则']) {
+    assert.doesNotMatch(content, new RegExp(hiddenLabel));
+  }
 });
 
 test('提交确认组件包含任务能力资料输出和风险五区', () => {
@@ -48,13 +47,11 @@ test('提交确认组件包含任务能力资料输出和风险五区', () => {
   assert.match(content, /输出结果/);
 });
 
-test('确认提交组合组件默认高亮第5步并包含四项全局设置和三项底部动作', () => {
+test('确认提交组合组件默认高亮第5步并只保留三项底部动作', () => {
   const content = source('TaskCreateTemplateOutputStep.vue');
   assert.match(content, /currentStep:\s*\{ type: Number, default: 4 \}/);
-  for (const marker of [
-    'aiGeneratedLabel', 'multiModelReview', 'saveProcessVersions', 'exportAuditTrail'
-  ]) {
-    assert.match(content, new RegExp(marker));
+  for (const marker of ['aiGeneratedLabel', 'multiModelReview', 'saveProcessVersions', 'exportAuditTrail', '全局输出与过程设置']) {
+    assert.doesNotMatch(content, new RegExp(marker));
   }
   for (const label of ['保存草稿', '上一步', '提交任务']) {
     assert.match(content, new RegExp(label));

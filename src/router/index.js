@@ -67,7 +67,7 @@ export const routes = [
   { path: '/supervision/report/draft', component: SupervisionReportDraft, meta: { title: '监督共享报告草稿' } },
   { path: '/expense/workbench', component: ExpenseWorkbench, meta: { title: '费用审计入口' } },
   { path: '/expense/audit/overview', component: ExpenseAuditOverview, meta: { title: '费用审计分析' } },
-  { path: '/expense/usage/new', redirect: { path: '/tasks/create', query: { capability: 'expense' } } },
+  { path: '/expense/usage/new', redirect: { path: '/tasks/create', query: { capability: 'expense', expenseSubAbility: 'analysis' } } },
   { path: '/expense/usage/dashboard', component: ExpenseUsageDashboard, meta: { title: '费用趋势分析' } },
   { path: '/expense/usage/drilldown', redirect: { path: '/expense/usage/dashboard', query: { panel: 'drilldown' } } },
   { path: '/expense/usage/report', redirect: { path: '/expense/usage/dashboard', query: { panel: 'report' } } },

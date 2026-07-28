@@ -60,23 +60,25 @@ test('隐藏报告审核能力不会隐藏报告生成配置组', () => {
   assert.equal(visibleKeys.includes('reportReview'), false);
 });
 
-test('模板输出校验定位缺失模板输出格式和审核规则', () => {
+test('模板输出校验定位缺失业务模板和输出格式', () => {
   const settings = createTemplateOutputSettings();
   settings.reportGeneration.reportTemplate = '';
   settings.reportGeneration.outputFormats = [];
-  settings.reportReview.rules = [];
+  settings.reportReview.businessTemplate = '';
+  settings.reportReview.output = '';
 
   assert.deepEqual(validateTemplateOutputSettings(settings, allCapabilityIds), {
-    'reportGeneration.reportTemplate': '请选择报告模板',
-    'reportGeneration.outputFormats': '请至少选择一种报告输出格式',
-    'reportReview.rules': '请至少选择一项报告审核规则'
+    'reportGeneration.businessTemplate': '请选择业务模板',
+    'reportGeneration.output': '请至少选择一种输出格式',
+    'reportReview.businessTemplate': '请选择业务模板',
+    'reportReview.output': '请至少选择一种输出格式'
   });
 });
 
 test('移除报告能力后不校验对应的隐藏配置', () => {
   const settings = createTemplateOutputSettings();
   settings.reportGeneration.reportTemplate = '';
-  settings.reportReview.rules = [];
+  settings.reportReview.businessTemplate = '';
   const ids = allCapabilityIds.filter((id) => !['report-generate', 'report-review'].includes(id));
 
   assert.deepEqual(validateTemplateOutputSettings(settings, ids), {});
