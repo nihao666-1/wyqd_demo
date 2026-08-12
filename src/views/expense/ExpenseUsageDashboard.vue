@@ -99,7 +99,7 @@
       <section><h3>预测结果（未来 3 个月）</h3><table><thead><tr><th scope="col">期间</th><th scope="col">预测金额（元）</th><th scope="col">环比趋势</th><th scope="col">预算使用率预测</th></tr></thead><tbody><tr v-for="row in trend.forecast" :key="row.period"><td>{{ row.period }}</td><td>{{ row.expected }}</td><td class="up">↑</td><td>{{ row.usage }}</td></tr></tbody></table></section>
       <section><h3>建议关注点</h3><ul><li v-for="item in trend.insights.recommendations" :key="item">{{ item }}</li></ul></section>
       <footer class="insight-actions">
-        <button class="primary action-half" type="button" @click="router.push({ path: '/expense/usage/dashboard', query: { panel: 'report' } })">生成趋势报告</button>
+        <button class="primary action-half" type="button" @click="router.push({ path: '/expense/audit/overview', query: { tab: 'trend', panel: 'report' } })">生成趋势报告</button>
         <button class="outline action-half" type="button" @click="store.setNotice('趋势分析结论已加入本次审计重点清单。')">加入审计重点</button>
         <button class="export action-full" type="button" @click="exportExcel"><span aria-hidden="true">↓</span> 导出 Excel</button>
       </footer>
@@ -134,7 +134,7 @@ function signedClass(value) { return String(value).trim().startsWith('-') ? 'dow
 function judgementClass(value) { return value === '下降' ? 'down' : value === '平稳' ? 'stable' : 'up'; }
 function queryTrend() { store.setNotice(`已按 ${filters.organization} / ${filters.period} 刷新趋势分析。`); }
 function resetFilters() { Object.assign(filters, { organization: '上海分公司', period: '本年累计（2025-01 ~ 2025-04）', category: '全部', department: '全部', budgetScope: '年度预算', source: '全部' }); store.setNotice('费用趋势筛选条件已重置。'); }
-function drilldown(row) { router.push({ path: '/expense/usage/dashboard', query: { panel: 'drilldown', dimension: row.category, name: row.department } }); }
+function drilldown(row) { router.push({ path: '/expense/audit/overview', query: { tab: 'trend', panel: 'drilldown', dimension: row.category, name: row.department } }); }
 function exportExcel() {
   const lines = [['期间', '费用类别', '部门', '金额', '环比', '同比', '预算偏差', '预算偏差率', '趋势判断'].join(','), ...trend.value.detailRows.map((row) => [row.period, row.category, row.department, row.amount, row.mom, row.yoy, row.budgetDiff, row.budgetRate, row.judgement].join(','))];
   const blob = new Blob([`\uFEFF${lines.join('\n')}`], { type: 'text/csv;charset=utf-8' });

@@ -6,6 +6,16 @@
   <TaskDetailArchived v-if="showArchivedState" />
   <template v-if="!showArchivedState">
   <TaskDetailGenerating v-if="showGeneratingState" />
+  <ExpenseAnomalyTaskDetail
+    v-else-if="isExpenseAnomalyDetail"
+    :anomaly="selectedExpenseAnomaly"
+    :evidence="selectedExpenseEvidence"
+    :similar-rows="similarExpenseRows"
+    @back="backToExpenseAnomalyList"
+    @confirm="confirmExpenseAnomaly"
+    @exclude="excludeExpenseAnomaly"
+    @supplement="supplementExpenseAnomaly"
+  />
   <div v-else class="pending-task-detail" :class="{ 'trace-closed': !traceOpen }">
     <main class="central-workspace">
       <TaskDetailHeader
@@ -124,6 +134,7 @@ import CapabilityResultGrid from './task-detail/CapabilityResultGrid.vue';
 import PendingConfirmationTable from './task-detail/PendingConfirmationTable.vue';
 import VersionExportPreview from './task-detail/VersionExportPreview.vue';
 import EvidenceTracePanel from './task-detail/EvidenceTracePanel.vue';
+import ExpenseAnomalyTaskDetail from './task-detail/ExpenseAnomalyTaskDetail.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -131,7 +142,7 @@ const store = inject('store');
 const allTaskRows = computed(() => [...(store?.db.createdTasks || []), ...taskRows]);
 const selectedTask = computed(() => route.query.state === 'generating' ? undefined : allTaskRows.value.find((task) => task.id === route.query.taskId));
 const detailMode = computed(() => resolveTaskDetailMode({
-  explicitState: String(route.query.state || ''),
+  explicitState: route.query.tab === 'expense-anomaly' && route.query.anomalyId ? 'pending' : String(route.query.state || ''),
   statusKey: selectedTask.value?.statusKey || '',
   tab: String(route.query.tab || '')
 }));
@@ -139,6 +150,24 @@ const showDraftState = computed(() => detailMode.value === 'draft');
 const detailView = computed(() => resolveTaskDetailView(route.query, selectedTask.value));
 const showArchivedState = computed(() => detailView.value === 'archived');
 const showGeneratingState = computed(() => detailView.value === 'generating');
+const selectedExpenseAnomaly = computed(() => {
+  const anomalyId = String(route.query.anomalyId || '');
+  return store?.db.expenseAnomalies.find((row) => row.anomalyId === anomalyId) || null;
+});
+const selectedExpenseEvidence = computed(() => store?.db.expenseEvidenceChains.find((row) => row.anomalyId === selectedExpenseAnomaly.value?.anomalyId) || {});
+const similarExpenseRows = computed(() => {
+  if (!selectedExpenseAnomaly.value) return [];
+  const evidenceRows = (selectedExpenseEvidence.value.similarRecords || []).map((row) => ({
+    ...row,
+    type: selectedExpenseAnomaly.value.type,
+    status: row.status || row.riskLevel
+  }));
+  const sameTypeRows = store.db.expenseAnomalies
+    .filter((row) => row.anomalyId !== selectedExpenseAnomaly.value.anomalyId && row.type === selectedExpenseAnomaly.value.type)
+    .slice(0, Math.max(0, 3 - evidenceRows.length));
+  return [...evidenceRows, ...sameTypeRows].slice(0, 3);
+});
+const isExpenseAnomalyDetail = computed(() => String(route.query.tab || '') === 'expense-anomaly' && Boolean(selectedExpenseAnomaly.value));
 
 const taskState = ref(createTaskResultState());
 const activeTab = ref('results');
@@ -194,6 +223,25 @@ function selectItem(item) {
 function handleTabChange(tabId) {
   activeTab.value = tabId;
   if (tabId !== 'results') showToast('已切换栏目，可随时返回生成结果');
+}
+
+function backToExpenseAnomalyList() {
+  router.push({ path: '/expense/anomaly/dashboard' });
+}
+
+function confirmExpenseAnomaly(row) {
+  const result = store.decideExpenseAnomaly(row.anomalyId, 'confirm');
+  if (result.ok) showToast('\u8d39\u7528\u5f02\u5e38\u5df2\u786e\u8ba4');
+}
+
+function excludeExpenseAnomaly(row, reason) {
+  const result = store.decideExpenseAnomaly(row.anomalyId, 'exclude', { reason });
+  if (result.ok) showToast('\u8d39\u7528\u5f02\u5e38\u5df2\u6392\u9664');
+}
+
+function supplementExpenseAnomaly(row, note) {
+  const result = store.saveExpenseSupplement(row.anomalyId, note);
+  if (result.ok) showToast('\u8865\u5145\u8bf4\u660e\u5df2\u4fdd\u5b58');
 }
 
 function handleViewResult(ability) {

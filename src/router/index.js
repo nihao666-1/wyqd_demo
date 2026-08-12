@@ -22,7 +22,6 @@ import SupervisionReportDraft from '../views/supervision/SupervisionReportDraft.
 import ExpenseWorkbench from '../views/expense/ExpenseWorkbench.vue';
 import ExpenseAuditOverview from '../views/expense/ExpenseAuditOverview.vue';
 import ExpenseAnomalyDashboard from '../views/expense/ExpenseAnomalyDashboard.vue';
-import ExpenseUsageDashboard from '../views/expense/ExpenseUsageDashboard.vue';
 import AuditReportWorkbench from '../views/audit-report/AuditReportWorkbench.vue';
 import AuditReportTemplate from '../views/audit-report/AuditReportTemplate.vue';
 import AuditReportSourceSelect from '../views/audit-report/AuditReportSourceSelect.vue';
@@ -66,12 +65,12 @@ export const routes = [
   { path: '/supervision/report/source-select', component: SupervisionReportSourceSelect, meta: { title: '监督共享报告来源选择' } },
   { path: '/supervision/report/draft', component: SupervisionReportDraft, meta: { title: '监督共享报告草稿' } },
   { path: '/expense/workbench', component: ExpenseWorkbench, meta: { title: '费用审计入口' } },
-  { path: '/expense/audit/overview', component: ExpenseAuditOverview, meta: { title: '费用审计分析' } },
+  { path: '/expense/audit/overview', component: ExpenseAuditOverview, meta: { title: '费用分析看板' } },
   { path: '/expense/usage/new', redirect: { path: '/tasks/create', query: { capability: 'expense', expenseSubAbility: 'analysis' } } },
-  { path: '/expense/usage/dashboard', component: ExpenseUsageDashboard, meta: { title: '费用趋势分析' } },
-  { path: '/expense/usage/drilldown', redirect: { path: '/expense/usage/dashboard', query: { panel: 'drilldown' } } },
-  { path: '/expense/usage/report', redirect: { path: '/expense/usage/dashboard', query: { panel: 'report' } } },
-  { path: '/expense/anomaly/dashboard', component: ExpenseAnomalyDashboard, meta: { title: '费用异常监控' } },
+  { path: '/expense/usage/dashboard', redirect: { path: '/expense/audit/overview', query: { tab: 'trend' } } },
+  { path: '/expense/usage/drilldown', redirect: { path: '/expense/audit/overview', query: { tab: 'trend', panel: 'drilldown' } } },
+  { path: '/expense/usage/report', redirect: { path: '/expense/audit/overview', query: { tab: 'trend', panel: 'report' } } },
+  { path: '/expense/anomaly/dashboard', component: ExpenseAnomalyDashboard, meta: { title: '费用异常分析' } },
   { path: '/expense/anomaly/candidates', redirect: '/expense/anomaly/dashboard' },
   { path: '/audit-report/workbench', component: AuditReportWorkbench, meta: { title: '审计报告入口' } },
   { path: '/audit-report/template', component: AuditReportTemplate, meta: { title: '报告模板管理' } },

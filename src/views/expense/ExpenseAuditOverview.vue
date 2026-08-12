@@ -1,8 +1,20 @@
 <template>
-  <div class="expense-audit-overview-page route-fill-page" aria-label="费用审计分析">
-    <section class="overview-main">
+  <div class="expense-analysis-dashboard route-fill-page" aria-label="费用分析看板">
+    <nav class="top-tabs" aria-label="费用分析类型">
+      <button
+        v-for="tab in pageTabs"
+        :key="tab.id"
+        type="button"
+        :class="{ active: activeTab === tab.id }"
+        @click="setActiveTab(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    </nav>
+
+    <section v-if="activeTab === 'summary'" class="summary-view" aria-label="费用审计综合分析">
       <section class="filter-panel" aria-label="费用审计筛选">
-        <label v-for="filter in filters" :key="filter.label">
+        <label v-for="filter in filters" :key="filter.label" :class="filter.className">
           <span>{{ filter.label }}</span>
           <select v-if="filter.type === 'select'" :aria-label="filter.label">
             <option>{{ filter.value }}</option>
@@ -21,7 +33,6 @@
           <div>
             <p>{{ metric.label }}</p>
             <strong>{{ metric.value }}</strong>
-            <small>同比 <b>{{ metric.delta }}</b> ↑</small>
           </div>
         </article>
       </section>
@@ -33,12 +44,12 @@
             <span>单位：万元</span>
           </div>
           <div class="trend-legend">
-            <span><i class="blue"></i>实际金额（元）</span>
-            <span><i class="green"></i>预算金额（元）</span>
-            <span><i class="orange"></i>预算使用率（%）</span>
+            <span><i class="blue"></i>实际金额</span>
+            <span><i class="orange"></i>预算金额</span>
+            <span><i class="red"></i>预算使用率</span>
           </div>
           <div class="trend-plot">
-            <div class="trend-scale"><span>800万</span><span>600万</span><span>400万</span><span>200万</span><span>0</span></div>
+            <div class="trend-scale"><span>700</span><span>600</span><span>500</span><span>400</span><span>300</span><span>200</span><span>100</span><span>0</span></div>
             <div class="trend-bars">
               <div v-for="item in budgetTrend" :key="item.month" class="trend-month">
                 <div class="bar-pair">
@@ -48,10 +59,7 @@
                 <span>{{ item.month }}</span>
               </div>
               <svg class="trend-line" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
-                <polyline points="36,62 150,38 264,38" fill="none" stroke="var(--color-warning)" stroke-width="3" />
-                <circle cx="36" cy="62" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
-                <circle cx="150" cy="38" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
-                <circle cx="264" cy="38" r="4" fill="#fff" stroke="var(--color-warning)" stroke-width="3" />
+                <polyline points="36,70 150,52 264,50" fill="none" stroke="#ff3b30" stroke-width="3" />
               </svg>
             </div>
           </div>
@@ -60,9 +68,9 @@
         <article class="chart-card">
           <div class="chart-title"><h2>费用类别结构</h2></div>
           <div class="donut-layout">
-            <div class="donut category-donut"><span>费用总额<br /><b>12,856,230.45</b><br />元</span></div>
+            <div class="donut category-donut"><span><b>1,285.62万</b><br />费用总额</span></div>
             <ul class="chart-list">
-              <li v-for="item in categoryStructure" :key="item.name"><i :style="{ background: item.color }"></i><span>{{ item.name }}</span><b>{{ item.value }}</b></li>
+              <li v-for="item in categoryStructure" :key="item.name"><i :style="{ background: item.color }"></i><span>{{ item.name }}</span></li>
             </ul>
           </div>
         </article>
@@ -73,7 +81,6 @@
             <li v-for="item in employeeRank" :key="item.name">
               <span>{{ item.name }}</span>
               <i><b :style="{ width: `${item.percent}%` }"></b></i>
-              <strong>{{ item.value }}</strong>
             </li>
           </ul>
         </article>
@@ -81,398 +88,948 @@
         <article class="chart-card">
           <div class="chart-title"><h2>异常类型分布</h2></div>
           <div class="donut-layout">
-            <div class="donut anomaly-donut"><span>异常总额<br /><b>1,256,780.32</b><br />元</span></div>
+            <div class="donut anomaly-donut"><span><b>125.68万</b><br />异常总额</span></div>
             <ul class="chart-list">
-              <li v-for="item in anomalyTypes" :key="item.name"><i :style="{ background: item.color }"></i><span>{{ item.name }}</span><b>{{ item.value }}</b></li>
+              <li v-for="item in anomalyTypes" :key="item.name"><i :style="{ background: item.color }"></i><span>{{ item.name }}</span></li>
             </ul>
+          </div>
+        </article>
+
+        <article class="chart-card wide-chart anomaly-trend-card">
+          <div class="chart-title">
+            <h2>异常监控趋势</h2>
+            <div class="trend-legend">
+              <span><i class="blue"></i>异常笔数</span>
+              <span><i class="orange"></i>异常金额</span>
+              <span><i class="red"></i>同比金额</span>
+              <em>万元</em>
+            </div>
+          </div>
+          <div class="anomaly-trend">
+            <div class="trend-scale"><span>30</span><span>25</span><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span></div>
+            <div class="trend-bars">
+              <div v-for="item in anomalyTrend" :key="item.month" class="trend-month">
+                <div class="bar-pair">
+                  <i class="bar actual" :style="{ height: `${item.count}%` }"></i>
+                  <i class="bar budget" :style="{ height: `${item.amount}%` }"></i>
+                </div>
+                <span>{{ item.month }}</span>
+              </div>
+              <svg class="trend-line" viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="36,114 150,114 264,10" fill="none" stroke="#ff3b30" stroke-width="3" />
+              </svg>
+            </div>
+          </div>
+        </article>
+
+        <article class="chart-card compact-donut">
+          <div class="chart-title"><h2>异常类型占比</h2></div>
+          <div class="donut-layout">
+            <div class="donut anomaly-share-donut"><span><b>27 笔</b><br />异常总笔数</span></div>
+            <ul class="chart-list">
+              <li v-for="item in anomalyShare" :key="item.name"><i :style="{ background: item.color }"></i><span>{{ item.name }}</span><b>{{ item.value }}</b></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="chart-card rule-rank-card">
+          <div class="chart-title"><h2>规则命中排行（TOP10）</h2><span>单位：笔</span></div>
+          <ul class="horizontal-rank">
+            <li v-for="item in ruleRanking" :key="item.name">
+              <span>{{ item.name }}</span>
+              <i><b :style="{ width: `${item.percent}%` }"></b></i>
+            </li>
+          </ul>
+        </article>
+      </section>
+    </section>
+
+    <section v-else class="trend-compact-view" aria-label="费用趋势分析">
+      <section class="trend-compact-filter" aria-label="费用趋势筛选">
+        <label v-for="field in trendFilterFields" :key="field.key">
+          <span>{{ field.label }}</span>
+          <select>
+            <option v-for="option in field.options" :key="option">{{ option }}</option>
+          </select>
+        </label>
+        <div class="filter-actions">
+          <button class="primary" type="button">查询</button>
+          <button type="button">重置</button>
+        </div>
+      </section>
+
+      <section class="trend-metrics" aria-label="费用趋势指标">
+        <article v-for="metric in trendMetricCards" :key="metric.key" class="metric-card" :class="metric.tone">
+          <span class="metric-icon">{{ metric.icon }}</span>
+          <div>
+            <p>{{ metric.label }}</p>
+            <strong>{{ metric.value }} <small>{{ metric.unit }}</small></strong>
           </div>
         </article>
       </section>
 
-      <section class="exception-section" aria-label="费用异常分类明细">
-        <div class="exception-tabs">
-          <button v-for="tab in anomalyTabs" :key="tab.label" type="button" :class="{ active: tab.active }">{{ tab.label }} <span>({{ tab.count }})</span></button>
-          <button class="export" type="button">导出 Excel</button>
-        </div>
-        <div class="table-wrap">
+      <section class="trend-compact-charts" aria-label="费用趋势核心图表">
+        <article class="trend-panel">
+          <h2>费用月度趋势与预算对比</h2>
+          <div class="mini-bars">
+            <span v-for="item in trend.monthlyTrend" :key="item.month">
+              <i class="actual" :style="{ height: `${item.actual / monthlyMax * 100}%` }"></i>
+              <i class="budget" :style="{ height: `${item.budget / monthlyMax * 100}%` }"></i>
+              <b>{{ item.month.slice(5) }}</b>
+            </span>
+          </div>
+        </article>
+        <article class="trend-panel">
+          <h2>费用类别趋势</h2>
+          <div class="mini-stacks">
+            <span v-for="item in trend.categoryTrend" :key="item.month">
+              <i class="business" :style="{ height: `${item.business / categoryMax * 100}%` }"></i>
+              <i class="marketing" :style="{ height: `${item.marketing / categoryMax * 100}%` }"></i>
+              <i class="travel" :style="{ height: `${item.travel / categoryMax * 100}%` }"></i>
+              <i class="meeting" :style="{ height: `${item.meeting / categoryMax * 100}%` }"></i>
+              <b>{{ item.month.slice(5) }}</b>
+            </span>
+          </div>
+        </article>
+        <article class="trend-panel">
+          <div class="chart-title"><h2>部门费用排行（TOP10）</h2><span>单位：元</span></div>
+          <ul class="compact-rank">
+            <li v-for="item in trend.departmentRanking.slice(0, 8)" :key="item.department">
+              <span>{{ item.department }}</span>
+              <i><b :style="{ width: `${item.amount / departmentMax * 100}%` }"></b></i>
+            </li>
+          </ul>
+        </article>
+        <article class="trend-panel">
+          <h2>员工费用离群分析</h2>
+          <div class="mini-scatter">
+            <i v-for="item in trend.employeeOutliers" :key="item.employee" :class="item.level" :style="{ left: `clamp(8px, ${item.amount / 5 * 100}%, calc(100% - 8px))`, bottom: `clamp(8px, ${item.frequency / 30 * 100}%, calc(100% - 8px))` }"></i>
+          </div>
+        </article>
+      </section>
+
+      <section class="trend-compact-bottom" aria-label="费用趋势摘要和明细">
+        <article class="trend-panel warning-table">
+          <h2>趋势预警摘要</h2>
           <table>
-            <colgroup>
-              <col class="col-id" />
-              <col class="col-type" />
-              <col class="col-department" />
-              <col class="col-employee" />
-              <col class="col-amount" />
-              <col class="col-voucher" />
-              <col class="col-rule" />
-              <col class="col-status" />
-              <col class="col-actions" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>异常编号</th>
-                <th>异常类型</th>
-                <th>部门</th>
-                <th>员工</th>
-                <th>金额（元）</th>
-                <th>凭证</th>
-                <th>依据</th>
-                <th>状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="row in anomalyRows" :key="row.id">
-                <td>{{ row.id }}</td>
-                <td>{{ row.type }}</td>
-                <td>{{ row.department }}</td>
-                <td>{{ row.employee }}</td>
-                <td>{{ row.amount }}</td>
-                <td>{{ row.voucher }}</td>
-                <td>{{ row.rule }}</td>
-                <td><span class="risk-tag" :class="row.riskClass">{{ row.risk }}</span></td>
-                <td class="table-actions"><button type="button">查看详情</button><button type="button">确认异常</button><button type="button">排除异常</button></td>
-              </tr>
-            </tbody>
+            <thead><tr><th>预警类型</th><th>预警项数</th><th>本期金额（元）</th><th>环比</th><th>主要影响部门</th></tr></thead>
+            <tbody><tr v-for="row in trend.warningSummary" :key="row.type"><td>{{ row.type }}</td><td>{{ row.count }}</td><td>{{ row.amount }}</td><td class="up">{{ row.mom }}</td><td>{{ row.owner }}</td></tr></tbody>
           </table>
-        </div>
-        <footer class="table-footer">
-          <span>共 86 条</span>
-          <div><button type="button">‹</button><button class="active" type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><span>...</span><button type="button">9</button><button type="button">›</button><select aria-label="分页条数"><option>10 条/页</option></select><span>跳至</span><input value="1" aria-label="跳转页码" /><span>页</span></div>
-        </footer>
+        </article>
+        <article class="trend-panel detail-table">
+          <h2>费用趋势明细</h2>
+          <table>
+            <thead><tr><th>期间</th><th>费用类别</th><th>部门</th><th>金额（元）</th><th>预算偏差率</th><th>趋势判断</th></tr></thead>
+            <tbody><tr v-for="row in trend.detailRows" :key="`${row.period}-${row.category}-${row.department}`"><td>{{ row.period }}</td><td>{{ row.category }}</td><td>{{ row.department }}</td><td>{{ row.amount }}</td><td class="up">{{ row.budgetRate }}</td><td>{{ row.judgement }}</td></tr></tbody>
+          </table>
+        </article>
       </section>
     </section>
-
-    <aside class="detail-drawer" aria-label="费用异常详情">
-      <header>
-        <h2>费用异常详情</h2>
-        <button type="button" aria-label="关闭">×</button>
-      </header>
-      <section>
-        <h3>基本信息</h3>
-        <dl>
-          <div v-for="item in baseInfo" :key="item.label"><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
-        </dl>
-      </section>
-      <section>
-        <h3>凭证信息</h3>
-        <dl>
-          <div v-for="item in voucherInfo" :key="item.label"><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
-        </dl>
-      </section>
-      <section>
-        <h3>审批链路</h3>
-        <ol class="approval-chain">
-          <li v-for="item in approvalChain" :key="item.text" :class="item.status"><span></span><p>{{ item.text }}</p><time>{{ item.time }}</time></li>
-        </ol>
-      </section>
-      <section>
-        <h3>规则命中</h3>
-        <dl>
-          <div><dt>命中规则</dt><dd>超预算未审批</dd></div>
-          <div><dt>规则依据</dt><dd>《费用报销管理办法》第5条</dd></div>
-          <div><dt>规则说明</dt><dd>费用超出预算需提前审批或说明原因。</dd></div>
-        </dl>
-      </section>
-      <section>
-        <h3>相似记录（3）</h3>
-      </section>
-      <section>
-        <h3>人工处理</h3>
-        <div class="drawer-actions"><button class="primary" type="button">确认异常</button><button type="button">排除异常</button><button type="button">补充说明</button></div>
-      </section>
-    </aside>
   </div>
 </template>
 
 <script setup>
+import { computed, inject, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faChartLine, faCoins, faGaugeHigh, faReceipt, faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faExclamationCircle, faReceipt } from '@fortawesome/free-solid-svg-icons';
+
+const store = inject('store');
+const route = useRoute();
+const router = useRouter();
+const pageTabs = [
+  { id: 'summary', label: '综合分析' },
+  { id: 'trend', label: '趋势分析' }
+];
+
+const activeTab = ref(resolveTab(route));
+
+watch(
+  () => route.query.tab,
+  () => {
+    activeTab.value = resolveTab(route);
+  }
+);
+
+function resolveTab(currentRoute) {
+  return currentRoute.query.tab === 'trend' ? 'trend' : 'summary';
+}
+
+function setActiveTab(tab) {
+  activeTab.value = tab;
+  router.replace({ path: '/expense/audit/overview', query: tab === 'trend' ? { ...route.query, tab } : omitTab(route.query) });
+}
+
+function omitTab(query) {
+  const nextQuery = { ...query };
+  delete nextQuery.tab;
+  delete nextQuery.panel;
+  delete nextQuery.dimension;
+  delete nextQuery.name;
+  return nextQuery;
+}
 
 const filters = [
   { label: '被审计单位', value: '上海分公司', type: 'select' },
   { label: '审计期间', value: '2025年Q1（2025-01 ~ 2025-03）', type: 'select' },
-  { label: '费用类别', value: '全部', type: 'select' },
   { label: '部门', value: '全部', type: 'select' },
-  { label: '员工', value: '请输入员工姓名 / 工号', type: 'input' },
-  { label: '数据来源', value: '全部', type: 'select' }
+  { label: '员工', value: '请输入员工姓名 / 工号', type: 'input' }
 ];
 
 const metrics = [
-  { label: '费用总额', value: '12,856,230.45 元', delta: '+8.62%', icon: faCoins, tone: 'red' },
-  { label: '预算使用率', value: '82.45 %', delta: '+5.21%', icon: faGaugeHigh, tone: 'blue' },
-  { label: '异常金额', value: '1,256,780.32 元', delta: '+23.18%', icon: faChartLine, tone: 'orange' },
-  { label: '异常笔数', value: '256 笔', delta: '+18.52%', icon: faReceipt, tone: 'green' },
-  { label: '高风险异常数', value: '48 笔', delta: '+26.32%', icon: faShieldHalved, tone: 'red' }
+  { label: '费用总额', value: '12,856,230.45 元', icon: faReceipt, tone: 'red' },
+  { label: '预算使用率', value: '82.45%', icon: faChartLine, tone: 'blue' },
+  { label: '异常金额', value: '1,256,780.32 元', icon: faChartLine, tone: 'orange' },
+  { label: '异常笔数', value: '256 笔', icon: faReceipt, tone: 'green' },
+  { label: '高风险异常数', value: '48 笔', icon: faExclamationCircle, tone: 'red' }
 ];
 
 const budgetTrend = [
-  { month: '2025-01', actual: 44, budget: 58 },
-  { month: '2025-02', actual: 51, budget: 64 },
-  { month: '2025-03', actual: 54, budget: 68 }
+  { month: '2025-01', actual: 55, budget: 70 },
+  { month: '2025-02', actual: 63, budget: 78 },
+  { month: '2025-03', actual: 68, budget: 88 }
+];
+
+const anomalyTrend = [
+  { month: '2025-01', count: 0, amount: 0 },
+  { month: '2025-02', count: 0, amount: 0 },
+  { month: '2025-03', count: 74, amount: 70 }
 ];
 
 const categoryStructure = [
-  { name: '差旅费', value: '28.63%', color: 'var(--color-info)' },
-  { name: '业务招待费', value: '18.75%', color: 'var(--color-success)' },
-  { name: '办公费', value: '15.42%', color: '#5b8790' },
-  { name: '会议费', value: '9.88%', color: 'var(--color-primary)' },
-  { name: '培训费', value: '7.31%', color: 'var(--color-warning)' },
-  { name: '其他', value: '19.01%', color: '#b8944f' }
+  { name: '差旅费', color: '#ff3b30' },
+  { name: '业务招待费', color: '#ff9b50' },
+  { name: '办公费', color: '#ffc263' },
+  { name: '会议费', color: '#ffdf9b' },
+  { name: '培训费', color: '#9cc9ff' },
+  { name: '其他', color: '#6b95f6' }
 ];
 
 const employeeRank = [
-  { name: '张伟', value: '28,650.00', percent: 100 },
-  { name: '李娜', value: '24,780.50', percent: 86 },
-  { name: '王磊', value: '21,430.30', percent: 75 },
-  { name: '刘洋', value: '19,850.20', percent: 69 },
-  { name: '陈晨', value: '18,920.10', percent: 66 },
-  { name: '赵敏', value: '17,680.40', percent: 62 },
-  { name: '周强', value: '16,540.80', percent: 58 },
-  { name: '吴迪', value: '15,320.60', percent: 53 },
-  { name: '孙悦', value: '14,880.30', percent: 52 },
-  { name: '黄凯', value: '13,950.40', percent: 49 }
+  { name: '张伟', percent: 100 },
+  { name: '李娜', percent: 86 },
+  { name: '王磊', percent: 74 },
+  { name: '刘洋', percent: 67 },
+  { name: '陈晨', percent: 63 },
+  { name: '赵敏', percent: 58 },
+  { name: '周强', percent: 54 },
+  { name: '吴迪', percent: 50 },
+  { name: '孙悦', percent: 47 },
+  { name: '黄凯', percent: 43 }
 ];
 
 const anomalyTypes = [
-  { name: '超预算未审批', value: '34.38%', color: 'var(--color-primary)' },
-  { name: '费用违规报销', value: '26.56%', color: 'var(--color-success)' },
-  { name: '疑似不合规报销', value: '21.88%', color: 'var(--color-warning)' },
-  { name: '重复报销', value: '9.38%', color: '#b8944f' },
-  { name: '其他', value: '7.80%', color: '#b97575' }
+  { name: '超预算未审批', color: '#ff3b30' },
+  { name: '费用违规报销', color: '#ff9b50' },
+  { name: '疑似不合规报销', color: '#ffc263' },
+  { name: '重复报销', color: '#ffdf9b' },
+  { name: '其他', color: '#9cc9ff' }
 ];
 
-const anomalyTabs = [
-  { label: '超预算未审批', count: 86, active: true },
-  { label: '费用违规报销', count: 64 },
-  { label: '疑似不合规报销', count: 58 },
-  { label: '异常汇总', count: 256 },
-  { label: '整改建议', count: 18 }
+const anomalyShare = [
+  { name: '超预算未审批', value: '22.2%', color: '#ff3b30' },
+  { name: '费用违规报销', value: '18.5%', color: '#ff9b50' },
+  { name: '疑似不合规报销', value: '22.2%', color: '#ffc263' },
+  { name: '重复报销', value: '22.2%', color: '#ffdf9b' },
+  { name: '其他', value: '14.8%', color: '#9cc9ff' }
 ];
 
-const anomalyRows = [
-  { id: 'AY202504280001', type: '超预算未审批', department: '市场部', employee: '张伟', amount: '28,650.00', voucher: '记-2025-001245', rule: '《费用报销管理办法》第5条', risk: '高风险', riskClass: 'high' },
-  { id: 'AY202504280002', type: '超预算未审批', department: '销售部', employee: '李娜', amount: '17,850.00', voucher: '记-2025-001267', rule: '《费用报销管理办法》第5条', risk: '高风险', riskClass: 'high' },
-  { id: 'AY202504280003', type: '超预算未审批', department: '技术部', employee: '王磊', amount: '13,420.00', voucher: '记-2025-001289', rule: '《费用报销管理办法》第5条', risk: '中风险', riskClass: 'medium' },
-  { id: 'AY202504280004', type: '超预算未审批', department: '综合管理部', employee: '刘洋', amount: '11,280.00', voucher: '记-2025-001301', rule: '《费用报销管理办法》第5条', risk: '中风险', riskClass: 'medium' },
-  { id: 'AY202504280005', type: '超预算未审批', department: '市场部', employee: '陈晨', amount: '9,760.00', voucher: '记-2025-001313', rule: '《费用报销管理办法》第5条', risk: '低风险', riskClass: 'low' }
+const ruleRanking = [
+  { name: '超预算未审批', percent: 100 },
+  { name: '疑似不合规报销', percent: 100 },
+  { name: '重复报销识别', percent: 100 },
+  { name: '费用违规报销', percent: 82 },
+  { name: '其他费用异常', percent: 67 }
 ];
 
-const baseInfo = [
-  { label: '异常编号', value: 'AY202504280001' },
-  { label: '异常类型', value: '超预算未审批' },
-  { label: '部门', value: '市场部' },
-  { label: '员工', value: '张伟（工号：100123）' },
-  { label: '申请日期', value: '2025-03-15' },
-  { label: '报销日期', value: '2025-03-20' },
-  { label: '金额（元）', value: '28,650.00' },
-  { label: '状态', value: '高风险' }
-];
-
-const voucherInfo = [
-  { label: '凭证编号', value: '记-2025-001245' },
-  { label: '费用类别', value: '差旅费' },
-  { label: '发生日期', value: '2025-03-12' },
-  { label: '发生地', value: '上海' },
-  { label: '附件', value: '发票_20250312.pdf' }
-];
-
-const approvalChain = [
-  { text: '提交申请 张伟', time: '2025-03-15 09:12', status: 'done' },
-  { text: '部门经理审批 李强（已驳回）', time: '2025-03-15 10:05', status: 'warning' },
-  { text: '重新提交 张伟', time: '2025-03-15 10:20', status: 'pending' },
-  { text: '未走完审批流程', time: '', status: 'pending' }
-];
+const trend = computed(() => store.db.expenseTrendAnalysis);
+const trendFilterFields = computed(() => [
+  { key: 'organization', label: '被审计单位', options: trend.value.filters.organizations },
+  { key: 'period', label: '对比周期', options: trend.value.filters.periods },
+  { key: 'category', label: '费用类别', options: trend.value.filters.categories },
+  { key: 'department', label: '部门', options: trend.value.filters.departments },
+  { key: 'budgetScope', label: '预算口径', options: trend.value.filters.budgetScopes },
+  { key: 'source', label: '数据来源', options: trend.value.filters.sources }
+]);
+const trendMetricCards = computed(() => trend.value.metrics.map((metric, index) => ({
+  ...metric,
+  icon: ['¥', '%', '↑', '率', '!'][index] || '•'
+})));
+const monthlyMax = computed(() => Math.max(...trend.value.monthlyTrend.flatMap((item) => [item.actual, item.budget])));
+const categoryMax = computed(() => Math.max(...trend.value.categoryTrend.map((item) => item.business + item.marketing + item.travel + item.meeting)));
+const departmentMax = computed(() => Math.max(...trend.value.departmentRanking.map((item) => item.amount)));
 </script>
 
 <style scoped>
-.expense-audit-overview-page{--audit-red:var(--color-primary);--audit-line:#e6ebf2;--audit-text:#1f2937;--audit-muted:#667085;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) clamp(286px,19vw,318px);min-height:calc(100dvh - 58px);overflow:visible;background:#f5f7fa;color:var(--audit-text);font-size:12px}.overview-main{min-width:0;overflow:visible;padding:12px 10px 10px 14px}.filter-actions,.drawer-actions{display:flex;gap:8px}.expense-audit-overview-page button{height:30px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#344054;font-size:12px;cursor:pointer}.expense-audit-overview-page button.primary{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.filter-panel{display:grid;grid-template-columns:1.05fr 1.7fr .95fr .85fr 1.35fr .75fr auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--audit-line);background:#fff}.filter-panel label{display:grid;gap:5px;min-width:0;color:#3f4a5a}.filter-panel span{font-size:11px}.filter-panel select,.filter-panel input{box-sizing:border-box;width:100%;height:30px;border:1px solid #d9e0e9;border-radius:4px;background:#fff;color:#475467;font-size:12px}.filter-actions button{min-width:54px}.metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:10px;border:1px solid var(--audit-line);background:#fff}.metric-card{display:flex;gap:8px;min-width:0;padding:13px 12px;border-right:1px solid var(--audit-line)}.metric-card:last-child{border-right:0}.metric-icon{display:grid;flex:0 0 36px;height:36px;place-items:center;border-radius:8px;font-weight:700}.metric-card.red .metric-icon{border:1px solid #fecaca;background:#fff1f2;color:var(--color-primary)}.metric-card.blue .metric-icon{border:1px solid #bfdbfe;background:#eff6ff;color:var(--color-info)}.metric-card.orange .metric-icon{border:1px solid #fed7aa;background:#fff7ed;color:var(--color-warning)}.metric-card.green .metric-icon{border:1px solid #bbf7d0;background:#ecfdf5;color:var(--color-success)}.metric-card p{margin:0 0 5px;color:#475467}.metric-card strong{display:block;min-width:0;overflow:hidden;font-size:15px;line-height:24px;text-overflow:clip;white-space:nowrap}.metric-card small{display:block;margin-top:8px;color:#667085}.metric-card small b{color:var(--color-primary);font-weight:500}.chart-grid{display:grid;grid-template-columns:1.18fr 1.05fr 1.08fr 1.05fr;gap:10px;margin-top:10px}.chart-card{box-sizing:border-box;min-width:0;height:272px;padding:12px;border:1px solid var(--audit-line);background:#fff}.chart-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.chart-title h2{margin:0;font-size:14px}.chart-title span,.trend-legend{color:#667085;font-size:10px}.trend-legend{display:flex;gap:12px;margin-bottom:8px}.trend-legend i,.chart-list i{display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:2px;vertical-align:-1px}.trend-legend .blue{background:var(--color-info)}.trend-legend .green{background:var(--color-success)}.trend-legend .orange{background:var(--color-warning)}.trend-plot{display:grid;grid-template-columns:36px minmax(0,1fr);height:200px}.trend-scale{display:flex;flex-direction:column;justify-content:space-between;color:#7b8794;font-size:10px;text-align:right}.trend-bars{position:relative;display:grid;grid-template-columns:repeat(3,1fr);align-items:end;padding:10px 10px 18px;border-bottom:1px solid #dce3eb;background:repeating-linear-gradient(to bottom,#fff 0,#fff 38px,#eef2f6 39px)}.trend-month{display:grid;justify-items:center;gap:6px;color:#667085}.bar-pair{display:flex;height:150px;align-items:end;gap:8px}.bar{width:13px;border-radius:2px 2px 0 0}.bar.actual{background:var(--color-info)}.bar.budget{background:var(--color-success)}.trend-line{position:absolute;right:5px;bottom:36px;left:5px;width:calc(100% - 10px);height:120px;pointer-events:none}.donut-layout{display:grid;grid-template-columns:minmax(104px,1fr) minmax(110px,1fr);gap:12px;align-items:center;height:210px}.donut{position:relative;display:grid;width:min(138px,100%);aspect-ratio:1;margin:auto;place-items:center;border-radius:50%}.category-donut{background:conic-gradient(var(--color-info) 0 28.63%,var(--color-success) 28.63% 47.38%,#5b8790 47.38% 62.8%,var(--color-primary) 62.8% 72.68%,var(--color-warning) 72.68% 79.99%,#b8944f 79.99% 100%)}.anomaly-donut{background:conic-gradient(var(--color-info) 0 34.38%,var(--color-success) 34.38% 60.94%,var(--color-warning) 60.94% 82.82%,#b8944f 82.82% 92.2%,#b97575 92.2% 100%)}.donut::after{position:absolute;inset:28%;border-radius:50%;background:#fff;content:""}.donut span{position:relative;z-index:1;color:#344054;font-size:11px;line-height:1.35;text-align:center}.donut b{font-size:12px}.chart-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}.chart-list li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;align-items:center;color:#344054;font-size:11px}.chart-list b{font-weight:500}.rank-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}.rank-list li{display:grid;grid-template-columns:42px minmax(80px,1fr) 66px;gap:8px;align-items:center}.rank-list span,.rank-list strong{font-size:11px;font-weight:500}.rank-list i{height:7px;overflow:hidden;border-radius:4px;background:#e9eef6}.rank-list b{display:block;height:100%;border-radius:inherit;background:var(--color-info)}.exception-section{margin-top:10px;border:1px solid var(--audit-line);background:#fff}.exception-tabs{display:flex;align-items:center;gap:24px;min-height:46px;padding:0 12px;border-bottom:1px solid var(--audit-line)}.exception-tabs button{border:0;background:transparent;color:#344054}.exception-tabs button.active{color:var(--audit-red);font-weight:700}.exception-tabs .export{margin-left:auto;padding:0 14px;border:1px solid #d7dee8;background:#fff}.table-wrap{overflow-x:auto;overflow-y:visible;padding:12px 12px 0}.exception-section table{width:100%;min-width:940px;border-collapse:collapse;font-size:11px}.exception-section th,.exception-section td{height:36px;border:1px solid #edf1f5;padding:0 10px;text-align:left;white-space:nowrap}.exception-section th{background:#f8fafc;color:#344054;font-weight:600}.risk-tag{display:inline-flex;height:20px;align-items:center;padding:0 7px;border-radius:4px;font-size:10px}.risk-tag.high{border:1px solid #fecaca;background:#fff1f2;color:var(--color-primary)}.risk-tag.medium{border:1px solid #fed7aa;background:#fff7ed;color:var(--color-warning)}.risk-tag.low{border:1px solid #bbf7d0;background:#ecfdf5;color:var(--color-success)}.table-actions{display:flex;gap:8px;align-items:center}.table-actions button{height:auto;border:0;background:transparent;color:var(--color-info);font-size:11px}.table-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 14px;color:#475467}.table-footer>div{display:flex;align-items:center;gap:8px}.table-footer button{width:26px;height:26px}.table-footer button.active{border-color:var(--audit-red);background:var(--audit-red);color:#fff}.table-footer select,.table-footer input{height:26px;border:1px solid #d7dee8;border-radius:4px;background:#fff;color:#475467}.table-footer input{width:46px;text-align:center}.detail-drawer{min-width:0;overflow:visible;border-left:1px solid var(--audit-line);background:#fff;padding:16px 16px 20px}.detail-drawer header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.detail-drawer h2{margin:0;font-size:15px}.detail-drawer header button{width:28px;border:0;font-size:20px}.detail-drawer section{padding:12px 0;border-bottom:1px solid var(--audit-line)}.detail-drawer h3{margin:0 0 10px;font-size:13px}.detail-drawer dl{display:grid;gap:10px;margin:0}.detail-drawer dl div{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px}.detail-drawer dt{color:#667085}.detail-drawer dd{margin:0;color:#344054}.approval-chain{display:grid;gap:10px;margin:0;padding:0;list-style:none}.approval-chain li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:start;color:#667085}.approval-chain li span{width:7px;height:7px;margin-top:5px;border-radius:50%;background:#cbd5e1}.approval-chain li.done span{background:var(--color-success)}.approval-chain li.warning span{background:var(--color-warning)}.approval-chain p{margin:0}.approval-chain time{font-size:10px}.drawer-actions button{min-width:72px}.drawer-actions button.primary{background:var(--audit-red)}
-@media(max-width:1380px){.expense-audit-overview-page{grid-template-columns:minmax(0,1fr) 286px}.filter-panel{grid-template-columns:repeat(3,minmax(0,1fr));}.filter-actions{justify-content:flex-end}.chart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-card{height:260px}.metric-card{padding:12px}.metric-card strong{font-size:16px}.exception-tabs{gap:12px;overflow-x:auto}.exception-tabs button{flex:0 0 auto}}
-@media(max-width:900px){.expense-audit-overview-page{display:block;height:auto;overflow:visible}.overview-main{overflow:visible;padding:12px}.detail-drawer{border-top:1px solid var(--audit-line);border-left:0}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-card:nth-child(2n){border-right:0}.chart-grid{grid-template-columns:1fr}.filter-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.filter-panel,.metric-grid{grid-template-columns:1fr}.metric-card{border-right:0;border-bottom:1px solid var(--audit-line)}.donut-layout{grid-template-columns:1fr}.chart-card{height:auto;min-height:260px}.table-footer{align-items:flex-start;flex-direction:column;gap:10px}.detail-drawer dl div{grid-template-columns:68px minmax(0,1fr)}}
-.expense-audit-overview-page {
+.expense-analysis-dashboard {
+  display: grid;
   height: 0;
   min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+  padding: 8px 10px 10px;
+  background: #f6f7fb;
+  color: #0f172a;
+}
+
+.top-tabs,
+.filter-panel,
+.metric-card,
+.chart-card {
+  box-sizing: border-box;
+  border: 1px solid #cfd8e8;
+  background: #fff;
+}
+
+.top-tabs {
+  display: flex;
+  height: 38px;
+  align-items: stretch;
+  gap: 22px;
+  padding: 0 28px;
+}
+
+.top-tabs button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.top-tabs button.active {
+  color: var(--color-primary);
+}
+
+.top-tabs button.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background: var(--color-primary);
+  content: "";
+}
+
+.summary-view {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto auto minmax(0, 1fr);
   overflow: hidden;
 }
 
-.overview-main {
-  display: flex;
-  min-height: 0;
-  flex-direction: column;
-  overflow: auto;
-}
-
-.detail-drawer {
-  min-height: 0;
-  overflow: auto;
-}
-
-.exception-section {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
-}
-
-.exception-section .table-wrap {
-  min-height: 0;
-  flex: 1;
-  overflow: auto;
-}
-
-.exception-section table {
+:deep(.expense-trend-page) {
   height: 100%;
-  table-layout: fixed;
 }
 
-.filter-panel span,
-.chart-title span,
-.trend-legend,
-.trend-scale,
-.donut span,
-.chart-list li,
-.rank-list span,
-.rank-list strong,
-.exception-section table,
-.table-actions button,
-.approval-chain time {
-  font-size: var(--ui-font-xs);
+.trend-compact-view {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
 }
 
-.metric-card strong {
-  overflow: visible;
-  line-height: 1.25;
-  white-space: normal;
+.trend-compact-filter {
+  display: grid;
+  grid-template-columns: minmax(130px, .92fr) minmax(220px, 1.45fr) repeat(4, minmax(112px, .85fr)) auto;
+  gap: 8px;
+  align-items: end;
+  padding: 8px 10px;
+  border: 1px solid #cfd8e8;
+  background: #fff;
 }
 
-.risk-tag {
-  font-size: var(--ui-font-xs);
+.trend-compact-filter label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: #1f2a44;
+  font-size: 12px;
 }
 
-@media (min-width: 1381px) {
-  .chart-grid {
-    grid-template-columns: minmax(330px, 1.16fr) minmax(250px, .9fr) minmax(330px, 1.18fr) minmax(300px, 1.06fr);
-    gap: 8px;
-  }
-
-  .chart-card {
-    height: 254px;
-    padding: 10px 12px;
-  }
-
-  .trend-plot {
-    height: 184px;
-  }
-
-  .trend-bars {
-    padding-bottom: 16px;
-  }
-
-  .bar-pair {
-    height: 132px;
-  }
-
-  .donut-layout {
-    height: 190px;
-    gap: 8px;
-  }
-
-  .donut {
-    width: min(124px, 100%);
-  }
-
-  .chart-list {
-    gap: 6px;
-  }
-
-  .rank-card {
-    padding-left: 16px;
-    padding-right: 14px;
-  }
-
-  .rank-list {
-    gap: 6px;
-  }
-
-  .rank-list li {
-    grid-template-columns: 44px minmax(112px, 1fr) 72px;
-    gap: 8px;
-  }
-}
-
-.exception-section table {
-  min-width: 1040px;
-}
-
-.exception-section th,
-.exception-section td {
-  height: 40px;
+.trend-compact-filter select {
+  width: 100%;
+  height: 28px;
+  border: 1px solid #bcc5d2;
+  border-radius: 0;
   padding: 0 8px;
+  background: #fff;
+  color: #111827;
+  font-size: 12px;
+}
+
+.trend-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.trend-compact-charts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.trend-panel {
+  min-width: 0;
+  height: clamp(150px, calc((100vh - 442px) / 2), 226px);
+  overflow: hidden;
+  border: 1px solid #cfd8e8;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.trend-panel h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+
+.mini-bars,
+.mini-stacks,
+.mini-scatter {
+  height: calc(100% - 24px);
+  border-bottom: 1px solid #dce3eb;
+  background: repeating-linear-gradient(to top, #fff 0, #fff 25px, #edf1f5 26px);
+}
+
+.mini-bars,
+.mini-stacks {
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  padding: 8px 10px 20px;
+}
+
+.mini-bars span,
+.mini-stacks span {
+  position: relative;
+  display: flex;
+  height: 100%;
+  align-items: end;
+  gap: 4px;
+}
+
+.mini-bars i {
+  width: 10px;
+  border-radius: 2px 2px 0 0;
+}
+
+.mini-bars .actual { background: #5a82f0; }
+.mini-bars .budget { background: #ff9b50; }
+
+.mini-bars b,
+.mini-stacks b {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 500;
+  transform: translateX(-50%);
+}
+
+.mini-stacks span {
+  width: 24px;
+  flex-direction: column-reverse;
+  gap: 0;
+}
+
+.mini-stacks i {
+  width: 100%;
+}
+
+.business { background: #5a82f0; }
+.marketing { background: #2f7b5f; }
+.travel { background: #ffc263; }
+.meeting { background: #9cc9ff; }
+
+.compact-rank {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 0 0;
+  list-style: none;
+}
+
+.compact-rank li {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  color: #344054;
+  font-size: 11px;
+}
+
+.compact-rank span {
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.exception-section tbody {
-  height: 1px;
-}
-
-.exception-section .table-wrap table {
-  height: auto;
-}
-
-.col-id {
-  width: 136px;
-}
-
-.col-type {
-  width: 112px;
-}
-
-.col-department {
-  width: 92px;
-}
-
-.col-employee {
-  width: 64px;
-}
-
-.col-amount {
-  width: 94px;
-}
-
-.col-voucher {
-  width: 132px;
-}
-
-.col-rule {
-  width: 178px;
-}
-
-.col-status {
-  width: 82px;
-}
-
-.col-actions {
-  width: 188px;
-}
-
-.table-actions {
-  display: inline-flex;
-  gap: 3px;
-  align-items: center;
-  width: 100%;
-  min-width: 0;
-}
-
-.table-actions button {
-  flex: 0 0 auto;
-  min-width: 0;
-  padding: 0;
-  line-height: 1;
   white-space: nowrap;
 }
 
-.exception-section .table-wrap {
-  padding-top: 8px;
+.compact-rank i {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #edf1f5;
+}
+
+.compact-rank b {
+  display: block;
+  height: 100%;
+  background: #5067f2;
+}
+
+.mini-scatter {
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-scatter i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.mini-scatter .正常 { background: #2f7b5f; }
+.mini-scatter .关注 { width: 10px; height: 10px; background: #ffc263; }
+.mini-scatter .异常 { width: 13px; height: 13px; background: #cf2d2d; }
+
+.trend-compact-bottom {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.trend-compact-bottom .trend-panel {
+  height: auto;
+  min-height: 0;
+}
+
+.trend-compact-bottom table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.trend-compact-bottom th,
+.trend-compact-bottom td {
+  height: 25px;
+  overflow: hidden;
+  border: 1px solid #edf0f4;
+  padding: 0 6px;
+  color: #344054;
+  font-size: 11px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trend-compact-bottom th {
+  background: #f7f8fa;
+  font-weight: 700;
+}
+
+.up {
+  color: #cf2d2d;
+}
+
+.filter-panel {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(240px, 1.6fr) minmax(130px, .8fr) minmax(220px, 1.25fr) auto;
+  gap: 8px;
+  align-items: end;
+  padding: 8px 10px;
+}
+
+.filter-panel label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: #1f2a44;
+  font-size: 12px;
+}
+
+.filter-panel select,
+.filter-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 28px;
+  border: 1px solid #bcc5d2;
+  border-radius: 0;
+  padding: 0 10px;
+  background: #fff;
+  color: #111827;
+  font-size: 13px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  height: 28px;
+  border: 1px solid #b9c1cd;
+  border-radius: 0;
+  padding: 0 16px;
+  background: #fff;
+  color: #1f2937;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+button.primary {
+  border-color: #cf2d2d;
+  background: #cf2d2d;
+  color: #fff;
+  font-weight: 700;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.metric-card {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.metric-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 6px;
+}
+
+.metric-card.red .metric-icon { border: 1px solid #d94c56; background: #fff5f5; color: #b22b38; }
+.metric-card.blue .metric-icon { border: 1px solid #4b87d8; background: #eff6ff; color: #2368af; }
+.metric-card.orange .metric-icon { border: 1px solid #e7a453; background: #fff7ed; color: #b36a16; }
+.metric-card.green .metric-icon { border: 1px solid #4aa386; background: #ecfdf5; color: #28775f; }
+
+.metric-card p {
+  margin: 0 0 3px;
+  color: #4b5563;
+  font-size: 12px;
+}
+
+.metric-card strong {
+  display: block;
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .95fr) minmax(0, 1.02fr) minmax(0, .95fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 0;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.chart-card {
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+  padding: 9px 10px 8px;
+  overflow: hidden;
+}
+
+.wide-chart {
+  grid-column: span 2;
+}
+
+.chart-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.chart-title h2 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.chart-title span,
+.trend-legend,
+.chart-title em {
+  color: #40506a;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.trend-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trend-legend i,
+.chart-list i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+
+.trend-legend .blue { background: #5a82f0; }
+.trend-legend .orange { background: #ff9b50; }
+.trend-legend .red { background: #ff3b30; }
+
+.trend-plot,
+.anomaly-trend {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  height: calc(100% - 38px);
+}
+
+.trend-scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #8a93a3;
+  font-size: 11px;
+  text-align: right;
+}
+
+.trend-bars {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  padding: 10px 14px 18px;
+  border-bottom: 1px solid #dce3eb;
+  background: repeating-linear-gradient(to bottom, #fff 0, #fff 36px, #edf1f5 37px);
+}
+
+.trend-month {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  color: #7a8290;
+}
+
+.bar-pair {
+  display: flex;
+  height: 100%;
+  align-items: end;
+  gap: 8px;
+}
+
+.bar {
+  width: 16px;
+  border-radius: 1px 1px 0 0;
+}
+
+.bar.actual { background: #5a82f0; }
+.bar.budget { background: #ff9b50; }
+
+.trend-line {
+  position: absolute;
+  right: 12px;
+  bottom: 42px;
+  left: 12px;
+  width: calc(100% - 24px);
+  height: 96px;
+  pointer-events: none;
+}
+
+.donut-layout {
+  display: grid;
+  grid-template-columns: minmax(116px, 1fr) minmax(96px, .75fr);
+  gap: 8px;
+  align-items: center;
+  height: calc(100% - 28px);
+}
+
+.donut {
+  position: relative;
+  display: grid;
+  width: min(142px, 100%);
+  aspect-ratio: 1;
+  margin: auto;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.category-donut {
+  background: conic-gradient(#ff3b30 0 30%, #ff9b50 30% 48%, #ffc263 48% 68%, #ffdf9b 68% 78%, #9cc9ff 78% 88%, #6b95f6 88% 100%);
+}
+
+.anomaly-donut {
+  background: conic-gradient(#ff3b30 0 35%, #ff9b50 35% 60%, #ffc263 60% 78%, #ffdf9b 78% 90%, #9cc9ff 90% 100%);
+}
+
+.anomaly-share-donut {
+  background: conic-gradient(#ff3b30 0 22%, #ff9b50 22% 41%, #ffc263 41% 63%, #ffdf9b 63% 85%, #9cc9ff 85% 100%);
+}
+
+.donut::after {
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+}
+
+.donut span {
+  position: relative;
+  z-index: 1;
+  color: #1f2937;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.donut b {
+  font-size: 20px;
+}
+
+.chart-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chart-list li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  align-items: center;
+  color: #344054;
+  font-size: 11px;
+}
+
+.chart-list span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rank-list,
+.horizontal-rank {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px 0 18px;
+  list-style: none;
+}
+
+.rank-list li,
+.horizontal-rank li {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.rank-list i,
+.horizontal-rank i {
+  height: 15px;
+  overflow: hidden;
+  background: linear-gradient(to right, transparent 0, transparent calc(100% - 1px), #edf1f5 calc(100% - 1px));
+}
+
+.rank-list b,
+.horizontal-rank b {
+  display: block;
+  height: 100%;
+  background: #5067f2;
+}
+
+.anomaly-trend-card .bar-pair {
+  height: 100%;
+}
+
+.compact-donut .donut-layout {
+  grid-template-columns: minmax(120px, 1fr) minmax(124px, 1fr);
+}
+
+.compact-donut .donut {
+  width: min(144px, 100%);
+}
+
+.rule-rank-card .horizontal-rank {
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.rule-rank-card .horizontal-rank li {
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+
+@media (max-width: 1180px) {
+  .filter-panel,
+  .trend-compact-filter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-actions {
+    justify-content: flex-end;
+  }
+
+  .metric-grid,
+  .chart-grid,
+  .trend-metrics,
+  .trend-compact-charts,
+  .trend-compact-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart-grid {
+    grid-template-rows: auto;
+    overflow: auto;
+  }
+
+  .wide-chart {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .expense-analysis-dashboard {
+    height: auto;
+    min-height: calc(100dvh - 58px);
+    overflow: auto;
+  }
+
+  .metric-grid,
+  .chart-grid,
+  .filter-panel,
+  .trend-compact-filter,
+  .trend-metrics,
+  .trend-compact-charts,
+  .trend-compact-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card strong {
+    white-space: normal;
+  }
 }
 </style>

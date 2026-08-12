@@ -1,5 +1,5 @@
 <template>
-  <div class="app-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }" @click.capture="handleGlobalUploadClick">
+  <div class="app-shell" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'task-empty-shell': route.path === '/tasks' && isEmptyMode, 'task-parsing-shell': isParsingPhase, 'task-template-shell': isTemplatePhase, 'task-detail-shell': isTaskDetailRoute, 'task-generating-shell': isGeneratingTaskDetail, 'task-archived-shell': isArchivedTaskDetail, 'audit-standard-result-shell': isAuditStandardResult, 'supervision-result-shell': isSupervisionShareResultRoute, 'expense-section-shell': isExpenseSection || isExpenseAnomalyDetailRoute, 'expense-empty-shell': isExpenseWorkbenchRoute, 'expense-audit-result-shell': isExpenseAuditResult, 'expense-trend-shell': isExpenseTrendResult, 'audit-report-generation-shell': isAuditReportGeneration, 'report-review-shell': isReportReviewRoute, 'regulatory-empty-shell': isSpecialAuditWorkbench, 'regulatory-result-shell': isRegulatoryResultRoute }" @click.capture="handleGlobalUploadClick">
     <aside class="sidebar">
       <div class="brand">
         <strong>审计大模型系统</strong>
@@ -7,7 +7,7 @@
 
       <nav class="main-nav">
         <template v-for="item in businessNavItems" :key="item.path">
-          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || (isExpenseSection && item.path === '/expense/workbench') || ((isAuditReportGeneration || isReportReviewRoute) && item.path === '/audit-report/workbench') || isNavParentActive(item) }">
+          <RouterLink :to="item.path" :active-class="isSupervisionShareResultRoute || isRegulatoryResultRoute ? 'route-active-disabled' : 'router-link-active'" :class="{ 'manual-active': (isAuditStandardResult && item.path === '/tasks') || (isSupervisionShareResultRoute && item.path === '/regulatory/workbench') || (isRegulatoryResultRoute && item.path === '/regulatory/workbench') || (isExpenseAuditResult && item.path === '/expense/workbench') || ((isExpenseSection || isExpenseAnomalyDetailRoute) && item.path === '/expense/workbench') || ((isAuditReportGeneration || isReportReviewRoute) && item.path === '/audit-report/workbench') || isNavParentActive(item) }">
             <span class="nav-icon"><AuditIcon :name="item.icon" /></span>
             <span class="nav-label">{{ item.label }}</span>
             <span v-if="item.children && shouldShowChildren(item)" class="nav-caret">⌄</span>
@@ -31,13 +31,14 @@
         <div>
           <div v-if="route.path === '/tasks' && isEmptyMode" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>任务中心</strong></div>
           <h1 v-else-if="route.path === '/tasks'" class="task-page-title">任务中心</h1>
+          <div v-else-if="isExpenseAnomalyDetailRoute" class="task-breadcrumb"><span>费用智能化审计</span><i>/</i><span>费用异常分析</span><i>/</i><strong>费用异常详情</strong></div>
           <div v-else-if="isTaskDetailRoute" class="task-breadcrumb"><span>任务中心</span><i>/</i><strong>任务详情</strong></div>
           <div v-else-if="isSupervisionShareResultRoute" class="task-breadcrumb"><span>任务中心</span><i>/</i><span>上海分公司Q1常规审计任务</span><i>/</i><strong>监督共享信息分析</strong></div>
           <div v-else-if="isAuditStandardResult" class="task-breadcrumb"><span>任务中心</span><i>/</i><span>上海分公司Q1常规审计任务</span><i>/</i><strong>审计规范生成</strong></div>
           <div v-else-if="isExpenseWorkbenchRoute" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>费用审计分析</strong></div>
-          <div v-else-if="isExpenseAuditOverview" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>费用审计分析</strong></div>
-          <div v-else-if="isExpenseAnomalyMonitor" class="task-breadcrumb"><span>审计工作台</span><i>/</i><span>费用审计分析</span><i>/</i><strong>费用异常监控</strong></div>
-          <div v-else-if="isExpenseTrendResult" class="task-breadcrumb"><span>审计工作台</span><i>/</i><span>费用审计分析</span><i>/</i><strong>费用趋势分析</strong></div>
+          <div v-else-if="isExpenseAuditOverview" class="task-breadcrumb"><span>费用智能化审计</span><i>/</i><strong>费用分析看板</strong></div>
+          <div v-else-if="isExpenseAnomalyMonitor" class="task-breadcrumb"><span>费用智能化审计</span><i>/</i><strong>费用异常分析</strong></div>
+          <div v-else-if="isExpenseTrendResult" class="task-breadcrumb"><span>费用智能化审计</span><i>/</i><strong>费用分析看板</strong></div>
           <div v-else-if="isReportReviewRoute" class="task-breadcrumb"><span>任务中心</span><i>/</i><span>上海分公司Q1常规审计任务</span><i>/</i><strong>报告审核</strong></div>
           <div v-else-if="isAuditReportGeneration" class="task-breadcrumb"><span>任务中心</span><i>/</i><span>上海分公司Q1常规审计任务</span><i>/</i><strong>报告生成</strong></div>
           <div v-else-if="isRegulatoryResultRoute" class="task-breadcrumb"><span>审计工作台</span><i>/</i><strong>专项审计分析</strong></div>
@@ -180,10 +181,8 @@ const businessNavItems = [
     label: '费用审计分析',
     path: '/expense/workbench',
     children: [
-      { label: '费用审计入口', path: '/expense/workbench' },
-      { label: '费用审计分析', path: '/expense/audit/overview' },
-      { label: '费用异常监控', path: '/expense/anomaly/dashboard' },
-      { label: '费用趋势分析', path: '/expense/usage/dashboard' }
+      { label: '费用分析看板', path: '/expense/audit/overview' },
+      { label: '费用异常分析', path: '/expense/anomaly/dashboard' }
     ]
   },
   {
@@ -218,6 +217,7 @@ const isExpenseAuditOverview = computed(() => route.path === '/expense/audit/ove
 const isExpenseAnomalyMonitor = computed(() => route.path === '/expense/anomaly/dashboard');
 const isExpenseAuditResult = computed(() => isExpenseAuditOverview.value || isExpenseAnomalyMonitor.value);
 const isExpenseTrendResult = computed(() => route.path === '/expense/usage/dashboard');
+const isExpenseAnomalyDetailRoute = computed(() => isTaskDetailRoute.value && route.query.tab === 'expense-anomaly' && Boolean(route.query.anomalyId));
 const isAuditReportGeneration = computed(() => route.path === '/audit-report/draft');
 const isReportReviewRoute = computed(() => route.path === '/audit-report/check-result');
 const isAuditReportSection = computed(() => route.path.startsWith('/audit-report'));
@@ -254,6 +254,7 @@ function toggleSidebar() {
 }
 
 function isNavChildActive(child) {
+  if (isExpenseAnomalyDetailRoute.value && child.path === '/expense/anomaly/dashboard') return true;
   const targetPath = child.path.split('?')[0];
   if (route.path !== targetPath) return false;
   const defaultMode = targetPath === '/audit-report/workbench' ? 'generate' : '';
@@ -313,7 +314,7 @@ function shouldShowChildren(item) {
     item.children &&
     ((isAuditStandardSection.value && item.path === '/audit-standard/policy') ||
       (isSpecialAuditSection.value && item.path === '/regulatory/workbench') ||
-      (isExpenseSection.value && item.path === '/expense/workbench') ||
+      ((isExpenseSection.value || isExpenseAnomalyDetailRoute.value) && item.path === '/expense/workbench') ||
       (isAuditReportSection.value && item.path === '/audit-report/workbench') ||
       (route.path === '/config' && item.path === '/config'))
   );
