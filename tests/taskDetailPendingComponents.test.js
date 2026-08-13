@@ -27,15 +27,20 @@ function compileComponent(file) {
   assert.deepEqual(template.errors, []);
 }
 
-test('任务头包含四项顶部动作、五个指标和十一项页签', () => {
+test('任务详情顶部保留阶段状态并收敛为六个核心页签', () => {
   const content = source('TaskDetailHeader.vue');
   for (const action of ['保存版本', '提交复核', '导出结果', '归档任务']) {
     assert.match(content, new RegExp(action));
   }
+  assert.match(content, /阶段状态/);
+  assert.doesNotMatch(content, /完成比例|总进度|progressbar/);
   assert.equal((content.match(/data-summary-metric/g) || []).length, 5);
   const dataContent = taskDataSource();
-  for (const tab of ['任务概览', '输入资料', '分析过程', '生成结果', '智能体会话', '报告与附件', '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕']) {
+  for (const tab of ['任务概览', '输入资料', '分析过程', '生成结果', '输出文件', '任务时间线']) {
     assert.match(dataContent, new RegExp(tab));
+  }
+  for (const removedTab of ['智能体会话', '报告与附件', '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕']) {
+    assert.doesNotMatch(dataContent, new RegExp(`label: '${removedTab}'`));
   }
 });
 
@@ -57,11 +62,12 @@ test('待确认表包含八列、人工处理动作和分页', () => {
   }
 });
 
-test('版本导出预览包含两个功能区和文件卡', () => {
+test('输出文件组件集中展示成果文件且不平铺版本时间线', () => {
   const content = source('VersionExportPreview.vue');
-  for (const marker of ['data-version-preview', 'data-export-preview', '版本时间线', '输出文件预览', '更多文件']) {
+  for (const marker of ['data-export-preview', '输出文件', '更多文件']) {
     assert.match(content, new RegExp(marker));
   }
+  assert.doesNotMatch(content, /data-version-preview|版本时间线/);
 });
 
 test('追溯栏包含五个标签和人工处理区', () => {

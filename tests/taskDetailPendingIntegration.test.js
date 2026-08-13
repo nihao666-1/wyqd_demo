@@ -22,7 +22,7 @@ function compileSfc(url) {
   return content;
 }
 
-test('任务详情编排五个专属组件并默认进入生成结果', () => {
+test('任务详情编排核心组件并默认进入任务概览', () => {
   const source = compileSfc(taskDetailUrl);
   for (const component of [
     'TaskDetailHeader',
@@ -34,7 +34,19 @@ test('任务详情编排五个专属组件并默认进入生成结果', () => {
     assert.match(source, new RegExp(`import ${component}`));
     assert.match(source, new RegExp(`<${component}`));
   }
-  assert.match(source, /ref\(['"]results['"]\)/);
+  assert.match(source, /ref\(['"]overview['"]\)/);
+  for (const tabGate of [
+    "activeTab === 'overview'",
+    "activeTab === 'materials'",
+    "activeTab === 'analysis'",
+    "activeTab === 'results'",
+    "activeTab === 'outputs'",
+    "activeTab === 'timeline'"
+  ]) {
+    assert.match(source, new RegExp(tabGate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  }
+  assert.match(source, /timelineTypeFilter/);
+  assert.match(source, /fileDrawer/);
 });
 
 test('页面接入状态模型和核心处理器', () => {

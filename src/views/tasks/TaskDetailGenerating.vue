@@ -17,10 +17,7 @@
         <div><dt>任务类型</dt><dd>{{ snapshot.task.type }}</dd></div>
         <div><dt>负责人</dt><dd>{{ snapshot.task.owner }}</dd></div>
         <div><dt>创建时间</dt><dd>{{ snapshot.task.createdAt }}</dd></div>
-        <div class="task-detail-generating-progress">
-          <dt>总进度</dt>
-          <dd><span role="progressbar" aria-label="任务总进度" aria-valuemin="0" aria-valuemax="100" :aria-valuenow="snapshot.task.progress"><i :style="{ width: `${snapshot.task.progress}%` }"></i></span><strong>{{ snapshot.task.progress }}%</strong></dd>
-        </div>
+        <div><dt>阶段状态</dt><dd class="phase-status">{{ snapshot.task.phaseStatus }}</dd></div>
         <div><dt>当前版本</dt><dd>{{ snapshot.task.version }}</dd></div>
       </dl>
 
@@ -33,6 +30,55 @@
       <TaskCapabilityExecutionGrid :stages="snapshot.stages" :summary="snapshot.summary" :capabilities="snapshot.capabilities" @view-log="viewCapabilityLog" @view-result="viewResult" @run-background="runInBackground" />
       <TaskExecutionLogRail ref="logRailRef" :logs="snapshot.logs" :model-execution="snapshot.modelExecution" :sources="snapshot.sources" :failures="snapshot.failures" :pending-items="snapshot.pendingItems" :active-capability-id="activeCapabilityId" @show-all-logs="showAllLogs" @view-source="viewSource" @handle-pending="handlePending" />
     </div>
+
+    <section v-else-if="activeTab === 'overview'" class="task-detail-generating-panel" aria-label="任务概览">
+      <h2>任务概览</h2>
+      <dl class="task-detail-generating-overview">
+        <div><dt>任务名称</dt><dd>{{ snapshot.task.name }}</dd></div>
+        <div><dt>当前状态</dt><dd>{{ snapshot.task.phaseStatus }}</dd></div>
+        <div><dt>已选择业务能力</dt><dd>{{ snapshot.capabilities.map((item) => item.name).join('、') }}</dd></div>
+        <div><dt>关键说明</dt><dd>概览仅展示任务身份、阶段状态与业务能力，不重复平铺完整文件、过程和操作记录。</dd></div>
+      </dl>
+    </section>
+
+    <section v-else-if="activeTab === 'materials'" class="task-detail-generating-panel" aria-label="输入资料">
+      <h2>输入资料</h2>
+      <table class="task-detail-generating-table">
+        <thead><tr><th>文件名称</th><th>类型</th><th>解析状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr v-for="source in snapshot.sources" :key="source.id">
+            <td>{{ source.label }}</td><td>任务锁定资料</td><td>{{ source.value }}</td>
+            <td><button type="button" @click="viewSource(source)">查看详情</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section v-else-if="activeTab === 'outputs'" class="task-detail-generating-panel" aria-label="输出文件">
+      <h2>输出文件</h2>
+      <table class="task-detail-generating-table">
+        <thead><tr><th>成果类型</th><th>文件名称</th><th>格式</th><th>生成状态</th></tr></thead>
+        <tbody>
+          <tr v-for="file in snapshot.outputFiles" :key="file.id">
+            <td>{{ file.category }}</td><td>{{ file.name }}</td><td>{{ file.type }}</td><td>{{ file.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section v-else-if="activeTab === 'timeline'" class="task-detail-generating-panel" aria-label="任务时间线">
+      <div class="task-detail-generating-panel-title">
+        <h2>任务时间线 / 操作记录</h2>
+        <select v-model="timelineTypeFilter" aria-label="按操作类型筛选">
+          <option v-for="filter in snapshot.timelineFilters" :key="filter.value" :value="filter.value">{{ filter.label }}</option>
+        </select>
+      </div>
+      <ol class="task-detail-generating-timeline">
+        <li v-for="event in filteredTimelineEvents" :key="event.id">
+          <time>{{ event.time }}</time><strong>{{ event.title }}</strong><span>{{ event.type }} · {{ event.operator }}</span><p>{{ event.detail }}</p>
+        </li>
+      </ol>
+    </section>
 
     <section v-else class="task-detail-generating-placeholder" aria-live="polite">
       <FontAwesomeIcon :icon="faFileLines" /><h2>{{ activeTabLabel }}</h2>
@@ -74,6 +120,7 @@ if (requestedTab) activeTab.value = requestedTab.key;
 
 const isPaused = ref(false);
 const activeCapabilityId = ref('');
+const timelineTypeFilter = ref('all');
 const liveMessage = ref('');
 const logRailRef = ref(null);
 const drawerCloseRef = ref(null);
@@ -81,6 +128,9 @@ const drawerState = ref({ open: false, eyebrow: '', title: '', details: [], desc
 let lastTrigger = null;
 
 const activeTabLabel = computed(() => snapshot.value.tabs.find((tab) => tab.key === activeTab.value)?.label || '任务详情');
+const filteredTimelineEvents = computed(() => timelineTypeFilter.value === 'all'
+  ? snapshot.value.timelineEvents
+  : snapshot.value.timelineEvents.filter((event) => event.type === timelineTypeFilter.value));
 
 function selectTab(tab) {
   if (!tab) return;
@@ -151,10 +201,10 @@ function closeDrawer() {
 </script>
 
 <style scoped>
-.task-detail-generating-page{--detail-red:var(--color-primary);--detail-blue:var(--color-info);--detail-line:#e1e6ed;box-sizing:border-box;width:100%;max-width:none;margin:0;color:#252d38}.task-detail-generating-header{box-sizing:border-box;height:152px;border:1px solid var(--detail-line);background:#fff}.task-detail-generating-title-row{display:flex;height:43px;align-items:center;justify-content:space-between;padding:0 10px}.task-detail-generating-title-copy{display:flex;align-items:center;gap:12px}.task-detail-generating-title-copy h1{margin:0;color:#171d25;font-size:21px;line-height:30px}.task-detail-generating-title-copy>span{height:21px;padding:0 8px;border:1px solid #ffc989;border-radius:4px;background:#fff7e9;color:var(--color-warning);font-size:10px;line-height:19px}.task-detail-generating-actions{display:flex;gap:9px}.task-detail-generating-actions button{display:flex;height:33px;min-width:101px;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:1px solid #d5dce5;border-radius:4px;background:#fff;color:#344052;font-size:11px}.task-detail-generating-actions button.danger{border-color:#efb7ba;color:var(--color-primary)}.task-detail-generating-metadata{display:grid;height:63px;grid-template-columns:145px 108px 245px 92px 75px 220px minmax(190px,1fr) 95px;margin:0;padding:6px 10px 8px}.task-detail-generating-metadata>div{min-width:0;padding:0 12px;border-right:1px solid #e6e9ef}.task-detail-generating-metadata>div:first-child{padding-left:0}.task-detail-generating-metadata>div:last-child{border-right:0}.task-detail-generating-metadata dt{color:#657083;font-size:9px;line-height:18px}.task-detail-generating-metadata dd{margin:3px 0 0;overflow:hidden;color:#202832;font-size:10px;line-height:18px;text-overflow:ellipsis;white-space:nowrap}.task-detail-generating-progress dd{display:flex;align-items:center;gap:8px}.task-detail-generating-progress dd>span{display:block;width:127px;height:6px;overflow:hidden;border-radius:6px;background:#e2e6eb}.task-detail-generating-progress dd i{display:block;height:100%;border-radius:inherit;background:var(--detail-red)}.task-detail-generating-progress dd strong{color:var(--color-danger);font-size:10px}.task-detail-generating-tabs{display:flex;height:45px;align-items:stretch;overflow:auto;padding:0 2px;border-top:1px solid #eef1f4}.task-detail-generating-tabs button{position:relative;flex:0 0 auto;padding:0 13px;border:0;background:#fff;color:#303946;font-size:12px;white-space:nowrap}.task-detail-generating-tabs button.active{color:var(--detail-red);font-weight:700}.task-detail-generating-tabs button.active::after{position:absolute;right:7px;bottom:3px;left:7px;height:2px;background:var(--detail-red);content:""}.task-detail-generating-workspace{display:grid;grid-template-columns:minmax(0,3.23fr) clamp(300px,23.4%,340px);gap:15px;align-items:start;margin-top:2px}.task-detail-generating-placeholder{display:grid;min-height:540px;place-content:center;justify-items:center;margin-top:10px;border:1px solid var(--detail-line);background:#fff;color:#6e7a8c;text-align:center}.task-detail-generating-placeholder>svg{font-size:38px}.task-detail-generating-placeholder h2{margin:14px 0 5px;color:#29323e;font-size:18px}.task-detail-generating-placeholder p{margin:0 0 14px;font-size:12px}.task-detail-generating-placeholder button{height:32px;padding:0 15px;border:1px solid var(--detail-red);border-radius:4px;background:#fff;color:var(--detail-red)}.task-detail-generating-live{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.task-detail-generating-drawer-layer{position:fixed;z-index:80;inset:0}.task-detail-generating-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:rgb(17 24 39 / 24%)}.task-detail-generating-drawer{position:absolute;top:0;right:0;box-sizing:border-box;width:min(380px,92vw);height:100%;padding:18px;border-left:1px solid #dfe4eb;background:#fff;box-shadow:-8px 0 28px rgb(23 31 43 / 16%)}.task-detail-generating-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--detail-line)}.task-detail-generating-drawer>header small{color:var(--detail-red);font-size:10px}.task-detail-generating-drawer h2{margin:4px 0 0;font-size:18px}.task-detail-generating-drawer>header button{display:grid;width:30px;height:30px;place-items:center;border:1px solid var(--detail-line);border-radius:4px;background:#fff}.task-detail-generating-drawer dl{margin:16px 0}.task-detail-generating-drawer dl>div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;padding:9px 0;border-bottom:1px solid #eef1f4;font-size:11px}.task-detail-generating-drawer dt{color:#6d7888}.task-detail-generating-drawer dd{margin:0;overflow-wrap:anywhere}.task-detail-generating-drawer>p{color:#687587;font-size:11px;line-height:1.7}.task-detail-generating-page button:focus-visible{outline:2px solid var(--detail-blue);outline-offset:2px}
+.task-detail-generating-page{--detail-red:var(--color-primary);--detail-blue:var(--color-info);--detail-line:#e1e6ed;box-sizing:border-box;width:100%;max-width:none;margin:0;color:#252d38}.task-detail-generating-header{box-sizing:border-box;height:152px;border:1px solid var(--detail-line);background:#fff}.task-detail-generating-title-row{display:flex;height:43px;align-items:center;justify-content:space-between;padding:0 10px}.task-detail-generating-title-copy{display:flex;align-items:center;gap:12px}.task-detail-generating-title-copy h1{margin:0;color:#171d25;font-size:21px;line-height:30px}.task-detail-generating-title-copy>span{height:21px;padding:0 8px;border:1px solid #ffc989;border-radius:4px;background:#fff7e9;color:var(--color-warning);font-size:10px;line-height:19px}.task-detail-generating-actions{display:flex;gap:9px}.task-detail-generating-actions button{display:flex;height:33px;min-width:101px;align-items:center;justify-content:center;gap:7px;padding:0 12px;border:1px solid #d5dce5;border-radius:4px;background:#fff;color:#344052;font-size:11px}.task-detail-generating-actions button.danger{border-color:#efb7ba;color:var(--color-primary)}.task-detail-generating-metadata{display:grid;height:63px;grid-template-columns:145px 108px 245px 92px 75px 220px minmax(190px,1fr) 95px;margin:0;padding:6px 10px 8px}.task-detail-generating-metadata>div{min-width:0;padding:0 12px;border-right:1px solid #e6e9ef}.task-detail-generating-metadata>div:first-child{padding-left:0}.task-detail-generating-metadata>div:last-child{border-right:0}.task-detail-generating-metadata dt{color:#657083;font-size:9px;line-height:18px}.task-detail-generating-metadata dd{margin:3px 0 0;overflow:hidden;color:#202832;font-size:10px;line-height:18px;text-overflow:ellipsis;white-space:nowrap}.task-detail-generating-metadata .phase-status{display:inline-block;padding:0 6px;border:1px solid #ffd5a2;border-radius:3px;background:#fff7ea;color:var(--color-warning)}.task-detail-generating-tabs{display:flex;height:45px;align-items:stretch;overflow:auto;padding:0 2px;border-top:1px solid #eef1f4}.task-detail-generating-tabs button{position:relative;flex:0 0 auto;padding:0 13px;border:0;background:#fff;color:#303946;font-size:12px;white-space:nowrap}.task-detail-generating-tabs button.active{color:var(--detail-red);font-weight:700}.task-detail-generating-tabs button.active::after{position:absolute;right:7px;bottom:3px;left:7px;height:2px;background:var(--detail-red);content:""}.task-detail-generating-workspace{display:grid;grid-template-columns:minmax(0,3.23fr) clamp(300px,23.4%,340px);gap:15px;align-items:start;margin-top:2px}.task-detail-generating-panel{min-height:520px;margin-top:10px;padding:16px;border:1px solid var(--detail-line);background:#fff}.task-detail-generating-panel h2{margin:0 0 14px;color:#202832;font-size:16px}.task-detail-generating-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin:0;border:1px solid #e6e9ef}.task-detail-generating-overview>div{padding:12px;border-right:1px solid #e6e9ef;border-bottom:1px solid #e6e9ef}.task-detail-generating-overview dt{color:#657083;font-size:11px}.task-detail-generating-overview dd{margin:6px 0 0;color:#202832;font-size:12px;line-height:1.6}.task-detail-generating-table{width:100%;border-collapse:collapse;table-layout:fixed}.task-detail-generating-table th,.task-detail-generating-table td{height:38px;padding:0 12px;border:1px solid #e6e9ef;overflow:hidden;text-align:left;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.task-detail-generating-table th{background:#f6f8fa;color:#4b5666}.task-detail-generating-table button{padding:0;border:0;background:transparent;color:var(--detail-blue)}.task-detail-generating-panel-title{display:flex;align-items:center;justify-content:space-between}.task-detail-generating-panel-title select{height:30px;border:1px solid #d5dce5;border-radius:4px;background:#fff;color:#303946}.task-detail-generating-timeline{display:grid;gap:8px;margin:0;padding:0;list-style:none}.task-detail-generating-timeline li{padding:12px;border:1px solid #e6e9ef;background:#fff}.task-detail-generating-timeline time,.task-detail-generating-timeline span{color:#687587;font-size:11px}.task-detail-generating-timeline strong{display:block;margin:4px 0;color:#202832;font-size:13px}.task-detail-generating-timeline p{margin:0;color:#4b5666;font-size:12px}.task-detail-generating-placeholder{display:grid;min-height:540px;place-content:center;justify-items:center;margin-top:10px;border:1px solid var(--detail-line);background:#fff;color:#6e7a8c;text-align:center}.task-detail-generating-placeholder>svg{font-size:38px}.task-detail-generating-placeholder h2{margin:14px 0 5px;color:#29323e;font-size:18px}.task-detail-generating-placeholder p{margin:0 0 14px;font-size:12px}.task-detail-generating-placeholder button{height:32px;padding:0 15px;border:1px solid var(--detail-red);border-radius:4px;background:#fff;color:var(--detail-red)}.task-detail-generating-live{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.task-detail-generating-drawer-layer{position:fixed;z-index:80;inset:0}.task-detail-generating-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;background:rgb(17 24 39 / 24%)}.task-detail-generating-drawer{position:absolute;top:0;right:0;box-sizing:border-box;width:min(380px,92vw);height:100%;padding:18px;border-left:1px solid #dfe4eb;background:#fff;box-shadow:-8px 0 28px rgb(23 31 43 / 16%)}.task-detail-generating-drawer>header{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--detail-line)}.task-detail-generating-drawer>header small{color:var(--detail-red);font-size:10px}.task-detail-generating-drawer h2{margin:4px 0 0;font-size:18px}.task-detail-generating-drawer>header button{display:grid;width:30px;height:30px;place-items:center;border:1px solid var(--detail-line);border-radius:4px;background:#fff}.task-detail-generating-drawer dl{margin:16px 0}.task-detail-generating-drawer dl>div{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;padding:9px 0;border-bottom:1px solid #eef1f4;font-size:11px}.task-detail-generating-drawer dt{color:#6d7888}.task-detail-generating-drawer dd{margin:0;overflow-wrap:anywhere}.task-detail-generating-drawer>p{color:#687587;font-size:11px;line-height:1.7}.task-detail-generating-page button:focus-visible{outline:2px solid var(--detail-blue);outline-offset:2px}
 :global(.task-detail-density-compact .topbar){min-height:56px}:global(.task-detail-density-compact .task-detail-generating-header){height:140px}:global(.task-detail-density-compact .task-detail-generating-title-row){height:39px}:global(.task-detail-density-compact .task-detail-generating-metadata){height:58px}:global(.task-detail-density-compact .task-detail-generating-tabs){height:42px}:global(.task-detail-density-compact .task-detail-stage-summary){height:95px}:global(.task-detail-density-compact .task-detail-stage-list){padding-top:16px}:global(.task-detail-density-compact .task-detail-capability-section){height:350px}:global(.task-detail-density-compact .task-detail-capability-grid){grid-auto-rows:105px}:global(.task-detail-density-compact .task-detail-table-section){height:210px;margin-top:9px}:global(.task-detail-density-compact .task-detail-execution-rail){grid-template-rows:430px 55px 183px}:global(.task-detail-density-compact .task-detail-pending-all){height:39px}
 .task-detail-generating-title-row{padding:0 40px 0 7px}
-.task-detail-generating-metadata{grid-template-columns:138px 108px 240px 92px 75px 220px 250px minmax(180px,1fr)}
+.task-detail-generating-metadata{grid-template-columns:138px 108px 240px 92px 75px 220px 160px minmax(180px,1fr)}
 .task-detail-generating-metadata dt{font-size:10px}
 .task-detail-generating-metadata dd{font-size:11px}
 .task-detail-generating-actions button{font-size:12px}

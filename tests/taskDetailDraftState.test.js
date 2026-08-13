@@ -8,8 +8,7 @@ test('草稿详情快照严格对应参考图', () => {
   assert.equal(draftTaskDetail.version, '--');
   assert.deepEqual(draftTaskDetail.materials, []);
   assert.deepEqual(draftTaskDetail.tabs.map(({ label }) => label), [
-    '任务概览', '输入资料', '分析过程', '生成结果', '智能体会话', '报告与附件',
-    '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕'
+    '任务概览', '输入资料', '分析过程', '生成结果', '输出文件', '任务时间线'
   ]);
   assert.deepEqual(draftTaskDetail.capabilities.map(({ name }) => name), ['制度比对', '费用审计', '报告生成']);
   assert.equal(draftTaskDetail.timeline.length, 7);

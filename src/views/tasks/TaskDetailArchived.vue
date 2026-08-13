@@ -30,12 +30,12 @@
         <nav class="archive-tabs" data-archive-region="tabs" aria-label="任务详情页签">
           <button
             v-for="tab in archive.tabs"
-            :key="tab.label"
+            :key="tab.id"
             class="archive-tab"
-            :class="{ active: tab.active }"
+            :class="{ active: activeTab === tab.id }"
             type="button"
-            :aria-current="tab.active ? 'page' : undefined"
-            @click="performAction(`查看${tab.label}`)"
+            :aria-current="activeTab === tab.id ? 'page' : undefined"
+            @click="activeTab = tab.id"
           >
             {{ tab.label }}
           </button>
@@ -46,7 +46,7 @@
           <span>该任务已归档，所有结果不可修改，可查看、下载和复制任务。</span>
         </div>
 
-        <TaskArchiveMain :archive="archive" @archive-action="performAction" />
+        <TaskArchiveMain :archive="archive" :active-tab="activeTab" @archive-action="performAction" />
       </div>
 
       <TaskArchiveSidebar
@@ -71,6 +71,7 @@ import TaskArchiveSidebar from './TaskArchiveSidebar.vue';
 
 const feedback = ref('');
 const sidebarOpen = ref(true);
+const activeTab = ref('timeline');
 
 function performAction(label) {
   if (!isArchivedReadAction(label)) return;

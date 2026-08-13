@@ -18,7 +18,8 @@ test('任务详情编排生成中驾驶舱而非旧通用台账', () => {
   assert.match(source, /TaskExecutionLogRail/);
   assert.match(source, /data-detail-region="task-header"/);
   assert.match(source, /snapshot\.task\.status/);
-  assert.match(source, /snapshot\.task\.progress/);
+  assert.match(source, /snapshot\.task\.phaseStatus/);
+  assert.doesNotMatch(source, /snapshot\.task\.progress|任务总进度|role="progressbar"/);
   assert.match(source, /snapshot\.task\.version/);
 });
 

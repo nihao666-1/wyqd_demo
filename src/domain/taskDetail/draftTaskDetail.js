@@ -13,9 +13,7 @@ export const draftTaskDetail = Object.freeze({
   materials: Object.freeze([]),
   tabs: Object.freeze([
     ['overview', '任务概览'], ['materials', '输入资料'], ['analysis', '分析过程'],
-    ['results', '生成结果'], ['agent', '智能体会话'], ['reports', '报告与附件'],
-    ['changes', '修改记录'], ['reviews', '复核记录'], ['versions', '版本记录'],
-    ['exports', '导出记录'], ['logs', '操作留痕']
+    ['results', '生成结果'], ['outputs', '输出文件'], ['timeline', '任务时间线']
   ].map(([id, label]) => Object.freeze({ id, label }))),
   requiredMaterials: Object.freeze([
     { name: '财务报表（2025Q1）', status: '未上传' },

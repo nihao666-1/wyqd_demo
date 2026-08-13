@@ -28,8 +28,12 @@ test('归档快照包含参考图要求的全部成果和全过程记录', () =>
   assert.equal(archivedTaskDetail.exports.length, 6);
   assert.equal(archivedTaskDetail.reviews.length, 1);
   assert.equal(archivedTaskDetail.timeline.length, 8);
-  assert.equal(archivedTaskDetail.tabs.length, 11);
-  assert.equal(archivedTaskDetail.tabs.find((tab) => tab.active)?.label, '版本记录');
+  assert.equal(archivedTaskDetail.operationRecords.length, 16);
+  assert.deepEqual(archivedTaskDetail.recordTabs.map((tab) => tab.label), ['全部', '修改', '复核', '导出']);
+  assert.deepEqual(archivedTaskDetail.tabs.map((tab) => tab.label), [
+    '任务概览', '输入资料', '分析过程', '生成结果', '输出文件', '任务时间线', '导出记录'
+  ]);
+  assert.equal(archivedTaskDetail.tabs.find((tab) => tab.active)?.label, '任务时间线');
 });
 
 test('归档摘要在头部表格时间线和侧栏中保持一致', () => {

@@ -1,22 +1,61 @@
 <template>
   <main class="archive-main-frame">
-    <section class="outcome-grid" data-archive-region="outcomes" aria-label="最终归档成果">
-      <article v-for="outcome in archive.outcomes" :key="outcome.title" class="outcome-card">
-        <span class="outcome-icon" :class="`tone-${outcome.tone}`">
-          <FontAwesomeIcon :icon="outcomeIcons[outcome.icon]" />
-        </span>
-        <div>
-          <h2>{{ outcome.title }}</h2>
-          <p><strong>{{ outcome.count }}</strong><span>{{ outcome.unit }}</span></p>
-          <small>{{ outcome.format }}</small>
+    <section v-if="activeTab === 'overview'" class="archive-overview-panel">
+      <h2>任务概览</h2>
+      <dl class="archive-overview-grid">
+        <div v-for="item in archive.metadata" :key="item.label">
+          <dt>{{ item.label }}</dt>
+          <dd>{{ item.value }}</dd>
         </div>
-      </article>
+      </dl>
     </section>
 
-    <TaskArchiveRecords :archive="archive" @archive-action="$emit('archive-action', $event)" />
-    <TaskArchiveReviewTrail :archive="archive" />
+    <section v-else-if="activeTab === 'materials'" class="archive-simple-panel">
+      <h2>输入资料</h2>
+      <table class="archive-simple-table">
+        <thead><tr><th>文件名称</th><th>类型</th><th>状态</th><th>负责人</th><th>更新时间</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr v-for="item in archive.materials" :key="item.name">
+            <td>{{ item.name }}</td><td>{{ item.type }}</td><td>{{ item.status }}</td><td>{{ item.owner }}</td><td>{{ item.time }}</td>
+            <td><button type="button" @click="$emit('archive-action', `查看${item.name}`)">查看</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-    <section class="relation-section" data-archive-region="relations">
+    <section v-else-if="activeTab === 'analysis'" class="archive-simple-panel">
+      <h2>分析过程</h2>
+      <table class="archive-simple-table">
+        <thead><tr><th>阶段</th><th>状态</th><th>处理人</th><th>时间</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr v-for="item in archive.analysis" :key="item.phase">
+            <td>{{ item.phase }}</td><td>{{ item.status }}</td><td>{{ item.owner }}</td><td>{{ item.time }}</td><td>{{ item.note }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <template v-else-if="activeTab === 'results' || activeTab === 'outputs'">
+      <section class="outcome-grid" data-archive-region="outcomes" aria-label="最终归档成果">
+        <article v-for="outcome in archive.outcomes" :key="outcome.title" class="outcome-card">
+          <span class="outcome-icon" :class="`tone-${outcome.tone}`">
+            <FontAwesomeIcon :icon="outcomeIcons[outcome.icon]" />
+          </span>
+          <div>
+            <h2>{{ outcome.title }}</h2>
+            <p><strong>{{ outcome.count }}</strong><span>{{ outcome.unit }}</span></p>
+            <small>{{ outcome.format }}</small>
+          </div>
+        </article>
+      </section>
+      <TaskArchiveRecords v-if="activeTab === 'outputs'" :archive="archive" export-only @archive-action="$emit('archive-action', $event)" />
+    </template>
+
+    <TaskArchiveRecords v-else-if="activeTab === 'timeline'" :archive="archive" @archive-action="$emit('archive-action', $event)" />
+    <TaskArchiveRecords v-else-if="activeTab === 'export-records'" :archive="archive" export-only @archive-action="$emit('archive-action', $event)" />
+    <TaskArchiveReviewTrail v-if="activeTab === 'timeline'" :archive="archive" />
+
+    <section v-if="activeTab === 'overview'" class="relation-section" data-archive-region="relations">
       <h2>关联任务与引用</h2>
       <div class="relation-grid">
         <article v-for="relation in archive.relations" :key="relation.title" class="relation-card">
@@ -40,7 +79,10 @@ import {
 import TaskArchiveRecords from './TaskArchiveRecords.vue';
 import TaskArchiveReviewTrail from './TaskArchiveReviewTrail.vue';
 
-defineProps({ archive: { type: Object, required: true } });
+defineProps({
+  archive: { type: Object, required: true },
+  activeTab: { type: String, default: 'timeline' },
+});
 defineEmits(['archive-action']);
 
 const outcomeIcons = {
@@ -55,6 +97,16 @@ const outcomeIcons = {
 
 <style scoped>
 .archive-main-frame { height: 690px; margin: 8px 4px 0 2px; padding: 6px 10px 8px 7px; border: 1px solid #e5e8ec; border-radius: 4px; background: #fff; overflow: hidden; }
+.archive-overview-panel,.archive-simple-panel { min-height: 460px; padding: 12px; border: 1px solid #e5e8ec; background: #fff; }
+.archive-overview-panel h2,.archive-simple-panel h2 { margin: 0 0 12px; font-size: 15px; }
+.archive-overview-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); margin: 0; border: 1px solid #e5e8ec; }
+.archive-overview-grid div { min-width: 0; padding: 12px; border-right: 1px solid #e5e8ec; border-bottom: 1px solid #e5e8ec; }
+.archive-overview-grid dt { color: #667085; font-size: 11px; }
+.archive-overview-grid dd { margin: 6px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.archive-simple-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+.archive-simple-table th,.archive-simple-table td { height: 38px; padding: 0 10px; border: 1px solid #d8dee8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+.archive-simple-table th { background: #f6f8fb; }
+.archive-simple-table button { border: 0; background: transparent; color: #b4000a; font-weight: 700; }
 .outcome-grid { height: 84px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid #e5e8ec; border-radius: 4px; overflow: hidden; }
 .outcome-card { min-width: 0; padding: 8px 10px; border-right: 1px solid #e5e8ec; display: flex; align-items: flex-start; gap: 10px; }
 .outcome-card:last-child { border-right: 0; }

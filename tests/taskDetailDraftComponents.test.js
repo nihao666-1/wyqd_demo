@@ -62,7 +62,7 @@ test('草稿右栏包含资料输出阻断和当前任务日志', () => {
   compileComponent('TaskDetailDraftRail.vue');
 });
 
-test('草稿页包含任务头、11标签、75比25双栏和删除确认', () => {
+test('草稿页包含任务头、6标签、75比25双栏和删除确认', () => {
   const content = source('TaskDetailDraft.vue');
   const dataContent = draftTaskDataSource();
 
@@ -74,8 +74,11 @@ test('草稿页包含任务头、11标签、75比25双栏和删除确认', () =>
   }
   assert.equal((content.match(/data-task-meta/g) || []).length, 7);
 
-  for (const label of ['任务概览', '输入资料', '分析过程', '生成结果', '智能体会话', '报告与附件', '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕']) {
+  for (const label of ['任务概览', '输入资料', '分析过程', '生成结果', '输出文件', '任务时间线']) {
     assert.match(dataContent, new RegExp(label));
+  }
+  for (const label of ['智能体会话', '报告与附件', '修改记录', '复核记录', '版本记录', '导出记录', '操作留痕']) {
+    assert.doesNotMatch(dataContent, new RegExp(`'${label}'`));
   }
   assert.match(content, /role="tablist"/);
   assert.match(content, /role="tab"/);
